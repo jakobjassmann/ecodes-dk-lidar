@@ -7,8 +7,8 @@ SETLOCAL EnableDelayedExpansion
 
 
 REM Copy files from server:
-REM robocopy /MIR O:\ST_Ecoinformatics\B_Read\Denmark\Elevation\GST_2014\Punktsky\laz ..\data\laz\
-REM robocopy /MIR O:\ST_Ecoinformatics\B_Read\Denmark\Elevation\GST_2014\DTM_tif ..\data\dtm\
+robocopy /MIR O:\ST_Ecoinformatics\B_Read\Denmark\Elevation\GST_2014\Punktsky\laz ..\data\laz\
+robocopy /MIR O:\ST_Ecoinformatics\B_Read\Denmark\Elevation\GST_2014\DTM_tif ..\data\dtm\
 
 REM Create MD5 checksums for pointcloud files
 for %%f in (..\data\laz\*.laz) do (
