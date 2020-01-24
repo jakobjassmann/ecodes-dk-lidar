@@ -3,6 +3,7 @@
 
 # Imports
 import glob
+import time
 import sys
 import re
 import os
@@ -55,7 +56,7 @@ def dtm_generate_footprint(tile_id):
     """
     Generates a footprint file using gdal
     :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
-    :return nothing.
+    :return stdout and stderr command line output of gdal command execution.
     """
     print(tile_id + ' '),
     cmd = gdaltlindex_bin + \
@@ -69,7 +70,7 @@ def dtm_mosaic_neighbours(tile_id):
     """
     Generates a tif mosaic with all existing 8 neighbouring cells
     :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
-    :return: nothing.
+    :return: stdout and stderr command line output of gdal command execution.
     """
     # Retrieve row and col numbers for the current tile_id
     tile_id_rowcol = tile_ids[tile_id]
@@ -115,9 +116,20 @@ def dtm_calculate_slope(tile_id):
     """
     Calculates the slope parameter for a DTM neighbourhood mosaic and crops to original tile_size
     :param tile_id: tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
-    :return: nothing.
+    :return: stdout and stderr command line output of gdal command execution.
     """
     print(tile_id + ' '),
+
+    # Check whether DTM mosaic exists
+    if not os.path.exists(wd + '/' + dtm_mosaics_folder + '/DTM_' + tile_id + '_mosaic.tif '):
+        print('\n' + tile_id + ' Warning: DTM mosaic does not exist!\n')
+        return '\n' + tile_id + ' Warning: DTM mosaic does not exist!'
+
+    # Check whether slope has already been calculated
+    #if os.path.exists(wd + '/' + output_folder + '/dtm_slope/slope_' + tile_id + '.tif '):
+    #    print('\n' + tile_id + ' slope has already been calculated. Skipping tile...\n')
+    #    return '\n' + tile_id + ' slope has already been calculated. Skipping tile...'
+
     # Calculate slope parameter
     cmd = gdaldem_bin + ' slope ' + \
           wd + '/' + dtm_mosaics_folder + '/DTM_' + tile_id + '_mosaic.tif ' + \
@@ -183,17 +195,19 @@ if __name__ == '__main__':
 
     # Generate footprints for all files
     print('\nGenerating tile footprints: ...')
-    output = pool.map(dtm_generate_footprint, tile_ids.keys())
-    log_file.write(' '.join(output))
+    #output = pool.map(dtm_generate_footprint, tile_ids.keys())
+    #log_file.write(' '.join(output))
 
     ## Generate neighbourhood mosaics for all files
     print('\nGenerating neighbourhood mosaics: ...')
-    output = pool.map(dtm_mosaic_neighbours, tile_ids.keys())
-    log_file.write(' '.join(output))
+    #output = pool.map(dtm_mosaic_neighbours, tile_ids.keys())
+    #log_file.write(' '.join(output))
 
     ## Generate calculate slopes for all files
     print('\nGenerating slopes: ...')
-    output = pool.map(dtm_calculate_slope, tile_ids.keys())
+    output = pool.map(dtm_calculate_slope, tile_ids.keys()[0:106])
+
+    # Pause for 10 seconds to allow for pool to finish up processing
     log_file.write(' '.join(output))
 
     # Tidy up environment
