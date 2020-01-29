@@ -19,6 +19,7 @@ This project has been developed with OPALS 2.3.2.0, Python 2.7 (as distributed w
 
 ## Contributors
 Repository maintanance and code development: Jakob Assmann (j.assmann@bios.au.dk)
+
 PI leading the research for this project: Signe Normand (signe.normand@bios.au.dk)
 
 Process design and selection of output variables: Urs Treier, Andràs Zlinszky and Jesper Moeslund.
