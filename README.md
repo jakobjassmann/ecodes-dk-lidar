@@ -5,7 +5,7 @@ Raster outputs for ecological and environmental variables derived from DK nation
 __*NOTE: This repository is currently under development.*__
 
 ## General notes
-This project has been developed with OPALS 2.3.2.0, Python 2.7 (as distributed with OPALS) and GDAL 2.2.4 (from OSgeo4W64) on Windows 2012 Server. 
+This project has been developed with OPALS 2.3.2.0, Python 2.7 (as distributed with OPALS) and GDAL 2.2.4 (from OSgeo4W64) executed on Windows 2012 Server. 
 
 ## Repository Structure
 ```
@@ -16,6 +16,10 @@ This project has been developed with OPALS 2.3.2.0, Python 2.7 (as distributed w
 |- scratch/       empty, place-holder for temporary data handling.
 |- scripts/       contains all Batch and Python scritps for carrying out the processsing.
 ```
+## Getting Started
+1. Set up your local environment and download data following the instructions in  */scritps/readme.md* .
+2. Basic processing for each tile is done with the */scripts/process_tile.py* script.
+3. See */dk_lidar/readme.md* for an introduction to the modules and functions of the *dk_lidar* Python package.
 
 ## Contributors
 Repository maintanance and code development: Jakob Assmann (j.assmann@bios.au.dk)
