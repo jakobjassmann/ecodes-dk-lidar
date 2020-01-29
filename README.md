@@ -1,7 +1,7 @@
 # dk_nationwide_lidar
 Raster outputs for ecological and environmental variables derived from DK nationwide LiDAR data "Punktsky"
 
-__*This repository is currently under development*__
+__*NOTE: This repository is currently under development.*__
 
 ## General notes
 The processing was carried out with OPALS, Python 2.7 (as distributed with OPALS), GDAL 2.2.4 (from OSgeo4W64) on Windows 10. 
