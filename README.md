@@ -5,7 +5,7 @@ Raster outputs for ecological and environmental variables derived from DK nation
 __*NOTE: This repository is currently under development.*__
 
 ## General notes
-The processing was carried out with OPALS, Python 2.7 (as distributed with OPALS), GDAL 2.2.4 (from OSgeo4W64) on Windows 10. 
+The processing was carried out with OPALS 2.3.2.0, Python 2.7 (as distributed with OPALS), GDAL 2.2.4 (from OSgeo4W64) on Windows 10. 
 
 ## Repository Structure
 ```
