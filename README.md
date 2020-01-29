@@ -1,5 +1,5 @@
 # dk_nationwide_lidar
-Raster outputs for ecological and environmental variables derived from DK nationwide LiDAR data "Punktsky"
+Raster outputs for ecological and environmental variables derived from DK nationwide LiDAR data "Punktsky".
 
 ---
 __*NOTE: This repository is currently under development.*__
