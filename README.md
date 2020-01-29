@@ -17,9 +17,9 @@ This project has been developed with OPALS 2.3.2.0, Python 2.7 (as distributed w
 |- scripts/       contains all Batch and Python scritps for carrying out the processsing.
 ```
 ## Getting Started
-* Set up your local environment and download data following the instructions in  */scritps/readme.md*.
-* Basic processing for each tile is done with the */scripts/process_tile.py* script.
-* See */dk_lidar/readme.md* for an introduction to the modules and functions of the *dk_lidar* Python package.
+1. Set up your local environment and download data following the instructions in  */scritps/readme.md* .
+2. Basic processing for each tile is done with the */scripts/process_tile.py* script.
+3. See */dk_lidar/readme.md* for an introduction to the modules and functions of the *dk_lidar* Python package.
 
 ## Contributors
 Repository maintanance and code development: Jakob Assmann (j.assmann@bios.au.dk)
