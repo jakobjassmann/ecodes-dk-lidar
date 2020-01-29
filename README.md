@@ -11,11 +11,18 @@ The processing was carried out with OPALS, Python 2.7 (as distributed with OPALS
 ```
 /                 root folder
 |- data/          empty, place-holder for the data (needs to be imported from external sources).
-|- dk_lidar/      contains the python package for data processing.
+|- dk_lidar/      contains the python package with modules for processing.
 |- log/           empty, place-holder for log file storage.
 |- scratch/       empty, place-holder for temporary data handling.
-|- scripts/       contains all bash and python scritps using the dk_lidar package for processsing.
+|- scripts/       contains all bash and python scritps for carrying out the processsing.
 ```
 
-## 
+## Contributors
+Repository maintanance and code development: Jakob Assmann (j.assmann@bios.au.dk)
+PI leading the research for this project: Signe Normand (signe.normand@bios.au.dk)
+
+Process design and selection of output variables: Urs Treier, Andràs Zlinszky and Jesper Moeslund.
+
+## License
+Content in this repository is currently not avialalbe under any license. Please speak to Jakob (j.assmann@bios.au.dk) if you would like to share or re-use any of the code in this repostiory. 
 
