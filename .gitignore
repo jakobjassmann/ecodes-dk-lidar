@@ -1,1 +1,13 @@
-data/
+data/auxillaryfiles
+data/dtm
+data/dtm_footprints
+data/dtm_mosaics
+data/laz
+data/odm
+data/odm_mosaics
+data/outputs
+data/sample
+data/damaged_filse.txt
+.idea/
+.spyproject/
+auxillary_files

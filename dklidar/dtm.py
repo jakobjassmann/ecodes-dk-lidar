@@ -1,3 +1,6 @@
+### Functions for DTM raster file handling for DK Lidar project
+### Jakob Assmann j.assmann@bios.au.dk 29 January 2019
+
 import os
 import subprocess
 import multiprocessing
