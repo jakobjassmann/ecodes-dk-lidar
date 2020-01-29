@@ -1,0 +1,175 @@
+
+6213_575 footprint generation... 
+D:\Jakob\dk_nationwide_lidar
+File D:/Jakob/dk_nationwide_lidar/data/sample/dtm/DTM_1km_6213_575.tif is already in tileindex. Skipping it.
+ 
+6215_576 footprint generation... 
+D:\Jakob\dk_nationwide_lidar
+File D:/Jakob/dk_nationwide_lidar/data/sample/dtm/DTM_1km_6215_576.tif is already in tileindex. Skipping it.
+ 
+6213_577 footprint generation... 
+D:\Jakob\dk_nationwide_lidar
+File D:/Jakob/dk_nationwide_lidar/data/sample/dtm/DTM_1km_6213_577.tif is already in tileindex. Skipping it.
+ 
+6213_576 footprint generation... 
+D:\Jakob\dk_nationwide_lidar
+File D:/Jakob/dk_nationwide_lidar/data/sample/dtm/DTM_1km_6213_576.tif is already in tileindex. Skipping it.
+ 
+6215_577 footprint generation... 
+D:\Jakob\dk_nationwide_lidar
+File D:/Jakob/dk_nationwide_lidar/data/sample/dtm/DTM_1km_6215_577.tif is already in tileindex. Skipping it.
+ 
+6214_576 footprint generation... 
+D:\Jakob\dk_nationwide_lidar
+File D:/Jakob/dk_nationwide_lidar/data/sample/dtm/DTM_1km_6214_576.tif is already in tileindex. Skipping it.
+ 
+6214_577 footprint generation... 
+D:\Jakob\dk_nationwide_lidar
+File D:/Jakob/dk_nationwide_lidar/data/sample/dtm/DTM_1km_6214_577.tif is already in tileindex. Skipping it.
+ 
+6215_575 footprint generation... 
+D:\Jakob\dk_nationwide_lidar
+File D:/Jakob/dk_nationwide_lidar/data/sample/dtm/DTM_1km_6215_575.tif is already in tileindex. Skipping it.
+ 
+6214_575 footprint generation... 
+D:\Jakob\dk_nationwide_lidar
+File D:/Jakob/dk_nationwide_lidar/data/sample/dtm/DTM_1km_6214_575.tif is already in tileindex. Skipping it.
+
+6213_575 mosaicing... 
+Warning! Number of neighbours = 4. Incomplete. Edge effects possible!
+D:\Jakob\dk_nationwide_lidar
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+ 
+6215_576 mosaicing... 
+Warning! Number of neighbours = 6. Incomplete. Edge effects possible!
+D:\Jakob\dk_nationwide_lidar
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+ 
+6213_577 mosaicing... 
+Warning! Number of neighbours = 4. Incomplete. Edge effects possible!
+D:\Jakob\dk_nationwide_lidar
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+ 
+6213_576 mosaicing... 
+Warning! Number of neighbours = 6. Incomplete. Edge effects possible!
+D:\Jakob\dk_nationwide_lidar
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+ 
+6215_577 mosaicing... 
+Warning! Number of neighbours = 4. Incomplete. Edge effects possible!
+D:\Jakob\dk_nationwide_lidar
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+ 
+6214_576 mosaicing... 
+Number of neighbours = 9. Complete!
+D:\Jakob\dk_nationwide_lidar
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+ 
+6214_577 mosaicing... 
+Warning! Number of neighbours = 6. Incomplete. Edge effects possible!
+D:\Jakob\dk_nationwide_lidar
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+ 
+6215_575 mosaicing... 
+Warning! Number of neighbours = 4. Incomplete. Edge effects possible!
+D:\Jakob\dk_nationwide_lidar
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+ 
+6214_575 mosaicing... 
+Warning! Number of neighbours = 6. Incomplete. Edge effects possible!
+D:\Jakob\dk_nationwide_lidar
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+
+6213_575 slope calculation... 
+ D:\Jakob\dk_nationwide_lidar
+0...10...20...30...40...50...60...70...80...90...100 - done.
+D:\Jakob\dk_nationwide_lidar
+0...10...20...30...40...50...60...70...80...90...100 - done.
+ 
+6215_576 slope calculation... 
+ D:\Jakob\dk_nationwide_lidar
+0...10...20...30...40...50...60...70...80...90...100 - done.
+D:\Jakob\dk_nationwide_lidar
+0...10...20...30...40...50...60...70...80...90...100 - done.
+ 
+6213_577 slope calculation... 
+ D:\Jakob\dk_nationwide_lidar
+0...10...20...30...40...50...60...70...80...90...100 - done.
+D:\Jakob\dk_nationwide_lidar
+0...10...20...30...40...50...60...70...80...90...100 - done.
+ 
+6213_576 slope calculation... 
+ D:\Jakob\dk_nationwide_lidar
+0...10...20...30...40...50...60...70...80...90...100 - done.
+D:\Jakob\dk_nationwide_lidar
+0...10...20...30...40...50...60...70...80...90...100 - done.
+ 
+6215_577 slope calculation... 
+ D:\Jakob\dk_nationwide_lidar
+0...10...20...30...40...50...60...70...80...90...100 - done.
+D:\Jakob\dk_nationwide_lidar
+0...10...20...30...40...50...60...70...80...90...100 - done.
+ 
+6214_576 slope calculation... 
+ D:\Jakob\dk_nationwide_lidar
+0...10...20...30...40...50...60...70...80...90...100 - done.
+D:\Jakob\dk_nationwide_lidar
+0...10...20...30...40...50...60...70...80...90...100 - done.
+ 
+6214_577 slope calculation... 
+ D:\Jakob\dk_nationwide_lidar
+0...10...20...30...40...50...60...70...80...90...100 - done.
+D:\Jakob\dk_nationwide_lidar
+0...10...20...30...40...50...60...70...80...90...100 - done.
+ 
+6215_575 slope calculation... 
+ D:\Jakob\dk_nationwide_lidar
+0...10...20...30...40...50...60...70...80...90...100 - done.
+D:\Jakob\dk_nationwide_lidar
+0...10...20...30...40...50...60...70...80...90...100 - done.
+ 
+6214_575 slope calculation... 
+ D:\Jakob\dk_nationwide_lidar
+0...10...20...30...40...50...60...70...80...90...100 - done.
+D:\Jakob\dk_nationwide_lidar
+0...10...20...30...40...50...60...70...80...90...100 - done.

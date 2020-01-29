@@ -1,0 +1,262 @@
+
+
+!!! SOF Log for pid 1:
+
+6210_571 footprint generation... 
+D:\Jakob\dk_nationwide_lidar\scratch\temp_1
+Creating new index file...
+
+6210_571 successful.
+
+6210_571 mosaicing...
+Warning! Number of neighbours = 6. Incomplete. Edge effects possible!
+D:\Jakob\dk_nationwide_lidar\scratch\temp_1
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+6210_571 successful.
+
+
+6210_571 slope calculation... 
+ D:\Jakob\dk_nationwide_lidar\scratch\temp_1
+0...10...20...30...40...50...60...70...80...90...100 - done.
+D:\Jakob\dk_nationwide_lidar\scratch\temp_1
+0...10...20...30...40...50...60...70...80...90...100 - done.
+6210_571 successful.
+
+
+
+!!! EOF Log for pid 1.
+
+
+!!! SOF Log for pid 2:
+
+6210_572 footprint generation... 
+D:\Jakob\dk_nationwide_lidar\scratch\temp_2
+Creating new index file...
+
+6210_572 successful.
+
+6210_572 mosaicing...
+Warning! Number of neighbours = 6. Incomplete. Edge effects possible!
+D:\Jakob\dk_nationwide_lidar\scratch\temp_2
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+6210_572 successful.
+
+
+6210_572 slope calculation... 
+ D:\Jakob\dk_nationwide_lidar\scratch\temp_2
+0...10...20...30...40...50...60...70...80...90...100 - done.
+D:\Jakob\dk_nationwide_lidar\scratch\temp_2
+0...10...20...30...40...50...60...70...80...90...100 - done.
+6210_572 successful.
+
+
+
+!!! EOF Log for pid 2.
+
+
+!!! SOF Log for pid 3:
+
+6210_573 footprint generation... 
+D:\Jakob\dk_nationwide_lidar\scratch\temp_3
+Creating new index file...
+
+6210_573 successful.
+
+6210_573 mosaicing...
+Warning! Number of neighbours = 6. Incomplete. Edge effects possible!
+D:\Jakob\dk_nationwide_lidar\scratch\temp_3
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+6210_573 successful.
+
+
+6210_573 slope calculation... 
+ D:\Jakob\dk_nationwide_lidar\scratch\temp_3
+0...10...20...30...40...50...60...70...80...90...100 - done.
+D:\Jakob\dk_nationwide_lidar\scratch\temp_3
+0...10...20...30...40...50...60...70...80...90...100 - done.
+6210_573 successful.
+
+
+
+!!! EOF Log for pid 3.
+
+
+!!! SOF Log for pid 4:
+
+6210_574 footprint generation... 
+D:\Jakob\dk_nationwide_lidar\scratch\temp_4
+Creating new index file...
+
+6210_574 successful.
+
+6210_574 mosaicing...
+Warning! Number of neighbours = 6. Incomplete. Edge effects possible!
+D:\Jakob\dk_nationwide_lidar\scratch\temp_4
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+6210_574 successful.
+
+
+6210_574 slope calculation... 
+ D:\Jakob\dk_nationwide_lidar\scratch\temp_4
+0...10...20...30...40...50...60...70...80...90...100 - done.
+D:\Jakob\dk_nationwide_lidar\scratch\temp_4
+0...10...20...30...40...50...60...70...80...90...100 - done.
+6210_574 successful.
+
+
+
+!!! EOF Log for pid 4.
+
+
+!!! SOF Log for pid 5:
+
+6210_575 footprint generation... 
+D:\Jakob\dk_nationwide_lidar\scratch\temp_5
+Creating new index file...
+
+6210_575 successful.
+
+6210_575 mosaicing...
+Warning! Number of neighbours = 6. Incomplete. Edge effects possible!
+D:\Jakob\dk_nationwide_lidar\scratch\temp_5
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+6210_575 successful.
+
+
+6210_575 slope calculation... 
+ D:\Jakob\dk_nationwide_lidar\scratch\temp_5
+0...10...20...30...40...50...60...70...80...90...100 - done.
+D:\Jakob\dk_nationwide_lidar\scratch\temp_5
+0...10...20...30...40...50...60...70...80...90...100 - done.
+6210_575 successful.
+
+
+
+!!! EOF Log for pid 5.
+
+
+!!! SOF Log for pid 6:
+
+6210_576 footprint generation... 
+D:\Jakob\dk_nationwide_lidar\scratch\temp_6
+Creating new index file...
+
+6210_576 successful.
+
+6210_576 mosaicing...
+Warning! Number of neighbours = 6. Incomplete. Edge effects possible!
+D:\Jakob\dk_nationwide_lidar\scratch\temp_6
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+6210_576 successful.
+
+
+6210_576 slope calculation... 
+ D:\Jakob\dk_nationwide_lidar\scratch\temp_6
+0...10...20...30...40...50...60...70...80...90...100 - done.
+D:\Jakob\dk_nationwide_lidar\scratch\temp_6
+0...10...20...30...40...50...60...70...80...90...100 - done.
+6210_576 successful.
+
+
+
+!!! EOF Log for pid 6.
+
+
+!!! SOF Log for pid 7:
+
+6210_577 footprint generation... 
+D:\Jakob\dk_nationwide_lidar\scratch\temp_7
+Creating new index file...
+
+6210_577 successful.
+
+6210_577 mosaicing...
+Warning! Number of neighbours = 6. Incomplete. Edge effects possible!
+D:\Jakob\dk_nationwide_lidar\scratch\temp_7
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+6210_577 successful.
+
+
+6210_577 slope calculation... 
+ D:\Jakob\dk_nationwide_lidar\scratch\temp_7
+0...10...20...30...40...50...60...70...80...90...100 - done.
+D:\Jakob\dk_nationwide_lidar\scratch\temp_7
+0...10...20...30...40...50...60...70...80...90...100 - done.
+6210_577 successful.
+
+
+
+!!! EOF Log for pid 7.
+
+
+!!! SOF Log for pid 8:
+
+6210_578 footprint generation... 
+D:\Jakob\dk_nationwide_lidar\scratch\temp_8
+Creating new index file...
+
+6210_578 successful.
+
+6210_578 mosaicing...
+Warning! Number of neighbours = 6. Incomplete. Edge effects possible!
+D:\Jakob\dk_nationwide_lidar\scratch\temp_8
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+0...10...20...30...40...50...60...70...80...90...100 - done.
+6210_578 successful.
+
+
+6210_578 slope calculation... 
+ D:\Jakob\dk_nationwide_lidar\scratch\temp_8
+0...10...20...30...40...50...60...70...80...90...100 - done.
+D:\Jakob\dk_nationwide_lidar\scratch\temp_8
+0...10...20...30...40...50...60...70...80...90...100 - done.
+6210_578 successful.
+
+
+
+!!! EOF Log for pid 8.
+
+
+!!! SOF Log for pid 9:
+File does not exists.
+
+!!! EOF Log for pid 9.
