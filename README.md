@@ -25,5 +25,5 @@ PI leading the research for this project: Signe Normand (signe.normand@bios.au.d
 Process design and selection of output variables: Urs Treier, Andràs Zlinszky and Jesper Moeslund.
 
 ## License
-Content in this repository is currently not avialalbe under any license. Please speak to Jakob (j.assmann@bios.au.dk) if you would like to share or re-use any of the code in this repostiory. 
+Content in this repository is currently not avialalbe under any license. Please contact Jakob (j.assmann@bios.au.dk) if you would like to share or re-use any of the code in this repostiory. 
 
