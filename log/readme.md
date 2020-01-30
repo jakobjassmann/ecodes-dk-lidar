@@ -13,5 +13,5 @@ Upon initiating the processing log files will be stored here in the following fo
     |               |         |- status.txt               file with status summary (processing steps & their exit status)
     |               |           
     |               |- overall_progress.csv               overall progress summary (which tiles, steps & their exit status)                 
-    |- ...                                                 other log files
+    |- ...                                                other log files
 ´´´
