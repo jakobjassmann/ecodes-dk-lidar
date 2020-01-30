@@ -13,6 +13,7 @@ import datetime
 import time
 import multiprocessing
 import opals
+import pandas
 
 #### Prepare the environment
 
@@ -84,9 +85,14 @@ if __name__ == '__main__':
     ## Start timer
     startTime = datetime.datetime.now()
 
-    # open log file
-    global_log_file = open(settings.log_folder + '/process_tiles_'+ startTime.strftime('%Y%m%d-%H-%M-%S') + '.log', 'a+')
+    ## Status output to console
+    print('\n' + '-' * 80 + 'Starting process_tiles.py at ' + str(startTime) + '\n')
 
+    ## Prepare process managment and logging
+    # Specify list of processing steps to be carried out
+    step_list = ['create_tile_moasic']
+    progress_df = common.init_log_folder('process_tiles', laz_tile_ids, step_list)
+    tiles_to_process = set(progress_df['tile_id'].toList())
     # Set up processing pool
     multiprocessing.set_executable(settings.python_exec_path)
     n_processes = 10
@@ -96,14 +102,7 @@ if __name__ == '__main__':
     print('Processing tiles: ...')
     tile_processing = pool.map_async(process_tile, laz_tile_ids[0:2])
     # Make sure all processes finish before carrying on.
-    tile_processing.wait()
-
-    # Gather log file from workers:
-    common.gather_logs(n_processes, global_log_file)
-
-    # Tidy up environment
-    global_log_file.close()
-    pool.close()
+    #tile_processing.wait()
 
     # Print out time elapsed:
     print('\nTime elapsed: ' + str(datetime.datetime.now() - startTime))
