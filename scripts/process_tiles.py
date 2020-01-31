@@ -65,11 +65,24 @@ def process_tile(tile_id):
         os.mkdir(temp_wd)
     os.chdir(temp_wd)
 
+    # Create folder for logging
+    tile_log_folder = settings.log_folder + '/process_tiles/' + tile_id
+    if not os.path.exists(tile_log_folder):
+        os.mkdir(tile_log_folder)
+
     # Load all (available) OPALS modules
-    opals.loadAllModules()
+    #opals.loadAllModules()
 
     # Create tile neighbourhood mosaic
-    points.create_tile_mosaic(tile_id)
+    # points.create_tile_mosaic(tile_id)
+
+    # Write status update into status.csv file
+    colnames = ['tile_id', 'processing']
+    columns = [[tile_id], ['completed']]
+    # Zip into pandas data frame
+    status_df = pandas.DataFrame(zip(*columns), columns=colnames)
+    # Export as CSV
+    status_df.to_csv(tile_log_folder + '/status.csv', index=False, header=True)
 
     # Change back to original working directory
     os.chdir(wd)
@@ -92,7 +105,7 @@ if __name__ == '__main__':
     # Specify list of processing steps to be carried out
     step_list = ['create_tile_moasic']
     progress_df = common.init_log_folder('process_tiles', laz_tile_ids, step_list)
-    tiles_to_process = set(progress_df['tile_id'].toList())
+    tiles_to_process = set(progress_df['tile_id'].tolist())
     # Set up processing pool
     multiprocessing.set_executable(settings.python_exec_path)
     n_processes = 10
@@ -100,9 +113,9 @@ if __name__ == '__main__':
 
     # Execute processing of tiles
     print('Processing tiles: ...')
-    tile_processing = pool.map_async(process_tile, laz_tile_ids[0:2])
+    tile_processing = pool.map_async(process_tile, tiles_to_process)
     # Make sure all processes finish before carrying on.
-    #tile_processing.wait()
+    tile_processing.wait()
 
     # Print out time elapsed:
     print('\nTime elapsed: ' + str(datetime.datetime.now() - startTime))

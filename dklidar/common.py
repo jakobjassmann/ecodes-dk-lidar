@@ -36,7 +36,7 @@ def init_log_folder(script_name, tile_ids, processing_steps):
         for steps in processing_steps:
             cols.append(['pending'] * len(tile_ids))
         # prepare colnames
-        colnames = ['tile_id', 'processed']
+        colnames = ['tile_id', 'processing']
         colnames.extend(processing_steps)
         # Zip into pandas data frame
         progress_df = pandas.DataFrame(zip(*cols), columns = colnames)
@@ -59,9 +59,18 @@ def init_log_folder(script_name, tile_ids, processing_steps):
     print(' done.')
     return(progress_df)
 
+def update_progress_log(script_name):
+    # Check and create root folder for script
+    log_folder = settings.log_folder + '/' + script_name
+    if not os.path.exists(log_folder):
+        print('\nWarning: script log folder does not exist. Exiting script')
+        quit()
+
+
 ## Define function to gather logs
 def update_logs(step_name, tile_id):
     # Generate string for log folder
+
     print('test')
 
 
