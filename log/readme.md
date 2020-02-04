@@ -1,5 +1,5 @@
 ## This folder is emtpy on prurpose!
-Upon initiating the processing log files will be stored here in the following folder structure:
+Upon initiating the processing, log files will be stored here in the following folder structure:
 ```
 /log/                                                     log folder
     |- process_tiles/                                     subfolder log outputs for process_tiles.py
