@@ -6,14 +6,12 @@ from dklidar import points
 from dklidar import settings
 from dklidar import common
 import glob
-import sys
 import re
 import os
 import datetime
-import time
 import multiprocessing
-import opals
 import pandas
+import opals
 
 #### Prepare the environment
 
@@ -70,29 +68,30 @@ def process_tile(tile_id):
     if not os.path.exists(tile_log_folder):
         os.mkdir(tile_log_folder)
 
-    # Load all (available) OPALS modules
-    #opals.loadAllModules()
-
+    # opals load odules
+    opals.loadAllModules()
+    
     # Create tile neighbourhood mosaic
-    # points.create_tile_mosaic(tile_id)
+    points.create_tile_mosaic(tile_id)
+
 
     # Write status update into status.csv file
-    colnames = ['tile_id', 'processing']
-    columns = [[tile_id], ['completed']]
+    colnames = ['processing','create_tile_moasic']
+    columns = [['complete'],['complete']]
     # Zip into pandas data frame
-    status_df = pandas.DataFrame(zip(*columns), columns=colnames)
+    status_df = pandas.DataFrame(zip(*columns), index = [tile_id], columns=colnames)
+    status_df.index.name = 'tile_id'
     # Export as CSV
-    status_df.to_csv(tile_log_folder + '/status.csv', index=False, header=True)
+    status_df.to_csv(tile_log_folder + '/status.csv', index=True, header=True)
 
     # Change back to original working directory
     os.chdir(wd)
 
     # Print tile_id to console to update on status
-    print(tile_id)
+    print(tile_id),
 
 
 #### Main body of script
-
 if __name__ == '__main__':
 
     ## Start timer
@@ -102,20 +101,27 @@ if __name__ == '__main__':
     print('\n' + '-' * 80 + 'Starting process_tiles.py at ' + str(startTime) + '\n')
 
     ## Prepare process managment and logging
-    # Specify list of processing steps to be carried out
-    step_list = ['create_tile_moasic']
-    progress_df = common.init_log_folder('process_tiles', laz_tile_ids, step_list)
-    tiles_to_process = set(progress_df['tile_id'].tolist())
+    progress_df = common.init_log_folder('process_tiles', laz_tile_ids[1:10])
+
+    ## Identify which tiles still require processing
+    tiles_to_process = set(progress_df.index.values[progress_df['processing'] != 'complete'].tolist())
     # Set up processing pool
     multiprocessing.set_executable(settings.python_exec_path)
     n_processes = 10
     pool = multiprocessing.Pool(processes = n_processes)
 
     # Execute processing of tiles
-    print('Processing tiles: ...')
+    print('Processing tiles: ... '),
     tile_processing = pool.map_async(process_tile, tiles_to_process)
     # Make sure all processes finish before carrying on.
     tile_processing.wait()
+    print('... done.')
+
+    # Update progress status
+    progress_df = common.update_progress_df('process_tiles', progress_df)
+    # Export progress_df as CSV
+    progress_file = settings.log_folder + '/process_tiles/' + 'overall_progress.csv'
+    progress_df.to_csv(progress_file, index=True, header=True)
 
     # Print out time elapsed:
     print('\nTime elapsed: ' + str(datetime.datetime.now() - startTime))
