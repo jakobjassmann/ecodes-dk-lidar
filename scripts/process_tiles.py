@@ -68,18 +68,23 @@ def process_tile(tile_id):
     if not os.path.exists(tile_log_folder):
         os.mkdir(tile_log_folder)
 
-    # opals load odules
+    # opals loadModules
     opals.loadAllModules()
-    
+
+    # Keep track of progress for each step and overall progress
+    steps = ['processing']
+    status_steps = [['pending']]
+
     # Create tile neighbourhood mosaic
-    points.create_tile_mosaic(tile_id)
+    return_value = points.create_tile_mosaic(tile_id)
+    # Update progress variables
+    steps.append('create_tile_mosaic')
+    status_steps.append([return_value])
+    # gather logs for step and tile
+    common.gather_logs('process_tiles', 'create_tile_mosaic', tile_id)
 
-
-    # Write status update into status.csv file
-    colnames = ['processing','create_tile_moasic']
-    columns = [['complete'],['complete']]
     # Zip into pandas data frame
-    status_df = pandas.DataFrame(zip(*columns), index = [tile_id], columns=colnames)
+    status_df = pandas.DataFrame(zip(*status_steps), index = [tile_id], columns=steps)
     status_df.index.name = 'tile_id'
     # Export as CSV
     status_df.to_csv(tile_log_folder + '/status.csv', index=True, header=True)

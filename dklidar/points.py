@@ -18,8 +18,11 @@ def create_tile_mosaic(tile_id):
         Imports a tile (specified by tile_id) and it's 3 x 3 neighbourhood into a shared ODM file for subsequent
         processing.
     :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
-    :return: returns nothing.
+    :return: returns execution status.
     """
+
+    # Initiate return value
+    return_value = ''
 
     # Retrieve row and col numbers for the current tile_id
     center_row = int(re.sub('(\d+)_\d+', '\g<1>', tile_id))
@@ -50,6 +53,7 @@ def create_tile_mosaic(tile_id):
         log_output = tile_id + ' importing point clouds into ODM mosaic...\n' + 'Number of neighbours = ' + str(n_neighbours) + '. Complete!\n'
     else:
         log_output = tile_id + ' importing point clouds into ODM mosaic...\n' + 'Warning! Number of neighbours = ' + str(n_neighbours) + '. Incomplete. Edge effects possible!\n'
+        return_value = 'Warning:Neighbours&'
 
     # Generate output file name string
     odm_file = settings.odm_mosaics_folder + '/odm_mosaic_' + tile_id + '.odm'
@@ -63,13 +67,18 @@ def create_tile_mosaic(tile_id):
         import_tile.commons.screenLogLevel = opals.Types.LogLevel.none
         import_tile.run()
         log_output = log_output + tile_id + ' success.\n\n'
+        return_value = return_value + 'complete'
     except:
-        log_output = log_output + tile_id + ' failed.\n\n'
+        return_value = 'opalsError'
+        log_output = log_output + tile_id + ' failed. OpalsError.\n\n'
 
     # Write log output to log file
     log_file = open('log.txt', 'a+')
     log_file.write(log_output)
     log_file.close()
+
+    # return status output
+    return(return_value)
 
 
 

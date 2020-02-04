@@ -7,6 +7,7 @@ import os
 import glob
 import pandas
 import re
+import shutil
 
 ## Function definitons
 
@@ -119,11 +120,55 @@ def update_progress_df(script_name, progress_df):
     return(progress_df)
 
 ## Define function to gather logs
-def update_logs(step_name, tile_id):
-    # Generate string for log folder
+def gather_logs(script_name, step_name, tile_id):
+    """
+    This wee function needs to be run out of a temporary working directory by a pool process from the multiprocessing
+    module. It then copies all log files in the temporary working directory to the log folder, where it stores them
+    in a sub-subfolder according to the step_name and tile_id parameters
+    :param script_name: name of the script that is calling the function.
+    :param step_name: name of the step that should be logged for
+    :param tile_id: tile id in the usual format (rrrr_ccc).
+    :return: nothing.
+    """
+    # Generate string for log folder for the tile and create the directory if it does not exist
+    log_folder_tile = settings.log_folder + '/' + script_name + '/' + tile_id
+    if not os.path.exists(log_folder_tile):
+        os.mkdir(log_folder_tile)
 
-    print('test')
+    # Generate string for log folder and create the directory if it does not exist
+    log_folder_step = log_folder_tile + '/' + step_name
+    if not os.path.exists(log_folder_step):
+        os.mkdir(log_folder_step)
 
+
+
+    # Confirm function is executed from temporary work dir using regex
+    wd = os.getcwd()
+    temp_re = re.compile('.*temp_.*')
+    if not temp_re.match(wd):
+        print(' Error: update_logs function called from outside temporary work dir.')
+        return('Error: update_logs.')
+
+    # Check whether dklidar logfile exists if yes copy:
+    if os.path.exists(wd + '/log.txt'):
+        # copy file to tile log directory
+        shutil.copy(wd + '/log.txt', log_folder_step)
+        # remove log file from temp directory
+        os.remove(wd + '/log.txt')
+
+    # Check whether opalslog logfile exists if yes copy:
+    if os.path.exists(wd + '/opalsLog.xml'):
+        # copy file to tile log directory
+        shutil.copy(wd + '/opalsLog.xml', log_folder_step)
+        # remove log file from temp directory
+        os.remove(wd + '/opalsLog.xml')
+
+    # Check whether opalsError logfile exists if yes copy:
+    if os.path.exists(wd + '/opalsErrors.txt'):
+        # copy file to tile log directory
+        shutil.copy(wd + '/opalsErrors.txt', log_folder_step)
+        # remove log file from temp directory
+        os.remove(wd + '/opalsErrors.txt')
 
 
 ## Define function to gather logs... (DEPRICATED)
