@@ -1,4 +1,4 @@
-# Scripts for setting up the envrionment and processing
+# Scripts for processing and envrionment set-up
 
 Script | Description 
 --- | ---
