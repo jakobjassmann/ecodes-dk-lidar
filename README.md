@@ -29,5 +29,5 @@ Repository maintanance and code development: Jakob Assmann (j.assmann@bios.au.dk
 Selection and computation of output variables: Urs Treier, Andràs Zlinszky and Jesper Moeslund.
 
 ## License
-Content in this repository is currently not avialalbe under any license. Please contact Jakob (j.assmann@bios.au.dk) if you would like to share or re-use any of the code in this repostiory. 
+Content in this repository is currently not avialalbe under any license. Please contact Jakob (j.assmann@bios.au.dk) if you would like to re-use or share any of the code in this repostiory. 
 
