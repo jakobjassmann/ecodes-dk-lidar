@@ -19,7 +19,7 @@ update_progress_df | Updates progress data frame for process managment.
 gather_logs | Gathers logs for a tile after a porcessing step is completed.
 
 ### points.py
-Functions for porcessing pointcloud data
+Functions for procesing pointcloud data
 
 Function | Description
 --- | ---
