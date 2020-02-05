@@ -19,7 +19,7 @@ This project has been developed with OPALS 2.3.2.0, Python 2.7 (as distributed w
 ## Getting Started
 1. Set up your local environment and download data following the instructions in  */scritps/readme.md* .
 2. Basic processing for each tile is done with the */scripts/process_tile.py* script.
-3. See */dklidar/readme.md* for an introduction to the modules and functions of the *dklidar* Python package.
+3. See */dklidar/readme.md* for an overview of the modules and functions of the *dklidar* Python package.
 
 ## Contributors
 PI leading the research for this project: Signe Normand (signe.normand@bios.au.dk)
