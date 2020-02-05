@@ -12,4 +12,4 @@ Script | Description
 download_files.bat | script to retrieve laz pointclouds and dtm rasters as well as generating local checksums. *(under construction)*
 checksum_qa.py | Validates checksums for laz pointcloud files and dtm rasters after download.
 
-Note: Other scripts may be version controlled here for temporary purposes.
+Note: Other scripts may appear here that are version controlled for temporary purposes.
