@@ -1,4 +1,6 @@
-# Scripts for processing and envrionment set-up
+# Scripts for processing and setting up the envrionment
+The scripts in this folder are used to set up the environment and process the dataset, using the functions defined int he dklidar pacakage (*/dklida/*). 
+
 
 Script | Description 
 --- | ---
