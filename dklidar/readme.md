@@ -2,12 +2,6 @@
 Functions for processing and rasterising DK's nationwide LiDAR data 'Punktsky'
 
 ## Modules
-Module | Content
---- | ---
-settings.py | Global settings file.
-common.py | Functions for logging, process managment etc.
-points.py | Functions for processing point cloud data.
-dtm.py |  Functions for processing the raster DTM data.
 
 ### settings.py
 Global settings file with:
