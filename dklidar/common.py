@@ -140,8 +140,6 @@ def gather_logs(script_name, step_name, tile_id):
     if not os.path.exists(log_folder_step):
         os.mkdir(log_folder_step)
 
-
-
     # Confirm function is executed from temporary work dir using regex
     wd = os.getcwd()
     temp_re = re.compile('.*temp_.*')

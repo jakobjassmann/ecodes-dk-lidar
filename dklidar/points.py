@@ -13,7 +13,7 @@ import time
 ##### Function definitions
 
 ## Define function to load neighbourhood of tiles into ODM
-def create_tile_mosaic(tile_id):
+def odm_create_mosaic(tile_id):
     """
         Imports a tile (specified by tile_id) and it's 3 x 3 neighbourhood into a shared ODM file for subsequent
         processing.
@@ -53,7 +53,7 @@ def create_tile_mosaic(tile_id):
         log_output = tile_id + ' importing point clouds into ODM mosaic...\n' + 'Number of neighbours = ' + str(n_neighbours) + '. Complete!\n'
     else:
         log_output = tile_id + ' importing point clouds into ODM mosaic...\n' + 'Warning! Number of neighbours = ' + str(n_neighbours) + '. Incomplete. Edge effects possible!\n'
-        return_value = 'Warning:Neighbours&'
+
 
     # Generate output file name string
     odm_file = settings.odm_mosaics_folder + '/odm_mosaic_' + tile_id + '.odm'
@@ -68,6 +68,7 @@ def create_tile_mosaic(tile_id):
         import_tile.run()
         log_output = log_output + tile_id + ' success.\n\n'
         return_value = return_value + 'complete'
+        if n_neighbours != 9: return_value = 'Warning: Incomplete Neighbourhood!'
     except:
         return_value = 'opalsError'
         log_output = log_output + tile_id + ' failed. OpalsError.\n\n'
@@ -83,7 +84,7 @@ def create_tile_mosaic(tile_id):
 
 
 ## Def: Export tile footprint
-def laz_grid_footprint(tile_id):
+def odm_generate_footprint(tile_id):
     """
     Exports footprint from a laz file based on the tile_id in the DK nationwide dataset
     :param laz_tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
@@ -131,7 +132,7 @@ def laz_grid_footprint(tile_id):
     os.chdir(settings.wd)
 
 ## Def: Retrieve CRS
-def laz_validate_crs(tile_id):
+def odm_validate_crs(tile_id):
     """
     Function to validate the crs of a dk nationwide LiDAR
     :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.

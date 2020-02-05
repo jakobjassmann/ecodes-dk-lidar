@@ -10,7 +10,7 @@ from dklidar import settings
 #### Function definitions
 
 ## Generate tile footprint
-def generate_footprint(tile_id):
+def dtm_generate_footprint(tile_id):
     """
     Generates a footprint file using gdal
     :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
@@ -44,7 +44,7 @@ def generate_footprint(tile_id):
 
 
 
-def mosaic_neighbours(tile_id):
+def dtm_mosaic_neighbours(tile_id):
     """
     Generates a tif mosaic with all existing 8 neighbouring cells
     :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
@@ -110,7 +110,7 @@ def mosaic_neighbours(tile_id):
     os.chdir(wd)
 
 ## Calculate slope parameter for file
-def calculate_slope(tile_id):
+def dtm_calculate_slope(tile_id):
     """
     Calculates the slope parameter for a DTM neighbourhood mosaic and crops to original tile_size
     :param tile_id: tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.

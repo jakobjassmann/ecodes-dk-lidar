@@ -76,12 +76,12 @@ def process_tile(tile_id):
     status_steps = [['pending']]
 
     # Create tile neighbourhood mosaic
-    return_value = points.create_tile_mosaic(tile_id)
+    return_value = points.odm_create_mosaic(tile_id)
     # Update progress variables
     steps.append('create_tile_mosaic')
     status_steps.append([return_value])
     # gather logs for step and tile
-    common.gather_logs('process_tiles', 'create_tile_mosaic', tile_id)
+    common.gather_logs('process_tiles', 'odm_create_tile_mosaic', tile_id)
 
     # Zip into pandas data frame
     status_df = pandas.DataFrame(zip(*status_steps), index = [tile_id], columns=steps)
