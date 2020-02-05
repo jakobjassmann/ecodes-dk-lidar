@@ -1,4 +1,5 @@
-## dklidar - python package with functions for processing and rasterising DK's nationwide LiDAR data
+# dklidar - python package 
+Functions for processing and rasterising DK's nationwide LiDAR data 'Punktsky'
 
 ## Modules
 Module | Content
