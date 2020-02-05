@@ -1,5 +1,5 @@
 # dklidar - python package 
-Functions for processing and rasterising DK's nationwide LiDAR data 'Punktsky'
+Functions for processing and rasterising DK's nationwide LiDAR data 'Punktsky'.
 
 ## Modules
 
@@ -10,7 +10,7 @@ Global settings file with:
 - paths to input / output folders.
 
 ### common.py
-Functions for logging process manamgnet etc.
+Functions for logging process management etc.
 
 Function nam| Description
 --- | ---
@@ -19,7 +19,7 @@ update_progress_df | Updates progress data frame for process managment.
 gather_logs | Gathers logs for a tile after a porcessing step is completed.
 
 ### points.py
-Functions for porcessing point cloud data
+Functions for porcessing pointcloud data
 
 Function | Description
 --- | ---
