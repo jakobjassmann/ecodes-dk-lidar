@@ -1,6 +1,10 @@
 # Scripts for processing and setting up the envrionment
 The scripts in this folder are used to set up the environment and process the dataset, using the functions defined int he dklidar pacakage. 
 
+## Getting started
+*To be completed..*
+
+## Scripts
 Script | Description 
 --- | ---
 **set_environment.bat** | Launched from the opals shell, adds dklidar python package folder to python path.
