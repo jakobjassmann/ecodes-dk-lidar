@@ -32,6 +32,6 @@ Functions for processing raster DTM data
 
 Function | Description
 --- | ---
-dtm_generate_footpring | Generates footprint for a single dtm tile.
+dtm_generate_footprint | Generates footprint for a single dtm tile.
 dtm_creat_mosaic | Creates neigbhourhood mosaic of dtm tiles.
 dtm_calculate_slope | Calculates the slope from a dtm neighbourhood mosaic and crops oupput to single tile raster.
