@@ -107,21 +107,21 @@ def process_tile(tile_id):
     # # gather logs for step and tile]
     # common.gather_logs('process_tiles', 'odm_generate_footprint', tile_id)
 
-    # ## Normalise height
-    # return_value = points.odm_add_normalized_z(tile_id)
-    # # Update progress variables
-    # steps.append('odm_add_normalized_z')
-    # status_steps.append([return_value])
-    # # gather logs for step and tile]
-    # common.gather_logs('process_tiles', 'odm_add_normalized_z', tile_id)
-
-    ## Export mean normalised height for 10 m x 10 m cell
-    return_value = points.odm_export_normalied_z(tile_id)
+    ## Normalise height
+    return_value = points.odm_add_normalized_z(tile_id)
     # Update progress variables
-    steps.append('odm_export_normalied_z')
+    steps.append('odm_add_normalized_z')
     status_steps.append([return_value])
     # gather logs for step and tile]
-    common.gather_logs('process_tiles', 'odm_export_normalied_z', tile_id)
+    common.gather_logs('process_tiles', 'odm_add_normalized_z', tile_id)
+
+    ## Export mean normalised height for 10 m x 10 m cell
+    return_value = points.odm_export_normalized_z(tile_id)
+    # Update progress variables
+    steps.append('odm_export_normalized_z')
+    status_steps.append([return_value])
+    # gather logs for step and tile]
+    common.gather_logs('process_tiles', 'odm_export_normalized_z', tile_id)
 
     ## Logging: finalise log outputs
     # Zip into pandas data frame
@@ -153,8 +153,8 @@ if __name__ == '__main__':
     tiles_to_process = set(progress_df.index.values[progress_df['processing'] != 'complete'].tolist())
     # Set up processing pool
     multiprocessing.set_executable(settings.python_exec_path)
-    n_processes = 10
-    pool = multiprocessing.Pool(processes = n_processes)
+    n_processes = 54
+    pool = multiprocessing.Pool(processes=n_processes)
 
     # Execute processing of tiles
     print(datetime.datetime.now().strftime('%X') + ' Processing tiles: ... '),

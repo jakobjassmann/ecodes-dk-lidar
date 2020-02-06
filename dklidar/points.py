@@ -240,18 +240,19 @@ def odm_add_normalized_z(tile_id, mosaic = False):
         add_normalized_z = opals.AddInfo.AddInfo()
         add_normalized_z.inFile = odm_file
         add_normalized_z.gridFile = dtm_file
-        add_normalized_z.attribute = 'Normalized_Z = z - r[0]'
+        add_normalized_z.attribute = 'normalizedZ = z - r[0]'
         add_normalized_z.commons.screenLogLevel = opals.Types.LogLevel.none
-        add_normalized_z.commons.nbThreads = 1 # Might need to be used to reduce strain on machine
+        add_normalized_z.commons.nbThreads = settings.nbThreads # Might need to be used to reduce strain on machine
         add_normalized_z.run()
+
         return_value = 'success'
     except:
         return_value = 'opalsError'
 
     # Return exist status
-    return (return_value)
+    return(return_value)
 
-def odm_export_normalied_z(tile_id):
+def odm_export_normalized_z(tile_id):
     """
     Exports mean and standard deviation of the normalisedZ variable to the 10 m x 10 m raster grid.
     :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
