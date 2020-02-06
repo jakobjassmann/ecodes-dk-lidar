@@ -12,7 +12,7 @@ Global settings file with:
 - nbThreads - number of subthreads used by OPALS.
 
 ### common.py
-Functions for logging process management etc.
+Functions for logging, process management etc.
 
 Function nam| Description
 --- | ---
