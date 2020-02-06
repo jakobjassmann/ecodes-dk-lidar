@@ -12,15 +12,43 @@ import time
 
 ##### Function definitions
 
+## Functio to import a single tile into ODM
+def odm_import_single_tile(tile_id):
+    """
+        Imports a single tile (specified by tile_id) into an ODM for subsequent processing
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+    :return: returns execution status.
+    """
+    # Initiate return value
+    return_value = ''
+
+    # Generate relevant file names:
+    laz_file = settings.laz_folder + '/PUNKTSKY_1km_' + tile_id + '.laz'
+    odm_file = settings.odm_folder + '/odm_' + tile_id + '.odm'
+
+    # Try import
+    try:
+        # Import tile id
+        import_tile = opals.Import.Import()
+        import_tile.inFile = laz_file
+        import_tile.outFile = odm_file
+        import_tile.commons.screenLogLevel = opals.Types.LogLevel.none
+        import_tile.run()
+        return_value = 'complete'
+    except:
+        return_value = 'opalsError'
+
+    # return execution status
+    return(return_value)
+
 ## Define function to load neighbourhood of tiles into ODM
-def odm_create_mosaic(tile_id):
+def odm_import_mosaic(tile_id):
     """
         Imports a tile (specified by tile_id) and it's 3 x 3 neighbourhood into a shared ODM file for subsequent
         processing.
     :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
     :return: returns execution status.
     """
-
     # Initiate return value
     return_value = ''
 
@@ -81,44 +109,53 @@ def odm_create_mosaic(tile_id):
     # return status output
     return(return_value)
 
-
-
 ## Def: Export tile footprint
 def odm_generate_footprint(tile_id):
     """
     Exports footprint from a laz file based on the tile_id in the DK nationwide dataset
     :param laz_tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
-    :return: returns nothing, but creates a
+    :return: returns execution status.
     """
+
+    # Initiate return value
+    return_value = ''
+
     # Generate relevant file names:
-    laz_file = settings.laz_folder + '/PUNKTSKY_1km_' + tile_id + '.laz'
     odm_file = settings.odm_folder + '/odm_' + tile_id + '.odm'
     temp_tif_file = os.getcwd() + '/temp_' + tile_id + '.tif'
     footprint_file = settings.odm_footprint_folder + '/footprint_' + tile_id + '.shp'
 
-    # Try generating footpring
+    # Try token raster export to temp tif
     try:
-        # Import tile id
-        import_tile = opals.Import.Import()
-        import_tile.inFile = laz_file
-        import_tile.outFile = odm_file
-        import_tile.run()
-
         # Export temporary tif
         export_tif = opals.Cell.Cell()
         export_tif.inFile = odm_file
         export_tif.outFile = temp_tif_file
         export_tif.feature = 'min'
         export_tif.cellSize = 10 # This is also the default cell size, so technically not needed.
+        export_tif.limit = 'corner' # This switch is really important when working with tiles!
+                                    # It sets the ROI to the extent to the bounding box of points in the ODM
+        export_tif.commons.screenLogLevel = opals.Types.LogLevel.none
         export_tif.run()
+        log_output = '\n' + tile_id + ' temporary raster export successful.\n\n'
+    except:
+        return_value = 'opalsError'
+        log_output = '\n' + tile_id + ' temporary raster export failed.\n\n'
 
-        # Generate footprint for temp tif
+    # Try generating footprint from temp tif
+    try:
+        # Specify gdal command
         cmd = settings.gdaltlindex_bin + ' ' + footprint_file + ' ' + temp_tif_file
-        log_output = '\n' + tile_id + ' footprint generation... \n' + \
+        # Execute gdal command
+        log_output = log_output + '\n' + tile_id + ' footprint generation... \n' + \
             subprocess.check_output(cmd, shell=False,  stderr=subprocess.STDOUT) + \
                      tile_id + ' successful.\n\n'
+        # set exit status
+        return_value = 'complete'
     except:
-        log_output = '\n' + tile_id + ' footprint generation... \n' + tile_id + ' failed.\n\n'
+        log_output = log_output + '\n' + tile_id + ' footprint generation... \n' + tile_id + ' failed.\n\n'
+        if return_value == 'opalsError': pass
+        else: return_value = 'gdalError'
 
     # Write log output to log file
     log_file = open('log.txt', 'a+')
@@ -128,26 +165,146 @@ def odm_generate_footprint(tile_id):
     # Remove temp raster file
     os.remove(temp_tif_file)
 
-    # change back to main workdir
-    os.chdir(settings.wd)
+    # return status output
+    return(return_value)
 
 ## Def: Retrieve CRS
 def odm_validate_crs(tile_id):
     """
-    Function to validate the crs of a dk nationwide LiDAR
+    Function to validate the crs for odm files (single tile and odm)
     :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
-    :return:
+    :return: execution status
     """
 
-    # Generate odm file pathname
-    odm_file = settings.odm_folder + '/odm_' + tile_id + '.odm'
+    # Initiate return value
+    return_value = ''
 
-    print(odm_file)
-    crs_str = ''
+    # Generate odm files pathnames
+    odm_file = settings.odm_folder + '/odm_' + tile_id + '.odm'
+    odm_mosaic = settings.odm_mosaics_folder + '/odm_mosaic_' + tile_id + '.odm'
+
+    # Retrieve CRS string for single tile
     try:
         odm_dm = opals.pyDM.Datamanager.load(odm_file)
         crs_str = odm_dm.getCRS()
+        if crs_str == settings.crs:
+            return_value = 'Single: match; '
+        elif crs_str == '':
+            odm_dm.setCRS(settings.crs)
+            return_value = 'Single: empty - set; '
+        else:
+            return_value = 'Single: warning - no match; '
         odm_dm = None
-        log_output = '\n' + tile_id + ' CRS string: ' + crs_str + '\n\n'
     except:
-        log_output = '\n' + tile_id + ' Unable to load file while retrieving CRS string.\n\n'
+        return_value = 'Single: error; '
+
+    # Retrieve CRS string for mosaic
+    try:
+        odm_dm = opals.pyDM.Datamanager.load(odm_mosaic)
+        crs_str = odm_dm.getCRS()
+        if crs_str == settings.crs:
+            return_value = return_value + 'Mosaic: match;'
+        elif crs_str == '':
+            odm_dm.setCRS(settings.crs)
+            return_value = return_value + 'Mosaic: empty - set;'
+        else:
+            return_value = return_value + 'Mosaic: warning - no match;'
+        odm_dm = None
+    except:
+        return_value = return_value + 'Mosaic: error;'
+
+    return(return_value)
+
+def odm_add_normalized_z(tile_id, mosaic = False):
+    """
+    Adds a adding a "normalizedZ' variable to each point in and ODM file by normalising the height using the DTM.
+    Can deal with either single tile odms or neighbourhood mosaics (option mosaic).
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+    :param mosaic: boolean (true or false) specifies whether a single tile pointcloud or a neighbourhood mosaic
+    should be normalised.
+    :return: execution status
+    """
+    # Initiate return value
+    return_value = ''
+
+    # Generate file paths
+    if(mosaic == False):
+        odm_file = settings.odm_folder + '/odm_' + tile_id + '.odm'
+        dtm_file = settings.dtm_folder + '/DTM_1km_' + tile_id + '.tif'
+    else:
+        odm_file = settings.odm_mosaics_folder + '/odm_mosaic_' + tile_id + '.odm'
+        dtm_file = settings.dtm_folder + '/dtm_mosaic_' + tile_id + '.tif'
+
+    # Normalise the point cloud data
+    try:
+        add_normalized_z = opals.AddInfo.AddInfo()
+        add_normalized_z.inFile = odm_file
+        add_normalized_z.gridFile = dtm_file
+        add_normalized_z.attribute = 'Normalized_Z = z - r[0]'
+        add_normalized_z.commons.screenLogLevel = opals.Types.LogLevel.none
+        add_normalized_z.commons.nbThreads = 1 # Might need to be used to reduce strain on machine
+        add_normalized_z.run()
+        return_value = 'success'
+    except:
+        return_value = 'opalsError'
+
+    # Return exist status
+    return (return_value)
+
+def odm_export_normalied_z(tile_id):
+    """
+    Exports mean and standard deviation of the normalisedZ variable to the 10 m x 10 m raster grid.
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+    :return: execution status
+    """
+    # Initiate return value
+    return_value = ''
+
+    # Generate file paths
+    odm_file = settings.odm_folder + '/odm_' + tile_id + '.odm'
+    out_folder = settings.output_folder + '/normalized_z'
+    if not os.path.exists(out_folder): os.mkdir(out_folder)
+    if not os.path.exists(out_folder + '/mean'): os.mkdir(out_folder + '/mean')
+    if not os.path.exists(out_folder + '/sd'): os.mkdir(out_folder + '/sd')
+
+    out_file_mean = out_folder + '/mean/normalized_z_mean_' + tile_id + '.tif'
+    out_file_sd = out_folder + '/sd/normalized_z_sd_' + tile_id + '.tif'
+
+    # Export normalized z raster mean and sd
+    try:
+        # Initialise exporter
+        export_normalized_z = opals.Cell.Cell()
+
+        # Export mean
+        export_normalized_z.inFile = odm_file
+        export_normalized_z.outFile = out_file_mean
+        export_normalized_z.attribute = 'normalizedZ'
+        export_normalized_z.feature = 'mean'
+        export_normalized_z.cellSize = 10 # This is also the default cell size, so technically not needed.
+        export_normalized_z.limit = 'corner' # This switch is really important when working with tiles!
+                                    # It sets the ROI to the extent to the bounding box of points in the ODM
+        export_normalized_z.commons.screenLogLevel = opals.Types.LogLevel.none
+        export_normalized_z.commons.nbThreads = settings.nbThreads
+        export_normalized_z.run()
+
+        # Reset  exporter
+        export_normalized_z.reset()
+
+        # Export sd
+        export_normalized_z = opals.Cell.Cell()
+        export_normalized_z.inFile = odm_file
+        export_normalized_z.outFile = out_file_sd
+        export_normalized_z.attribute = 'normalizedZ'
+        export_normalized_z.feature = 'stdDev'
+        export_normalized_z.cellSize = 10 # This is also the default cell size, so technically not needed.
+        export_normalized_z.limit = 'corner' # This switch is really important when working with tiles!
+                                    # It sets the ROI to the extent to the bounding box of points in the ODM
+        export_normalized_z.commons.screenLogLevel = opals.Types.LogLevel.none
+        export_normalized_z.commons.nbThreads = settings.nbThreads
+        export_normalized_z.run()
+        return_value = 'success'
+    except:
+        return_value = 'opalsError'
+
+    # Return exist status
+    return (return_value)

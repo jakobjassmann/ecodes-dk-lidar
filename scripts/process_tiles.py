@@ -55,6 +55,7 @@ for file_name in laz_files:
 ## Define processing steps for each tile to be carried out in parallel
 def process_tile(tile_id):
 
+    ## Prepare environment
     # Generate temporary wd for parallel worker, this will allow for smooth logging and opals sessions to run in parallel
     wd = os.getcwd()
     current_pid =  re.sub('[(),]', '', str(multiprocessing.current_process()._identity))
@@ -71,18 +72,58 @@ def process_tile(tile_id):
     # opals loadModules
     opals.loadAllModules()
 
-    # Keep track of progress for each step and overall progress
+    ## Logging: Keep track of progress for each step and overall progress
+    # Initiate progress variables
     steps = ['processing']
-    status_steps = [['pending']]
+    status_steps = [['complete']]
 
-    # Create tile neighbourhood mosaic
-    return_value = points.odm_create_mosaic(tile_id)
+    # ## Import tile to ODM
+    # return_value = points.odm_import_single_tile(tile_id)
+    # # Update progress variables
+    # steps.append('odm_import_single_tile')
+    # status_steps.append([return_value])
+    # # gather logs for step and tile
+    # common.gather_logs('process_tiles', 'odm_import_single_tile', tile_id)
+    #
+    # ## Import tile neighbourhood mosaic
+    # return_value = points.odm_import_mosaic(tile_id)
+    # # Update progress variables
+    # steps.append('odm_import_mosaic')
+    # status_steps.append([return_value])
+    # # gather logs for step and tile
+    # common.gather_logs('process_tiles', 'odm_import_mosaic', tile_id)
+    #
+    # ## Validate CRS of odm files
+    # return_value = points.odm_validate_crs(tile_id)
+    # # Update progress variables
+    # steps.append('odm_validate_crs')
+    # status_steps.append([return_value])
+
+    # ## Export footprint
+    # return_value = points.odm_generate_footprint(tile_id)
+    # # Update progress variables
+    # steps.append('odm_generate_footprint')
+    # status_steps.append([return_value])
+    # # gather logs for step and tile]
+    # common.gather_logs('process_tiles', 'odm_generate_footprint', tile_id)
+
+    # ## Normalise height
+    # return_value = points.odm_add_normalized_z(tile_id)
+    # # Update progress variables
+    # steps.append('odm_add_normalized_z')
+    # status_steps.append([return_value])
+    # # gather logs for step and tile]
+    # common.gather_logs('process_tiles', 'odm_add_normalized_z', tile_id)
+
+    ## Export mean normalised height for 10 m x 10 m cell
+    return_value = points.odm_export_normalied_z(tile_id)
     # Update progress variables
-    steps.append('create_tile_mosaic')
+    steps.append('odm_export_normalied_z')
     status_steps.append([return_value])
-    # gather logs for step and tile
-    common.gather_logs('process_tiles', 'odm_create_tile_mosaic', tile_id)
+    # gather logs for step and tile]
+    common.gather_logs('process_tiles', 'odm_export_normalied_z', tile_id)
 
+    ## Logging: finalise log outputs
     # Zip into pandas data frame
     status_df = pandas.DataFrame(zip(*status_steps), index = [tile_id], columns=steps)
     status_df.index.name = 'tile_id'
@@ -93,7 +134,7 @@ def process_tile(tile_id):
     os.chdir(wd)
 
     # Print tile_id to console to update on status
-    print(tile_id),
+    print(datetime.datetime.now().strftime('%X') + ' ' + tile_id + ' '),
 
 
 #### Main body of script
@@ -103,10 +144,10 @@ if __name__ == '__main__':
     startTime = datetime.datetime.now()
 
     ## Status output to console
-    print('\n' + '-' * 80 + 'Starting process_tiles.py at ' + str(startTime) + '\n')
+    print('\n' + '-' * 80 + 'Starting process_tiles.py at ' + str(startTime.strftime('%c')) + '\n')
 
     ## Prepare process managment and logging
-    progress_df = common.init_log_folder('process_tiles', laz_tile_ids[1:10])
+    progress_df = common.init_log_folder('process_tiles', laz_tile_ids)
 
     ## Identify which tiles still require processing
     tiles_to_process = set(progress_df.index.values[progress_df['processing'] != 'complete'].tolist())
@@ -116,7 +157,7 @@ if __name__ == '__main__':
     pool = multiprocessing.Pool(processes = n_processes)
 
     # Execute processing of tiles
-    print('Processing tiles: ... '),
+    print(datetime.datetime.now().strftime('%X') + ' Processing tiles: ... '),
     tile_processing = pool.map_async(process_tile, tiles_to_process)
     # Make sure all processes finish before carrying on.
     tile_processing.wait()

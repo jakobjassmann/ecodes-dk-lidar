@@ -91,8 +91,8 @@ def dtm_mosaic_neighbours(tile_id):
 
     # Construct command:
     cmd = settings.gdalwarp_bin + ' ' + tile_file_names + ' ' + \
-        settings.dtm_mosaics_folder + '/DTM_' + \
-        tile_id + '_mosaic.tif '
+        settings.dtm_mosaics_folder + '/dtm_mosaic' + \
+        tile_id + '.tif '
 
     # Execute command as subprocess and return message:
     try:

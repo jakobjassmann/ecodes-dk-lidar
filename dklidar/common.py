@@ -8,6 +8,7 @@ import glob
 import pandas
 import re
 import shutil
+import datetime
 
 ## Function definitons
 
@@ -27,7 +28,8 @@ def init_log_folder(script_name, tile_ids):
     progress_file = log_folder + '/' + 'overall_progress.csv'
 
     if not os.path.exists(progress_file):
-        print('No progress file found, generating log folder and progress file...'),
+        print(datetime.datetime.now().strftime('%X') +
+              ' No progress file found, creating log folder and progress file...'),
         ## Initiate pandas data frame with tile_ids as rows and processing_steps as columns
         # Create empty list to hold columns
         cols = []
@@ -41,7 +43,8 @@ def init_log_folder(script_name, tile_ids):
         # Status update
         print(' done.')
     else:
-        print('Progress file found, loading previous processing status...'),
+        print(datetime.datetime.now().strftime('%X') +
+              ' Progress file found, loading previous processing status...'),
         ## Load progress status_file
         try:
             progress_df = pandas.read_csv(progress_file, index_col='tile_id')
@@ -49,11 +52,12 @@ def init_log_folder(script_name, tile_ids):
             # update progress dataframe
             progress_df = update_progress_df(script_name, progress_df)
         except:
-            print('\nCan\'t load progress file. Exiting script!')
+            print('\n' + datetime.datetime.now().strftime('%X') + 'Can\'t load progress file. Exiting script!')
             quit()
         # Compare tile_id column with tile_ids list
         if not progress_df.index.values.tolist() == tile_ids:
-            print('\nWarning: lists of tile_ids in laz folder( ' + settings.laz_folder +
+            print('\n' +datetime.datetime.now().strftime('%X') +
+                  'Warning: lists of tile_ids in laz folder( ' + settings.laz_folder +
                   ') and progress file (' + progress_file + 'do not match.' +
                   '\nPlease remove manually to reset.\nExiting script!')
             quit()
@@ -72,12 +76,13 @@ def update_progress_df(script_name, progress_df):
     :return: returns updated progress_df
     """
     # Status update
-    print('Updating progress management...'),
+    print(datetime.datetime.now().strftime('%X') + ' Updating progress management...'),
 
     # Check log root folder for script if not existing... quit!
     log_folder = settings.log_folder + '/' + script_name
     if not os.path.exists(log_folder):
-        print('\nWarning: script log folder does not exist. Exiting script')
+        print('\n' + datetime.datetime.now().strftime('%X') +
+              'Warning: script log folder does not exist. Exiting script')
         quit()
 
     # Gather list of tile folders
@@ -144,8 +149,9 @@ def gather_logs(script_name, step_name, tile_id):
     wd = os.getcwd()
     temp_re = re.compile('.*temp_.*')
     if not temp_re.match(wd):
-        print(' Error: update_logs function called from outside temporary work dir.')
-        return('Error: update_logs.')
+        print(datetime.datetime.now().strftime('%X') + ' Error: gather_logs function called from outside temporary work dir.')
+        print(wd)
+        return('Error: gather_logs.')
 
     # Check whether dklidar logfile exists if yes copy:
     if os.path.exists(wd + '/log.txt'):
@@ -169,78 +175,3 @@ def gather_logs(script_name, step_name, tile_id):
         os.remove(wd + '/opalsErrors.txt')
 
 
-## Define function to gather logs... (DEPRICATED)
-def gather_logs_old(n_processes, global_log_file, global_opalsLog = None, global_opalsErrors = None):
-    """
-    WARNING: Depricated!
-    Small helper to gather all logs from the parallel processes and append them to the global log file.
-    :param n_processes: number of processes to search for in scratch folder
-    :param global_log_file: file connection to global log_file
-    :param global_opalsLog: file connection to global opalsLog file (default = None)
-    :param global_opalsErrors: file connection to global opalsErrors file (default = None)
-    :return: Nothing.
-    """
-    for pid in range(1, n_processes):
-        # Check whether log file exists
-        # Generate string to temp folder of process
-        temp_folder = settings.scratch_folder + '/temp_' + str(pid)
-        if os.path.exists(temp_folder + '/log.txt'):
-            # Open connection to process log file and read
-            log_file = open(temp_folder + '/log.txt', 'r')
-            log_text = log_file.read()
-            # Write log text to global log file
-            global_log_file.write('\n\n!!! SOF Log for pid ' + str(pid) + ':\n' +
-                              log_text +
-                              '\n\n!!! EOF Log for pid ' + str(pid) + '.\n')
-            # Close process log file
-            log_file.close()
-            # Remove temporary log file for process
-            os.remove(temp_folder + '/log.txt')
-        else:
-            # Write log text to global log file
-            global_log_file.write('\n\n!!! SOF Log for pid ' + str(pid) + ':\n' +
-                              'File does not exists.' +
-                              '\n\n!!! EOF Log for pid ' + str(pid) + '.\n')
-
-        # Check whether opalsLog file connection was supplied
-        if not global_opalsLog is None:
-            if os.path.exists(temp_folder + '/opalsLog.xml'):
-                # Open connection to process Log file and read
-                opalsLog_file = open(temp_folder + '/opalsLog.xml', 'r')
-                opalsLog_text = opalsLog_file.read()
-                # Write log text to global log file
-                global_opalsLog.write('\n\n!!! SOF opalsLog.xml for pid ' + str(pid) + ':\n' +
-                                  opalsLog_text +
-                                  '\n\n!!! EOF opalsLog.xmlo for pid ' + str(pid) + '.\n')
-                # Close process opalsLog file
-                opalsLog_file.close()
-
-                # Remove temporary log file for process
-                os.remove(temp_folder + '/opalsLog.xml')
-            else:
-                # Write log text to global log file
-                global_log_file.write('\n\n!!! SOF opalsLog.xml for pid ' + str(pid) + ':\n' +
-                                'File does not exists.' +
-                                '\n\n!!! EOF opalsLog.xml for pid ' + str(pid) + '.\n')
-
-        # Check whether opalsError file connection was supplied
-
-        if not global_opalsLog is None:
-            if os.path.exists(temp_folder + '/opalsLog.xml'):
-                # Open connection to process Log file and read
-                opalsErrors_file = open(temp_folder + '/opalsErrors.txt', 'r')
-                opalsErrors_text = opalsErrors_file.read()
-                # Write log text to global log file
-                global_opalsErrors.write('\n\n!!! SOF opalsErrors for pid ' + str(pid) + ':\n' +
-                                     opalsErrors_text +
-                                     '\n\n!!! EOF opalsErros for pid ' + str(pid) + '.\n')
-                # Close process opalsLog file
-                opalsErrors_file.close()
-
-                # Remove temporary log file for process
-                os.remove(temp_folder + '/opalsErrors.txt')
-            else:
-                # Write log text to global log file
-                global_log_file.write('\n\n!!! SOF opalsErrors.txt for pid ' + str(pid) + ':\n' +
-                                      'File does not exists.' +
-                                      '\n\n!!! EOF opalsErrors.txt for pid ' + str(pid) + '.\n')
