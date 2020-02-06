@@ -8,6 +8,7 @@ Global settings file with:
 - paths to system excutables (python, gdal).
 - paths to working directories.
 - paths to input / output folders.
+- common crs as WKT string interpretable by OPALS.
 
 ### common.py
 Functions for logging process management etc.
@@ -23,7 +24,8 @@ Functions for procesing pointcloud data
 
 Function | Description
 --- | ---
-odm_create_mosaic | Creates odm tile mosaic by importing a neighbourhood of pointclouds.
+odm_import_single_tile | Imports a laz pointcloud file into ODM for a single tile.
+odm_import_mosaic | Creates an odm tile mosaic by importing the whole neighbourhood of a tile.
 odm_generate_footprint | Generates the footprint for the odm of a single tile.
 odm_validate_crs | validates the crs for single tile odm or neigbourhood mosaic odm.
 
