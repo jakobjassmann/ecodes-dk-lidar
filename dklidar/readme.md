@@ -21,7 +21,7 @@ update_progress_df | Updates progress data frame for process managment.
 gather_logs | Gathers logs for a tile after a porcessing step is completed.
 
 ### points.py
-Functions for procesing pointcloud data
+Functions for procesing pointcloud data.
 
 Function | Description
 --- | ---
@@ -33,7 +33,7 @@ odm_add_normalized_z | Adds normalised height attribute to an ODM point cloud (s
 odm_export_normalied_z | Exports mean and sd of normalised height.
 
 ### dtm.py
-Functions for processing raster DTM data
+Functions for processing raster DTM data.
 
 Function | Description
 --- | ---
