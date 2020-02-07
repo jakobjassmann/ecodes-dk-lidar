@@ -326,10 +326,10 @@ def odm_export_point_count(tile_id, lower_limit = 0.0, upper_limit = 50.0):
     odm_file = settings.odm_folder + '/odm_' + tile_id + '.odm'
     out_folder = settings.output_folder + '/point_count'
     prefix = 'point_count_' + str(lower_limit) + 'm-' + str(upper_limit) + 'm'
-    out_file = out_folder + prefix + '/' + prefix + '_' + tile_id + '.tif'
+    out_file = out_folder + '/' + prefix + '/' + prefix + '_' + tile_id + '.tif'
 
     if not os.path.exists(out_folder): os.mkdir(out_folder)
-    if not os.path.exists(out_folder + prefix): os.mkdir(out_folder + prefix)
+    if not os.path.exists(out_folder + '/' + prefix): os.mkdir(out_folder + '/' + prefix)
 
     # Export normalized z raster mean and sd
     try:
