@@ -9,6 +9,7 @@ import opals
 import subprocess
 import settings
 import time
+import numpy
 
 ##### Function definitions
 
@@ -309,3 +310,85 @@ def odm_export_normalized_z(tile_id):
 
     # Return exist status
     return (return_value)
+
+def odm_export_point_count(tile_id, lower_limit = 0.0, upper_limit = 50.0):
+    """
+    Exports point count for a 10 m x 10 m cell and normalised hight interval specified by the lower and upper limit parameters.
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+    :param lower_limit: lower limit for the height interval to count in (normalised height in m).
+    :param upper_limit: upper limit for the height interval to count in (normalised height in m).
+    :return: execution status
+    """
+    # Initiate return value
+    return_value = ''
+
+    # Generate paths
+    odm_file = settings.odm_folder + '/odm_' + tile_id + '.odm'
+    out_folder = settings.output_folder + '/point_count'
+    prefix = 'point_count_' + str(lower_limit) + 'm-' + str(upper_limit) + 'm'
+    out_file = out_folder + prefix + '/' + prefix + '_' + tile_id + '.tif'
+
+    if not os.path.exists(out_folder): os.mkdir(out_folder)
+    if not os.path.exists(out_folder + prefix): os.mkdir(out_folder + prefix)
+
+    # Export normalized z raster mean and sd
+    try:
+        # Initialise exporter
+        export_point_count = opals.Cell.Cell()
+
+        # Export mean
+        export_point_count.inFile = odm_file
+        export_point_count.outFile = out_file
+        export_point_count.filter = 'generic[NormalizedZ >= ' + str(lower_limit) + ' and NormalizedZ < ' + \
+                                    str(upper_limit) + ']'
+        export_point_count.feature = 'pcount'
+        export_point_count.cellSize = 10 # This is also the default cell size, so technically not needed.
+        export_point_count.limit = 'corner' # This switch is really important when working with tiles!
+                                    # It sets the ROI to the extent to the bounding box of points in the ODM
+        export_point_count.commons.screenLogLevel = opals.Types.LogLevel.none
+        export_point_count.commons.nbThreads = settings.nbThreads
+        export_point_count.run()
+
+        return_value = 'success'
+    except:
+        return_value = 'opalsError'
+
+    # Return exist status
+    return (return_value)
+
+def odm_export_point_counts(tile_id):
+    """
+    Exports point counts for multiple, pre definided height intervals by calling the odm_export_point_count function.
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+    :return: execution status
+    """
+    # Initiate list for return values
+    return_values = []
+
+    # Execute point counts for all specified intervals
+
+    # 0-2 m at 0.5 m intervals
+    for lower in numpy.arange(0.0, 1.5, 0.5):
+        return_values.extend(odm_export_point_count(tile_id, lower, lower + 0.5))
+
+    # 2-20 m at 1 m intervals
+    for lower in range(2, 19, 1):
+        return_values.extend(odm_export_point_count(tile_id, lower, lower + 1))
+
+    # 20-25 m at 5 m interval
+    return_values.extend(odm_export_point_count(tile_id, 20, 25))
+
+    # 25 m to 50 m
+    return_values.extend(odm_export_point_count(tile_id, 25, 50))
+
+    # Set return value status
+    # There are only two return value states so if there is more than one return value in the list
+    # one of them has to be an opalsError
+    return_values = set(return_values)
+
+    if len(return_values) > 1:
+        return_value = "opalsError"
+    else:
+        return_value = return_values[0]
+
+    return return_value

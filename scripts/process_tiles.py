@@ -107,21 +107,29 @@ def process_tile(tile_id):
     # # gather logs for step and tile]
     # common.gather_logs('process_tiles', 'odm_generate_footprint', tile_id)
 
-    ## Normalise height
-    return_value = points.odm_add_normalized_z(tile_id)
-    # Update progress variables
-    steps.append('odm_add_normalized_z')
-    status_steps.append([return_value])
-    # gather logs for step and tile]
-    common.gather_logs('process_tiles', 'odm_add_normalized_z', tile_id)
+    # ## Normalise height
+    # return_value = points.odm_add_normalized_z(tile_id)
+    # # Update progress variables
+    # steps.append('odm_add_normalized_z')
+    # status_steps.append([return_value])
+    # # gather logs for step and tile]
+    # common.gather_logs('process_tiles', 'odm_add_normalized_z', tile_id)
+    #
+    # ## Export mean normalised height for 10 m x 10 m cell
+    # return_value = points.odm_export_normalized_z(tile_id)
+    # # Update progress variables
+    # steps.append('odm_export_normalized_z')
+    # status_steps.append([return_value])
+    # # gather logs for step and tile]
+    # common.gather_logs('process_tiles', 'odm_export_normalized_z', tile_id)
 
-    ## Export mean normalised height for 10 m x 10 m cell
-    return_value = points.odm_export_normalized_z(tile_id)
+    ## Export point count for pre-defined intervals
+    return_value = points.odm_export_point_counts(tile_id)
     # Update progress variables
-    steps.append('odm_export_normalized_z')
+    steps.append('odm_export_point_counts')
     status_steps.append([return_value])
     # gather logs for step and tile]
-    common.gather_logs('process_tiles', 'odm_export_normalized_z', tile_id)
+    common.gather_logs('process_tiles', 'odm_export_point_counts', tile_id)
 
     ## Logging: finalise log outputs
     # Zip into pandas data frame
@@ -147,7 +155,7 @@ if __name__ == '__main__':
     print('\n' + '-' * 80 + 'Starting process_tiles.py at ' + str(startTime.strftime('%c')) + '\n')
 
     ## Prepare process managment and logging
-    progress_df = common.init_log_folder('process_tiles', laz_tile_ids)
+    progress_df = common.init_log_folder('process_tiles', laz_tile_ids[0:10])
 
     ## Identify which tiles still require processing
     tiles_to_process = set(progress_df.index.values[progress_df['processing'] != 'complete'].tolist())
