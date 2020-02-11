@@ -13,6 +13,7 @@ python_exec_path = 'C:/Program Files/opals_nightly_2.3.2/opals/python.exe'
 gdalwarp_bin = 'C:/OSGeo4W64/OSGeo4W.bat gdalwarp '
 gdaldem_bin = 'C:/OSGeo4W64/OSGeo4W.bat gdaldem '
 gdaltlindex_bin = 'C:/OSGeo4W64/OSGeo4W.bat gdaltindex '
+gdal_translate_bin = 'C:/OSGeo4W64/OSGeo4W.bat gdal_translate '
 
 ### Set folder locations
 # Main working directory
@@ -53,3 +54,13 @@ crs = r'PROJCS["ETRS89 / UTM 32N",GEOGCS["ETRS89",DATUM["European_Terrestrial_Re
 
 # common nbThreads parameter - a throttle limiter for OPALS, ensures Opals subprocesses use only a single core
 nbThreads = 1
+
+## Processing Options
+
+# Output cell size
+out_cell_size = 10
+
+## Filter Strings
+
+# point filter for all three vegetation classes as OPALS WKT
+veg_classes_filter = "Generic[Classification == 3] OR Generic[Classification == 4] OR Generic[Classification == 5]"

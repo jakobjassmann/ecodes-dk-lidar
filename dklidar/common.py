@@ -58,7 +58,7 @@ def init_log_folder(script_name, tile_ids):
         if not progress_df.index.values.tolist() == tile_ids:
             print('\n' +datetime.datetime.now().strftime('%X') +
                   'Warning: lists of tile_ids in laz folder( ' + settings.laz_folder +
-                  ') and progress file (' + progress_file + 'do not match.' +
+                  ') and progress file (' + progress_file + ') do not match.' +
                   '\nPlease remove manually to reset.\nExiting script!')
             quit()
 

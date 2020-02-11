@@ -122,14 +122,30 @@ def process_tile(tile_id):
     # status_steps.append([return_value])
     # # gather logs for step and tile]
     # common.gather_logs('process_tiles', 'odm_export_normalized_z', tile_id)
-
-    ## Export point count for pre-defined intervals
-    return_value = points.odm_export_point_counts(tile_id)
+    #
+    ## Export canopy height
+    return_value = points.odm_export_canopy_height(tile_id)
     # Update progress variables
-    steps.append('odm_export_point_counts')
+    steps.append('odm_export_canopy_height')
     status_steps.append([return_value])
     # gather logs for step and tile]
-    common.gather_logs('process_tiles', 'odm_export_point_counts', tile_id)
+    common.gather_logs('process_tiles', 'odm_export_canopy_height', tile_id)
+
+    # ## Export point count for pre-defined intervals
+    # return_value = points.odm_export_point_counts(tile_id)
+    # # Update progress variables
+    # steps.append('odm_export_point_counts')
+    # status_steps.append([return_value])
+    # # gather logs for step and tile]
+    # common.gather_logs('process_tiles', 'odm_export_point_counts', tile_id)
+
+    # ## Export amplitude mean and sd
+    # return_value = points.odm_export_amplitude(tile_id)
+    # # Update progress variables
+    # steps.append('odm_export_amplitude')
+    # status_steps.append([return_value])
+    # # gather logs for step and tile]
+    # common.gather_logs('process_tiles', 'odm_export_amplitude', tile_id)
 
     ## Logging: finalise log outputs
     # Zip into pandas data frame
@@ -155,13 +171,13 @@ if __name__ == '__main__':
     print('\n' + '-' * 80 + 'Starting process_tiles.py at ' + str(startTime.strftime('%c')) + '\n')
 
     ## Prepare process managment and logging
-    progress_df = common.init_log_folder('process_tiles', laz_tile_ids)
+    progress_df = common.init_log_folder('process_tiles', laz_tile_ids[0:10])
 
     ## Identify which tiles still require processing
     tiles_to_process = set(progress_df.index.values[progress_df['processing'] != 'complete'].tolist())
     # Set up processing pool
     multiprocessing.set_executable(settings.python_exec_path)
-    n_processes = 54
+    n_processes = 10 # 54
     pool = multiprocessing.Pool(processes=n_processes)
 
     # Execute processing of tiles

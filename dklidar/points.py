@@ -282,7 +282,7 @@ def odm_export_normalized_z(tile_id):
         export_normalized_z.outFile = out_file_mean
         export_normalized_z.attribute = 'normalizedZ'
         export_normalized_z.feature = 'mean'
-        export_normalized_z.cellSize = 10 # This is also the default cell size, so technically not needed.
+        export_normalized_z.cellSize = settings.out_cell_size 
         export_normalized_z.limit = 'corner' # This switch is really important when working with tiles!
                                     # It sets the ROI to the extent to the bounding box of points in the ODM
         export_normalized_z.commons.screenLogLevel = opals.Types.LogLevel.none
@@ -298,7 +298,7 @@ def odm_export_normalized_z(tile_id):
         export_normalized_z.outFile = out_file_sd
         export_normalized_z.attribute = 'normalizedZ'
         export_normalized_z.feature = 'stdDev'
-        export_normalized_z.cellSize = 10 # This is also the default cell size, so technically not needed.
+        export_normalized_z.cellSize = settings.out_cell_size
         export_normalized_z.limit = 'corner' # This switch is really important when working with tiles!
                                     # It sets the ROI to the extent to the bounding box of points in the ODM
         export_normalized_z.commons.screenLogLevel = opals.Types.LogLevel.none
@@ -307,6 +307,75 @@ def odm_export_normalized_z(tile_id):
         return_value = 'success'
     except:
         return_value = 'opalsError'
+
+    # Return exist status
+    return (return_value)
+
+def odm_export_canopy_height(tile_id):
+    """
+    Exports the canopy height (95 percentile of normalised height only for points classified as vegetation) to the 10 m x 10 m raster grid.
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+    :return: execution status
+    """
+    # Initiate return value
+    return_value = ''
+    log_output = ''
+
+    # Generate file paths
+    odm_file = settings.odm_folder + '/odm_' + tile_id + '.odm'
+    temp_file = os.getcwd() + '/' + tile_id + '_temp.tif'
+    out_folder = settings.output_folder + '/canopy_height'
+    if not os.path.exists(out_folder): os.mkdir(out_folder)
+
+    out_file = out_folder + '/canopy_height_' + tile_id + '.tif'
+
+    # Export canopy height
+    try:
+        # Initialise exporter
+        export_canopy_height = opals.Cell.Cell()
+
+        # Export mean
+        export_canopy_height.inFile = odm_file
+        export_canopy_height.outFile = temp_file
+        export_canopy_height.attribute = 'normalizedZ'
+        export_canopy_height.feature = 'quantile:0.95'
+        # Apply extraction only to points classified as vegetation:
+        export_canopy_height.filter = settings.veg_classes_filter
+        # Set no data value to zero. Later the no data value will be set to -9999 this will assure that there are no
+        # holes in the dataset for pixels where there are no points classified as vegetation.
+        export_canopy_height.noData = 0
+        export_canopy_height.cellSize = settings.out_cell_size
+        export_canopy_height.limit = 'corner' # This switch is really important when working with tiles!
+                                    # It sets the ROI to the extent to the bounding box of points in the ODM
+        export_canopy_height.commons.screenLogLevel = opals.Types.LogLevel.none
+        export_canopy_height.commons.nbThreads = settings.nbThreads
+        export_canopy_height.run()
+
+        return_value = 'success'
+    except:
+        return_value = 'opalsError'
+
+    # Use gdal_translate to set Nodata value to -9999 (this will not affect any cell values only the file header)
+    try:
+        # Specify gdal command
+        cmd = settings.gdal_translate_bin + ' -a_nodata -9999 ' + temp_file + ' ' + out_file
+        log_output = log_output + '\n' + tile_id + ' setting no data value... \n' + \
+            subprocess.check_output(cmd, shell=False,  stderr=subprocess.STDOUT) + \
+                     tile_id + ' successful.\n\n'
+        # set exit status
+        return_value = 'success'
+    except:
+        log_output = log_output + tile_id + ' setting no data value... \n' + tile_id + ' failed.\n\n'
+        if return_value == 'opalsError': pass
+        else: return_value = 'gdalError'
+
+    # Write log output to log file
+    log_file = open('log.txt', 'a+')
+    log_file.write(log_output)
+    log_file.close()
+
+    # Remove temp raster file
+    os.remove(temp_file)
 
     # Return exist status
     return (return_value)
@@ -342,7 +411,7 @@ def odm_export_point_count(tile_id, lower_limit = 0.0, upper_limit = 50.0):
         export_point_count.filter = 'generic[NormalizedZ >= ' + str(lower_limit) + ' and NormalizedZ < ' + \
                                     str(upper_limit) + ']'
         export_point_count.feature = 'pcount'
-        export_point_count.cellSize = 10 # This is also the default cell size, so technically not needed.
+        export_point_count.cellSize = settings.out_cell_size
         export_point_count.limit = 'corner' # This switch is really important when working with tiles!
                                     # It sets the ROI to the extent to the bounding box of points in the ODM
         export_point_count.commons.screenLogLevel = opals.Types.LogLevel.none
@@ -369,17 +438,17 @@ def odm_export_point_counts(tile_id):
 
     # 0-2 m at 0.5 m intervals
     for lower in numpy.arange(0.0, 1.5, 0.5):
-        return_values.extend(odm_export_point_count(tile_id, lower, lower + 0.5))
+        return_values.append(odm_export_point_count(tile_id, lower, lower + 0.5))
 
     # 2-20 m at 1 m intervals
     for lower in range(2, 19, 1):
-        return_values.extend(odm_export_point_count(tile_id, lower, lower + 1))
+        return_values.append(odm_export_point_count(tile_id, lower, lower + 1))
 
     # 20-25 m at 5 m interval
-    return_values.extend(odm_export_point_count(tile_id, 20, 25))
+    return_values.append(odm_export_point_count(tile_id, 20, 25))
 
     # 25 m to 50 m
-    return_values.extend(odm_export_point_count(tile_id, 25, 50))
+    return_values.append(odm_export_point_count(tile_id, 25, 50))
 
     # Set return value status
     # There are only two return value states so if there is more than one return value in the list
@@ -389,6 +458,65 @@ def odm_export_point_counts(tile_id):
     if len(return_values) > 1:
         return_value = "opalsError"
     else:
-        return_value = return_values[0]
+        return_value = list(return_values)[0]
 
     return return_value
+
+def odm_export_amplitude(tile_id):
+    """
+    Exports mean and variacne for the lidar amplitude at the 10 m x 10 m grid cell.
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+    :return: execution status
+    """
+    # Initiate return value
+    return_value = ''
+
+    # Generate file paths
+    odm_file = settings.odm_folder + '/odm_' + tile_id + '.odm'
+    out_folder = settings.output_folder + '/amplitude'
+    if not os.path.exists(out_folder): os.mkdir(out_folder)
+    if not os.path.exists(out_folder + '/mean'): os.mkdir(out_folder + '/mean')
+    if not os.path.exists(out_folder + '/sd'): os.mkdir(out_folder + '/sd')
+
+    out_file_mean = out_folder + '/mean/amplitude_mean_' + tile_id + '.tif'
+    out_file_sd = out_folder + '/sd/amplitude_mean_' + tile_id + '.tif'
+
+    # Export normalized z raster mean and sd
+    try:
+        # Initialise exporter
+        export_normalized_z = opals.Cell.Cell()
+
+        # Export mean
+        export_normalized_z.inFile = odm_file
+        export_normalized_z.outFile = out_file_mean
+        export_normalized_z.attribute = 'amplitude'
+        export_normalized_z.feature = 'mean'
+        export_normalized_z.cellSize = settings.out_cell_size
+        export_normalized_z.limit = 'corner'  # This switch is really important when working with tiles!
+        # It sets the ROI to the extent to the bounding box of points in the ODM
+        export_normalized_z.commons.screenLogLevel = opals.Types.LogLevel.none
+        export_normalized_z.commons.nbThreads = settings.nbThreads
+        export_normalized_z.run()
+
+        # Reset  exporter
+        export_normalized_z.reset()
+
+        # Export sd
+        export_normalized_z = opals.Cell.Cell()
+        export_normalized_z.inFile = odm_file
+        export_normalized_z.outFile = out_file_sd
+        export_normalized_z.attribute = 'amplitude'
+        export_normalized_z.feature = 'stdDev'
+        export_normalized_z.cellSize = settings.out_cell_size
+        export_normalized_z.limit = 'corner'  # This switch is really important when working with tiles!
+        # It sets the ROI to the extent to the bounding box of points in the ODM
+        export_normalized_z.commons.screenLogLevel = opals.Types.LogLevel.none
+        export_normalized_z.commons.nbThreads = settings.nbThreads
+        export_normalized_z.run()
+        return_value = 'success'
+    except:
+        return_value = 'opalsError'
+
+    # Return exist status
+    return (return_value)
+
