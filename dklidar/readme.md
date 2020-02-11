@@ -35,8 +35,8 @@ odm_add_normalized_z | Adds normalised height attribute to an ODM point cloud (s
 odm_export_normalized_z | Exports mean and sd of normalised height for a given tile.
 odm_export_canopy_height | Exports canopy height as normalised height attribute of the 0.95th-quantile.
 odm_export_amplitude | Exports the mean and sd of all amplitude values in the cell.
-odm_export_point_count | Exports point count for a fiven height bracket (defined by parameters).
-odm_export_point_counts | Exports point counts for a pre-defined set of height brackets (using odm_expport_point_count). 
+odm_export_point_count | Exports point count for a fiven height bracket defined by parameters.
+odm_export_point_counts | Exports point counts for a pre-defined set of height brackets, using the odm_expport_point_count function. 
 
 ### dtm.py
 Functions for processing raster DTM data.
