@@ -282,7 +282,7 @@ def odm_export_normalized_z(tile_id):
         export_normalized_z.outFile = out_file_mean
         export_normalized_z.attribute = 'normalizedZ'
         export_normalized_z.feature = 'mean'
-        export_normalized_z.cellSize = settings.out_cell_size 
+        export_normalized_z.cellSize = settings.out_cell_size
         export_normalized_z.limit = 'corner' # This switch is really important when working with tiles!
                                     # It sets the ROI to the extent to the bounding box of points in the ODM
         export_normalized_z.commons.screenLogLevel = opals.Types.LogLevel.none
@@ -484,35 +484,36 @@ def odm_export_amplitude(tile_id):
     # Export normalized z raster mean and sd
     try:
         # Initialise exporter
-        export_normalized_z = opals.Cell.Cell()
+        export_amplitude = opals.Cell.Cell()
 
         # Export mean
-        export_normalized_z.inFile = odm_file
-        export_normalized_z.outFile = out_file_mean
-        export_normalized_z.attribute = 'amplitude'
-        export_normalized_z.feature = 'mean'
-        export_normalized_z.cellSize = settings.out_cell_size
-        export_normalized_z.limit = 'corner'  # This switch is really important when working with tiles!
+        export_amplitude.inFile = odm_file
+        export_amplitude.outFile = out_file_mean
+        export_amplitude.attribute = 'amplitude'
+        export_amplitude.feature = 'mean'
+        export_amplitude.cellSize = settings.out_cell_size
+        export_amplitude.limit = 'corner'  # This switch is really important when working with tiles!
         # It sets the ROI to the extent to the bounding box of points in the ODM
-        export_normalized_z.commons.screenLogLevel = opals.Types.LogLevel.none
-        export_normalized_z.commons.nbThreads = settings.nbThreads
-        export_normalized_z.run()
+        export_amplitude.commons.screenLogLevel = opals.Types.LogLevel.none
+        export_amplitude.commons.nbThreads = settings.nbThreads
+        export_amplitude.run()
 
         # Reset  exporter
-        export_normalized_z.reset()
+        export_amplitude.reset()
 
         # Export sd
-        export_normalized_z = opals.Cell.Cell()
-        export_normalized_z.inFile = odm_file
-        export_normalized_z.outFile = out_file_sd
-        export_normalized_z.attribute = 'amplitude'
-        export_normalized_z.feature = 'stdDev'
-        export_normalized_z.cellSize = settings.out_cell_size
-        export_normalized_z.limit = 'corner'  # This switch is really important when working with tiles!
+        export_amplitude = opals.Cell.Cell()
+        export_amplitude.inFile = odm_file
+        export_amplitude.outFile = out_file_sd
+        export_amplitude.attribute = 'amplitude'
+        export_amplitude.feature = 'stdDev'
+        export_amplitude.cellSize = settings.out_cell_size
+        export_amplitude.limit = 'corner'  # This switch is really important when working with tiles!
         # It sets the ROI to the extent to the bounding box of points in the ODM
-        export_normalized_z.commons.screenLogLevel = opals.Types.LogLevel.none
-        export_normalized_z.commons.nbThreads = settings.nbThreads
-        export_normalized_z.run()
+        export_amplitude.commons.screenLogLevel = opals.Types.LogLevel.none
+        export_amplitude.commons.nbThreads = settings.nbThreads
+        export_amplitude.run()
+        
         return_value = 'success'
     except:
         return_value = 'opalsError'
