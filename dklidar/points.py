@@ -42,6 +42,7 @@ def odm_import_single_tile(tile_id):
     # return execution status
     return(return_value)
 
+
 ## Define function to load neighbourhood of tiles into ODM
 def odm_import_mosaic(tile_id):
     """
@@ -169,6 +170,7 @@ def odm_generate_footprint(tile_id):
     # return status output
     return(return_value)
 
+
 ## Def: Retrieve CRS
 def odm_validate_crs(tile_id):
     """
@@ -216,6 +218,7 @@ def odm_validate_crs(tile_id):
 
     return(return_value)
 
+
 def odm_add_normalized_z(tile_id, mosaic = False):
     """
     Adds a adding a "normalizedZ' variable to each point in and ODM file by normalising the height using the DTM.
@@ -252,6 +255,7 @@ def odm_add_normalized_z(tile_id, mosaic = False):
 
     # Return exist status
     return(return_value)
+
 
 def odm_export_normalized_z(tile_id):
     """
@@ -310,6 +314,7 @@ def odm_export_normalized_z(tile_id):
 
     # Return exist status
     return (return_value)
+
 
 def odm_export_canopy_height(tile_id):
     """
@@ -380,7 +385,8 @@ def odm_export_canopy_height(tile_id):
     # Return exist status
     return (return_value)
 
-def odm_export_point_count(tile_id, lower_limit = 0.0, upper_limit = 50.0):
+
+def odm_export_veg_point_count(tile_id, lower_limit = 0.0, upper_limit = 50.0):
     """
     Exports point count for a 10 m x 10 m cell and normalised hight interval specified by the lower and upper limit parameters.
     :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
@@ -394,7 +400,7 @@ def odm_export_point_count(tile_id, lower_limit = 0.0, upper_limit = 50.0):
     # Generate paths
     odm_file = settings.odm_folder + '/odm_' + tile_id + '.odm'
     out_folder = settings.output_folder + '/point_count'
-    prefix = 'point_count_' + str(lower_limit) + 'm-' + str(upper_limit) + 'm'
+    prefix = 'veg_point_count_' + str(lower_limit) + 'm-' + str(upper_limit) + 'm'
     out_file = out_folder + '/' + prefix + '/' + prefix + '_' + tile_id + '.tif'
 
     if not os.path.exists(out_folder): os.mkdir(out_folder)
@@ -409,7 +415,7 @@ def odm_export_point_count(tile_id, lower_limit = 0.0, upper_limit = 50.0):
         export_point_count.inFile = odm_file
         export_point_count.outFile = out_file
         export_point_count.filter = 'generic[NormalizedZ >= ' + str(lower_limit) + ' and NormalizedZ < ' + \
-                                    str(upper_limit) + ']'
+                                    str(upper_limit) + '] AND ' + settings.veg_classes_filter
         export_point_count.feature = 'pcount'
         export_point_count.cellSize = settings.out_cell_size
         export_point_count.limit = 'corner' # This switch is really important when working with tiles!
@@ -425,7 +431,54 @@ def odm_export_point_count(tile_id, lower_limit = 0.0, upper_limit = 50.0):
     # Return exist status
     return (return_value)
 
-def odm_export_point_counts(tile_id):
+
+def odm_export_ground_point_count(tile_id, lower_limit = -1, upper_limit = 1):
+    """
+    Exports point count for a 10 m x 10 m cell and normalised hight interval specified by the lower and upper limit parameters.
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+    :param lower_limit: lower limit for the height interval to count in (normalised height in m).
+    :param upper_limit: upper limit for the height interval to count in (normalised height in m).
+    :return: execution status
+    """
+    # Initiate return value
+    return_value = ''
+
+    # Generate paths
+    odm_file = settings.odm_folder + '/odm_' + tile_id + '.odm'
+    out_folder = settings.output_folder + '/point_count'
+    prefix = 'ground_point_count_' + str(lower_limit) + 'm-' + str(upper_limit) + 'm'
+    out_file = out_folder + '/' + prefix + '/' + prefix + '_' + tile_id + '.tif'
+
+    if not os.path.exists(out_folder): os.mkdir(out_folder)
+    if not os.path.exists(out_folder + '/' + prefix): os.mkdir(out_folder + '/' + prefix)
+
+    # Export normalized z raster mean and sd
+    try:
+        # Initialise exporter
+        export_point_count = opals.Cell.Cell()
+
+        # Export mean
+        export_point_count.inFile = odm_file
+        export_point_count.outFile = out_file
+        export_point_count.filter = 'generic[NormalizedZ >= ' + str(lower_limit) + ' and NormalizedZ < ' + \
+                                    str(upper_limit) + '] AND generic[Classification == 2]'
+        export_point_count.feature = 'pcount'
+        export_point_count.cellSize = settings.out_cell_size
+        export_point_count.limit = 'corner' # This switch is really important when working with tiles!
+                                    # It sets the ROI to the extent to the bounding box of points in the ODM
+        export_point_count.commons.screenLogLevel = opals.Types.LogLevel.none
+        export_point_count.commons.nbThreads = settings.nbThreads
+        export_point_count.run()
+
+        return_value = 'success'
+    except:
+        return_value = 'opalsError'
+
+    # Return exist status
+    return (return_value)
+
+
+def odm_export_veg_point_counts(tile_id):
     """
     Exports point counts for multiple, pre definided height intervals by calling the odm_export_point_count function.
     :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
@@ -437,18 +490,18 @@ def odm_export_point_counts(tile_id):
     # Execute point counts for all specified intervals
 
     # 0-2 m at 0.5 m intervals
-    for lower in numpy.arange(0.0, 1.5, 0.5):
-        return_values.append(odm_export_point_count(tile_id, lower, lower + 0.5))
+    for lower in numpy.arange(0, 1.5, 0.5):
+        return_values.append(odm_export_veg_point_count(tile_id, lower, lower + 0.5))
 
     # 2-20 m at 1 m intervals
     for lower in range(2, 19, 1):
-        return_values.append(odm_export_point_count(tile_id, lower, lower + 1))
+        return_values.append(odm_export_veg_point_count(tile_id, lower, lower + 1))
 
     # 20-25 m at 5 m interval
-    return_values.append(odm_export_point_count(tile_id, 20, 25))
+    return_values.append(odm_export_veg_point_count(tile_id, 20, 25))
 
     # 25 m to 50 m
-    return_values.append(odm_export_point_count(tile_id, 25, 50))
+    return_values.append(odm_export_veg_point_count(tile_id, 25, 50))
 
     # Set return value status
     # There are only two return value states so if there is more than one return value in the list
@@ -461,6 +514,7 @@ def odm_export_point_counts(tile_id):
         return_value = list(return_values)[0]
 
     return return_value
+
 
 def odm_export_amplitude(tile_id):
     """
@@ -492,6 +546,7 @@ def odm_export_amplitude(tile_id):
         export_amplitude.attribute = 'amplitude'
         export_amplitude.feature = 'mean'
         export_amplitude.cellSize = settings.out_cell_size
+        export_amplitude.filter = settings.ground_and_veg_classes_filter # ground and veg points only
         export_amplitude.limit = 'corner'  # This switch is really important when working with tiles!
         # It sets the ROI to the extent to the bounding box of points in the ODM
         export_amplitude.commons.screenLogLevel = opals.Types.LogLevel.none
@@ -508,12 +563,13 @@ def odm_export_amplitude(tile_id):
         export_amplitude.attribute = 'amplitude'
         export_amplitude.feature = 'stdDev'
         export_amplitude.cellSize = settings.out_cell_size
+        export_amplitude.filter = settings.ground_and_veg_classes_filter  # ground and veg points only
         export_amplitude.limit = 'corner'  # This switch is really important when working with tiles!
         # It sets the ROI to the extent to the bounding box of points in the ODM
         export_amplitude.commons.screenLogLevel = opals.Types.LogLevel.none
         export_amplitude.commons.nbThreads = settings.nbThreads
         export_amplitude.run()
-        
+
         return_value = 'success'
     except:
         return_value = 'opalsError'
@@ -521,3 +577,154 @@ def odm_export_amplitude(tile_id):
     # Return exist status
     return (return_value)
 
+def odm_export_point_source_info(tile_id):
+    """
+
+    :return:
+    """
+
+    # Initate return value
+    return_value = ''
+
+    # Set file path
+    odm_file = settings.odm_folder + '/odm_' + tile_id + '.odm'
+
+    # Set output paths
+    out_folder = settings.output_folder + '/point_source_info'
+    out_folder_ids = out_folder + '/point_source_ids'
+    out_folder_counts = out_folder + '/point_source_counts'
+    out_folder_prop = out_folder + '/point_source_proportion'
+    out_folder_mode = out_folder + '/point_source_mode'
+
+    if not os.path.exists(out_folder): os.mkdir(out_folder)
+    if not os.path.exists(out_folder_ids): os.mkdir(out_folder_ids)
+    if not os.path.exists(out_folder_counts): os.mkdir(out_folder_counts)
+    if not os.path.exists(out_folder_prop): os.mkdir(out_folder_prop)
+    if not os.path.exists(out_folder_mode): os.mkdir(out_folder_mode)
+
+    ## Look up unique point source ids found in odm file
+    try:
+        # Open odm in python DM
+        dm = opals.pyDM.Datamanager.load(odm_file)
+
+        # Create layout and add 'PointSourceID' column
+        lf = opals.pyDM.AddInfoLayoutFactory()
+        lf.addColumn(dm, 'PointSourceId', True)
+        layout = lf.getLayout()
+
+        # Get set of histograms for layout (this will only have one item, the histogram for the point source id column)
+        histograms_set = dm.getHistogramSet(layout)
+
+        # Initate list of point source ids
+        point_source_ids = []
+
+        # Load unique point source ids from histogram
+        # The histogram set does not allow subsetting, so we loop through it. As it will only have one object, this does not
+        # matter
+        for histo in histograms_set.histograms():
+            for value, count in histo.values():
+                point_source_ids.append(value)
+        print point_source_ids
+
+        # Next use opals cell to extact point counts for each point source id
+        for point_source_id in point_source_ids:
+            print(settings.ground_and_veg_classes_filter +
+                                         ' AND Generic[PointSourceId == ' + str(point_source_id) + ']')
+            # Initate opals cell module
+            export_point_count = opals.Cell.Cell()
+
+            # Export point count
+            export_point_count.inFile = odm_file
+            export_point_count.outFile = 'temp_count_' + str(point_source_id) + '.tif'
+            export_point_count.filter =  settings.ground_and_veg_classes_filter +\
+                                         ' AND Generic[PointSourceId == ' + str(point_source_id) + ']'
+            export_point_count.feature = 'pcount'
+            export_point_count.cellSize = settings.out_cell_size
+            export_point_count.limit = 'corner'  # This switch is really important when working with tiles!
+            # It sets the ROI to the extent to the bounding box of points in the ODM
+            export_point_count.commons.screenLogLevel = opals.Types.LogLevel.none
+            export_point_count.commons.nbThreads = settings.nbThreads
+            export_point_count.run()
+
+            export_point_count.reset()
+
+    #     # Merge files into one:
+    #     # Specify gdal command
+    #     cmd = settings.gdal_merge_bin + '-a_nodata -9999 -separate ' + '-o ' + out_folder_counts + '/point_count_' + tile_id + '.tif ' +\
+    #          'temp_count_' + '.tif temp_count_'.join(point_source_ids) + '.tif'
+    #
+    #     # Execute gdal command
+    #     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+    #
+    #     ## Calculate proportion of hits pre cell per point source
+    #     # Prep gdal command
+    #     alphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+    #     files_string = ''
+    #     sum_string = ''
+    #     for i in range(len(point_source_ids)):
+    #         files_string = files_string + ' -' + alphabet[i] + ' ' + 'temp_count_' + point_source_ids[i] + '.tif '
+    #         sum_string = sum_string.append(alphabet[i])
+    #     sum_string = '+'.join(sum_string)
+    #
+    #     # Specify gdal command
+    #     cmd = settings.gdal_calc_bin + files_string + '--outfile=temp_total_points.tif --calc=' + sum_string +\
+    #           '--NoDataValue=-9999'
+    #     # Execute gdal command
+    #     subprocess.check_output(cmd, shell=False,  stderr=subprocess.STDOUT)
+    #
+    #     # calculate proportions
+    #     for point_source_id in point_source_ids:
+    #         # Specify gdal command
+    #         cmd = settings.gdal_calc_bin + '-A temp_count_' + point_source_id + '.tif ' + '-B temp_total_points.tif ' +\
+    #               '--outfile=temp_prop_points_' +  point_source_id + '.tif --calc=A/B' + '--NoDataValue=-9999'
+    #         # Execute gdal command
+    #         subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+    #     # set exit status
+    #     return_value = 'success'
+    #
+    #     # Merge files into one:
+    #     # Specify gdal command
+    #     cmd = settings.gdal_merge_bin + '-a_nodata -9999 -separate ' + '-o ' + out_folder_prop + '/point_source_prop_' + tile_id + '.tif ' +\
+    #          'temp_prop_points_' + '.tif temp_prop_points_'.join(point_source_ids) + '.tif'
+    #
+    #     # Execute gdal command
+    #     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+    #
+    #     ## Create a layer with presence / absence of point source id indicated by the point source id itself
+    #     for point_source_id in point_source_ids:
+    #         # Specify gdal command
+    #         cmd = settings.gdal_calc_bin + '-A temp_count_' + point_source_id + '.tif ' + \
+    #               '--outfile=temp_presence_' + point_source_id + '.tif --calc=' + point_source_id + '*(A>0)' \
+    #               '--NoDataValue=-9999'
+    #         # Execute gdal command
+    #         subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+    #
+    #     ## Merge files into one:
+    #     # Specify gdal command
+    #     cmd = settings.gdal_merge_bin + '-a_nodata -9999 -separate ' + '-o ' + out_folder_ids + '/point_sources_' + tile_id + '.tif ' +\
+    #          'temp_presence_' + '.tif temp_presence_'.join(point_source_ids) + '.tif'
+    #
+    #     # Execute gdal command
+    #     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+    #
+    #     ## Extract mode of point count ids
+    #     # Initate opals cell module
+    #     export_point_mode = opals.Cell.Cell()
+    #
+    #     # Export point count
+    #     export_point_mode.inFile = odm_file
+    #     export_point_mode.outFile = out_folder_mode + '/point_source_mode_' + tile_id + '.tif'
+    #     export_point_mode.filter = settings.ground_and_veg_classes_filter
+    #     export_point_mode.attribute = 'PointSourceID'
+    #     export_point_mode.feature = 'mode'
+    #     export_point_mode.cellSize = settings.out_cell_size
+    #     export_point_mode.limit = 'corner'  # This switch is really important when working with tiles!
+    #     # It sets the ROI to the extent to the bounding box of points in the ODM
+    #     export_point_mode.commons.screenLogLevel = opals.Types.LogLevel.none
+    #     export_point_mode.commons.nbThreads = settings.nbThreads
+    #     export_point_mode.run()
+    #
+    except:
+        return_value = 'opalsError'
+
+    return return_value

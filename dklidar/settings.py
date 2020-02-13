@@ -14,6 +14,8 @@ gdalwarp_bin = 'C:/OSGeo4W64/OSGeo4W.bat gdalwarp '
 gdaldem_bin = 'C:/OSGeo4W64/OSGeo4W.bat gdaldem '
 gdaltlindex_bin = 'C:/OSGeo4W64/OSGeo4W.bat gdaltindex '
 gdal_translate_bin = 'C:/OSGeo4W64/OSGeo4W.bat gdal_translate '
+gdal_calc_bin = 'C:/OSGeo4W64/OSGeo4W.bat gdal_calc '
+gdal_merge_bin = 'C:/OSGeo4W64/OSGeo4W.bat gdal_merge '
 
 ### Set folder locations
 # Main working directory
@@ -63,4 +65,5 @@ out_cell_size = 10
 ## Filter Strings
 
 # point filter for all three vegetation classes as OPALS WKT
-veg_classes_filter = "Generic[Classification == 3] OR Generic[Classification == 4] OR Generic[Classification == 5]"
+veg_classes_filter = "Generic[Classification == 3 OR Classification == 4 OR Classification == 5]"
+ground_and_veg_classes_filter = "Generic[Classification == 2 OR Classification == 3 OR Classification == 4 OR Classification == 5]"

@@ -1,14 +1,20 @@
-import multiprocessing
-import re
+import opals
 
-def f(x):
-    current = multiprocessing.current_process()
+opals.loadAllModules()
 
+dm = opals.pyDM.Datamanager.load('D:\Jakob\dk_nationwide_lidar\data\sample\odm\odm_6210_570.odm')
 
-    return re.sub('[(),]', '', str(current._identity))
+lf = opals.pyDM.AddInfoLayoutFactory()
+lf.addColumn(dm, "PointSourceId", True)
+layout = lf.getLayout()
 
+histograms_set = dm.getHistogramSet(layout)
+point_source_ids = []
+for histo in histograms_set.histograms():
+    print(histo)
+    for value in histo.values():
+        point_source_ids.append(value)
 
-if __name__ == '__main__':
+print('-' * 80)
 
-    p = multiprocessing.Pool(processes=54)
-    print p.map(f, range(100))
+print point_source_ids

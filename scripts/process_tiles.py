@@ -122,22 +122,46 @@ def process_tile(tile_id):
     # status_steps.append([return_value])
     # # gather logs for step and tile]
     # common.gather_logs('process_tiles', 'odm_export_normalized_z', tile_id)
-    #
-    ## Export canopy height
-    return_value = points.odm_export_canopy_height(tile_id)
-    # Update progress variables
-    steps.append('odm_export_canopy_height')
-    status_steps.append([return_value])
-    # gather logs for step and tile]
-    common.gather_logs('process_tiles', 'odm_export_canopy_height', tile_id)
-
-    # ## Export point count for pre-defined intervals
-    # return_value = points.odm_export_point_counts(tile_id)
+    # #
+    # ## Export canopy height
+    # return_value = points.odm_export_canopy_height(tile_id)
     # # Update progress variables
-    # steps.append('odm_export_point_counts')
+    # steps.append('odm_export_canopy_height')
     # status_steps.append([return_value])
     # # gather logs for step and tile]
-    # common.gather_logs('process_tiles', 'odm_export_point_counts', tile_id)
+    # common.gather_logs('process_tiles', 'odm_export_canopy_height', tile_id)
+
+    # ## Export vegetation point counts for pre-defined intervals
+    # return_value = points.odm_export_veg_point_counts(tile_id)
+    # # Update progress variables
+    # steps.append('odm_export_veg__point_counts')
+    # status_steps.append([return_value])
+    # # gather logs for step and tile]
+    # common.gather_logs('process_tiles', 'odm_export_veg__point_counts', tile_id)
+
+    # ## Export ground point count
+    # return_value = points.odm_export_ground_point_count(tile_id)
+    # # Update progress variables
+    # steps.append('odm_export_ground_point_count')
+    # status_steps.append([return_value])
+    # # gather logs for step and tile]
+    # common.gather_logs('process_tiles', 'odm_export_ground_point_count', tile_id)
+
+    # ## Export ground point count
+    # return_value = points.odm_export_veg_point_count(tile_id, 0, 50)
+    # # Update progress variables
+    # steps.append('odm_export_veg_point_count')
+    # status_steps.append([return_value])
+    # # gather logs for step and tile]
+    # common.gather_logs('process_tiles', 'odm_export_veg_point_count', tile_id)
+
+    ## Export point source information
+    return_value = points.odm_export_point_source_info(tile_id)
+    # Update progress variables
+    steps.append('odm_export_point_source_info')
+    status_steps.append([return_value])
+    # gather logs for step and tile]
+    common.gather_logs('process_tiles', 'odm_export_point_source_info', tile_id)
 
     # ## Export amplitude mean and sd
     # return_value = points.odm_export_amplitude(tile_id)
