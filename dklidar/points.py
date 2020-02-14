@@ -626,7 +626,6 @@ def odm_export_point_source_info(tile_id):
         for histo in histograms_set.histograms():
             for value, count in histo.values():
                 point_source_ids.append(value)
-        print point_source_ids
 
         # Remove dm object and close connection to odm file for later use
         del dm
