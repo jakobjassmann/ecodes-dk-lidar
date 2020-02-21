@@ -217,7 +217,7 @@ def odm_validate_crs(tile_id):
     except:
         return_value = return_value + 'Mosaic: error;'
 
-    return(return_value)
+    return return_value
 
 
 def odm_add_normalized_z(tile_id, mosaic = False):
@@ -387,21 +387,26 @@ def odm_export_canopy_height(tile_id):
     return (return_value)
 
 
-def odm_export_veg_point_count(tile_id, lower_limit = 0.0, upper_limit = 50.0):
+def odm_export_point_count(tile_id, name = 'vegetation_point_count', lower_limit = -1, upper_limit = 50.0, point_classes = None):
     """
     Exports point count for a 10 m x 10 m cell and normalised hight interval specified by the lower and upper limit parameters.
     :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+    :param name: identifier name for point count used in file and folder naming during export.
     :param lower_limit: lower limit for the height interval to count in (normalised height in m).
     :param upper_limit: upper limit for the height interval to count in (normalised height in m).
+    :param point_classes: classes to subset from
     :return: execution status
     """
     # Initiate return value
     return_value = ''
 
+    # Initiate point_classes default value if no value is provided:
+    if point_classes is None: point_classes = [3,4,5] # Veg class points
+
     # Generate paths
     odm_file = settings.odm_folder + '/odm_' + tile_id + '.odm'
     out_folder = settings.output_folder + '/point_count'
-    prefix = 'veg_point_count_' + str(lower_limit) + 'm-' + str(upper_limit) + 'm'
+    prefix = name + '_' + str(lower_limit) + 'm-' + str(upper_limit) + 'm'
     out_file = out_folder + '/' + prefix + '/' + prefix + '_' + tile_id + '.tif'
 
     if not os.path.exists(out_folder): os.mkdir(out_folder)
@@ -412,11 +417,15 @@ def odm_export_veg_point_count(tile_id, lower_limit = 0.0, upper_limit = 50.0):
         # Initialise exporter
         export_point_count = opals.Cell.Cell()
 
-        # Export mean
+        # Specificy filter strings:
+        height_filter = 'generic[NormalizedZ >= ' + str(lower_limit) + ' and NormalizedZ < ' + str(upper_limit) + ']'
+        class_filter = 'Generic[Classification == ' + \
+                       ' OR Classification == '.join([str(point_class) for point_class in point_classes]) + ']'
+
+        # Export point count
         export_point_count.inFile = odm_file
         export_point_count.outFile = out_file
-        export_point_count.filter = 'generic[NormalizedZ >= ' + str(lower_limit) + ' and NormalizedZ < ' + \
-                                    str(upper_limit) + '] AND ' + settings.veg_classes_filter
+        export_point_count.filter =  height_filter + ' AND ' + class_filter
         export_point_count.feature = 'pcount'
         export_point_count.cellSize = settings.out_cell_size
         export_point_count.limit = 'corner' # This switch is really important when working with tiles!
@@ -432,77 +441,50 @@ def odm_export_veg_point_count(tile_id, lower_limit = 0.0, upper_limit = 50.0):
     # Return exist status
     return (return_value)
 
-
-def odm_export_ground_point_count(tile_id, lower_limit = -1, upper_limit = 1):
+def odm_export_point_counts(tile_id):
     """
-    Exports point count for a 10 m x 10 m cell and normalised hight interval specified by the lower and upper limit parameters.
-    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
-    :param lower_limit: lower limit for the height interval to count in (normalised height in m).
-    :param upper_limit: upper limit for the height interval to count in (normalised height in m).
-    :return: execution status
-    """
-    # Initiate return value
-    return_value = ''
-
-    # Generate paths
-    odm_file = settings.odm_folder + '/odm_' + tile_id + '.odm'
-    out_folder = settings.output_folder + '/point_count'
-    prefix = 'ground_point_count_' + str(lower_limit) + 'm-' + str(upper_limit) + 'm'
-    out_file = out_folder + '/' + prefix + '/' + prefix + '_' + tile_id + '.tif'
-
-    if not os.path.exists(out_folder): os.mkdir(out_folder)
-    if not os.path.exists(out_folder + '/' + prefix): os.mkdir(out_folder + '/' + prefix)
-
-    # Export normalized z raster mean and sd
-    try:
-        # Initialise exporter
-        export_point_count = opals.Cell.Cell()
-
-        # Export mean
-        export_point_count.inFile = odm_file
-        export_point_count.outFile = out_file
-        export_point_count.filter = 'generic[NormalizedZ >= ' + str(lower_limit) + ' and NormalizedZ < ' + \
-                                    str(upper_limit) + '] AND generic[Classification == 2]'
-        export_point_count.feature = 'pcount'
-        export_point_count.cellSize = settings.out_cell_size
-        export_point_count.limit = 'corner' # This switch is really important when working with tiles!
-                                    # It sets the ROI to the extent to the bounding box of points in the ODM
-        export_point_count.commons.screenLogLevel = opals.Types.LogLevel.none
-        export_point_count.commons.nbThreads = settings.nbThreads
-        export_point_count.run()
-
-        return_value = 'success'
-    except:
-        return_value = 'opalsError'
-
-    # Return exist status
-    return (return_value)
-
-
-def odm_export_veg_point_counts(tile_id):
-    """
-    Exports point counts for multiple, pre definided height intervals by calling the odm_export_point_count function.
+    Exports point counts for multiple classes and pre defined height intervals by calling the odm_export_point_count function.
     :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
     :return: execution status
     """
     # Initiate list for return values
     return_values = []
 
-    # Execute point counts for all specified intervals
+    # Execute point counts
+
+    ## Ground point count
+    return_values.append(odm_export_point_count(tile_id, 'ground_point_count', -1, 1, [2]))
+
+    ## Water point count
+    return_values.append(odm_export_point_count(tile_id, 'water_point_count', -1, 1, [9]))
+
+    ## Ground and water point count
+    return_values.append(odm_export_point_count(tile_id, 'ground_and_water_point_count', -1, 1, [2,9]))
+
+    ## Vegetation point count
+    return_values.append(odm_export_point_count(tile_id, 'vegetation_point_count', 0, 50, [3,4,5]))
+
+    ## Building point counts
+    return_values.append(odm_export_point_count(tile_id, 'building_point_count', -1, 50, [6]))
+
+    ## All classes
+    return_values.append(odm_export_point_count(tile_id, 'total_point_count', -1, 50, [2,3,4,5,6,9]))
+
+    ## Vegetation point counts for continous bins (classes 3,4,5)
 
     # 0-2 m at 0.5 m intervals
     for lower in numpy.arange(0, 1.5, 0.5):
-        return_values.append(odm_export_veg_point_count(tile_id, lower, lower + 0.5))
+        return_values.append(odm_export_point_count(tile_id, 'vegetation_point_count', lower, lower + 0.5, [3,4,5]))
 
     # 2-20 m at 1 m intervals
     for lower in range(2, 19, 1):
-        return_values.append(odm_export_veg_point_count(tile_id, lower, lower + 1))
+        return_values.append(odm_export_point_count(tile_id, 'vegetation_point_count', lower, lower + 1, [3,4,5]))
 
     # 20-25 m at 5 m interval
-    return_values.append(odm_export_veg_point_count(tile_id, 20, 25))
+    return_values.append(odm_export_point_count(tile_id, 'vegetation_point_count', 20, 25, [3,4,5]))
 
     # 25 m to 50 m
-    return_values.append(odm_export_veg_point_count(tile_id, 25, 50))
+    return_values.append(odm_export_point_count(tile_id, 'vegetation_point_count', 25, 50, [3,4,5]))
 
     # Set return value status
     # There are only two return value states so if there is more than one return value in the list
@@ -516,6 +498,86 @@ def odm_export_veg_point_counts(tile_id):
 
     return return_value
 
+def odm_calc_proportions(tile_id, prop_name, point_count_id1, point_count_id2):
+    """
+    Function to calculate point count proportions
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+    :param prop_name: name to be assinged to the proportions output
+    :param point_count_id1: name of point count to be rationed (numerator)
+    :param point_count_id2: name of point count to be rationed to (denominator)
+    :return: execution status
+    """
+    return_value = ''
+
+    # Generate paths
+    num_file = settings.output_folder + '/point_count/' + point_count_id1 + '/' + point_count_id1 + '_' + tile_id + '.tif'
+    den_file = settings.output_folder + '/point_count/' + point_count_id2 + '/' + point_count_id2 + '_' + tile_id + '.tif'
+
+    out_folder = settings.output_folder + '/proportions'
+    out_file = out_folder + '/' + prop_name + '/' + prop_name + '_' + tile_id + '.tif'
+
+    if not os.path.exists(out_folder): os.mkdir(out_folder)
+    if not os.path.exists(out_folder + '/' + prop_name): os.mkdir(out_folder + '/' + prop_name)
+
+    try:
+        # Specify gdal command
+        cmd = settings.gdal_calc_bin + '-A ' + num_file + ' -B ' + den_file + ' --outfile=' + out_file + \
+              ' --calc=1000*A/B' + ' --type=Int16' + ' --NoDataValue=-9999'
+        # Execute gdal command
+        subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+        return_value = 'success'
+    except:
+        return_value = 'gdalError'
+
+    return return_value
+
+def odm_export_proportions(tile_id):
+    """
+    Exports proportions for: canopy openness, canopy height profile, buildings point counts
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+    :return: exit status
+    """
+    # Initiate return values
+    return_values = []
+
+    ## Export canopy openness
+    return_values.append(odm_calc_proportions(tile_id, 'canopy_openness', 'ground_and_water_point_count_-1m-1m',
+                                              'total_point_count_-1m-50m'))
+
+    # Export canopy height profile
+    # 0-2 m at 0.5 m intervals
+    for lower in numpy.arange(0, 1.5, 0.5):
+        veg_height_bin = 'vegetation_point_count_' + str(lower) + 'm-' + str(lower + 0.5) + 'm'
+        return_values.append(odm_calc_proportions(tile_id, 'canopy_openness', veg_height_bin,
+                                                  'vegetation_point_count_0m-50m'))
+
+    # 2-20 m at 1 m intervals
+    for lower in range(2, 19, 1):
+        veg_height_bin = 'vegetation_point_count_' + str(lower) + 'm-' + str(lower + 2) + 'm'
+        return_values.append(odm_calc_proportions(tile_id, 'canopy_openness', veg_height_bin,
+                                                  'vegetation_point_count_0m-50m'))
+
+    return_values.append(odm_calc_proportions(tile_id, 'canopy_openness', 'vegetation_point_count_20m-25m',
+                                              'vegetation_point_count_0m-50m'))
+
+    return_values.append(odm_calc_proportions(tile_id, 'canopy_openness', 'vegetation_point_count_25m-50m',
+                                              'vegetation_point_count_0m-50m'))
+
+    # Export building proportion
+    return_values.append(odm_calc_proportions(tile_id, 'canopy_openness', 'ground_and_water_point_count_-1m-1m',
+                                              'vegetation_point_count_0m-50m'))
+
+    # Set return value status
+    # There are only two return value states so if there is more than one return value in the list
+    # one of them has to be an opalsError
+    return_values = set(return_values)
+
+    if len(return_values) > 1:
+        return_value = "gdalError"
+    else:
+        return_value = list(return_values)[0]
+
+    return return_value
 
 def odm_export_amplitude(tile_id):
     """
