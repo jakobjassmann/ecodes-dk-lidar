@@ -77,13 +77,13 @@ def process_tile(tile_id):
     steps = ['processing']
     status_steps = [['complete']]
 
-    # ## Import tile to ODM
-    # return_value = points.odm_import_single_tile(tile_id)
-    # # Update progress variables
-    # steps.append('odm_import_single_tile')
-    # status_steps.append([return_value])
-    # # gather logs for step and tile
-    # common.gather_logs('process_tiles', 'odm_import_single_tile', tile_id)
+    ## Import tile to ODM
+    return_value = points.odm_import_single_tile(tile_id)
+    # Update progress variables
+    steps.append('odm_import_single_tile')
+    status_steps.append([return_value])
+    # gather logs for step and tile
+    common.gather_logs('process_tiles', 'odm_import_single_tile', tile_id)
     #
     # ## Import tile neighbourhood mosaic
     # return_value = points.odm_import_mosaic(tile_id)
@@ -93,51 +93,51 @@ def process_tile(tile_id):
     # # gather logs for step and tile
     # common.gather_logs('process_tiles', 'odm_import_mosaic', tile_id)
     #
-    # ## Validate CRS of odm files
-    # return_value = points.odm_validate_crs(tile_id)
-    # # Update progress variables
-    # steps.append('odm_validate_crs')
-    # status_steps.append([return_value])
-    #
-    # ## Export footprint
-    # return_value = points.odm_generate_footprint(tile_id)
-    # # Update progress variables
-    # steps.append('odm_generate_footprint')
-    # status_steps.append([return_value])
-    # # gather logs for step and tile]
-    # common.gather_logs('process_tiles', 'odm_generate_footprint', tile_id)
-    #
-    # ## Normalise height
-    # return_value = points.odm_add_normalized_z(tile_id)
-    # # Update progress variables
-    # steps.append('odm_add_normalized_z')
-    # status_steps.append([return_value])
-    # # gather logs for step and tile]
-    # common.gather_logs('process_tiles', 'odm_add_normalized_z', tile_id)
-    #
-    # ## Export mean normalised height for 10 m x 10 m cell
-    # return_value = points.odm_export_normalized_z(tile_id)
-    # # Update progress variables
-    # steps.append('odm_export_normalized_z')
-    # status_steps.append([return_value])
-    # # gather logs for step and tile]
-    # common.gather_logs('process_tiles', 'odm_export_normalized_z', tile_id)
-    # #
-    # ## Export canopy height
-    # return_value = points.odm_export_canopy_height(tile_id)
-    # # Update progress variables
-    # steps.append('odm_export_canopy_height')
-    # status_steps.append([return_value])
-    # # gather logs for step and tile]
-    # common.gather_logs('process_tiles', 'odm_export_canopy_height', tile_id)
+    ## Validate CRS of odm files
+    return_value = points.odm_validate_crs(tile_id)
+    # Update progress variables
+    steps.append('odm_validate_crs')
+    status_steps.append([return_value])
 
-    # ## Export vegetation point counts for pre-defined intervals
-    # return_value = points.odm_export_point_counts(tile_id)
-    # # Update progress variables
-    # steps.append('odm_export_point_counts')
-    # status_steps.append([return_value])
-    # # gather logs for step and tile]
-    # common.gather_logs('process_tiles', 'odm_export_point_counts', tile_id)
+    ## Export footprint
+    return_value = points.odm_generate_footprint(tile_id)
+    # Update progress variables
+    steps.append('odm_generate_footprint')
+    status_steps.append([return_value])
+    # gather logs for step and tile]
+    common.gather_logs('process_tiles', 'odm_generate_footprint', tile_id)
+
+    ## Normalise height
+    return_value = points.odm_add_normalized_z(tile_id)
+    # Update progress variables
+    steps.append('odm_add_normalized_z')
+    status_steps.append([return_value])
+    # gather logs for step and tile]
+    common.gather_logs('process_tiles', 'odm_add_normalized_z', tile_id)
+
+    ## Export mean normalised height for 10 m x 10 m cell
+    return_value = points.odm_export_normalized_z(tile_id)
+    # Update progress variables
+    steps.append('odm_export_normalized_z')
+    status_steps.append([return_value])
+    # gather logs for step and tile]
+    common.gather_logs('process_tiles', 'odm_export_normalized_z', tile_id)
+    #
+    ## Export canopy height
+    return_value = points.odm_export_canopy_height(tile_id)
+    # Update progress variables
+    steps.append('odm_export_canopy_height')
+    status_steps.append([return_value])
+    # gather logs for step and tile]
+    common.gather_logs('process_tiles', 'odm_export_canopy_height', tile_id)
+
+    ## Export vegetation point counts for pre-defined intervals
+    return_value = points.odm_export_point_counts(tile_id)
+    # Update progress variables
+    steps.append('odm_export_point_counts')
+    status_steps.append([return_value])
+    # gather logs for step and tile]
+    common.gather_logs('process_tiles', 'odm_export_point_counts', tile_id)
 
     ## Export
     return_value = points.odm_export_proportions(tile_id)
@@ -147,21 +147,21 @@ def process_tile(tile_id):
     # gather logs for step and tile]
     common.gather_logs('process_tiles', 'odm_export_proportions', tile_id)
 
-    # ## Export point source information
-    # return_value = points.odm_export_point_source_info(tile_id)
-    # # Update progress variables
-    # steps.append('odm_export_point_source_info')
-    # status_steps.append([return_value])
-    # # gather logs for step and tile]
-    # common.gather_logs('process_tiles', 'odm_export_point_source_info', tile_id)
-    #
-    # ## Export amplitude mean and sd
-    # return_value = points.odm_export_amplitude(tile_id)
-    # # Update progress variables
-    # steps.append('odm_export_amplitude')
-    # status_steps.append([return_value])
-    # # gather logs for step and tile]
-    # common.gather_logs('process_tiles', 'odm_export_amplitude', tile_id)
+    ## Export point source information
+    return_value = points.odm_export_point_source_info(tile_id)
+    # Update progress variables
+    steps.append('odm_export_point_source_info')
+    status_steps.append([return_value])
+    # gather logs for step and tile]
+    common.gather_logs('process_tiles', 'odm_export_point_source_info', tile_id)
+
+    ## Export amplitude mean and sd
+    return_value = points.odm_export_amplitude(tile_id)
+    # Update progress variables
+    steps.append('odm_export_amplitude')
+    status_steps.append([return_value])
+    # gather logs for step and tile]
+    common.gather_logs('process_tiles', 'odm_export_amplitude', tile_id)
 
     ## Logging: finalise log outputs
     # Zip into pandas data frame
@@ -187,7 +187,7 @@ if __name__ == '__main__':
     print('\n' + '-' * 80 + 'Starting process_tiles.py at ' + str(startTime.strftime('%c')) + '\n')
 
     ## Prepare process managment and logging
-    progress_df = common.init_log_folder('process_tiles', laz_tile_ids[0:9])
+    progress_df = common.init_log_folder('process_tiles', laz_tile_ids)
 
     ## Identify which tiles still require processing
     tiles_to_process = set(progress_df.index.values[progress_df['processing'] != 'complete'].tolist())

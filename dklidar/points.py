@@ -508,6 +508,7 @@ def odm_calc_proportions(tile_id, prop_name, point_count_id1, point_count_id2):
     :return: execution status
     """
     return_value = ''
+    log_output = ''
 
     # Generate paths
     num_file = settings.output_folder + '/point_count/' + point_count_id1 + '/' + point_count_id1 + '_' + tile_id + '.tif'
@@ -524,10 +525,18 @@ def odm_calc_proportions(tile_id, prop_name, point_count_id1, point_count_id2):
         cmd = settings.gdal_calc_bin + '-A ' + num_file + ' -B ' + den_file + ' --outfile=' + out_file + \
               ' --calc=1000*A/B' + ' --type=Int16' + ' --NoDataValue=-9999'
         # Execute gdal command
-        subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+        log_output = log_output + '\n' + tile_id + ' calculation of proportions ' + prop_name + '... \n' + \
+            subprocess.check_output(cmd, shell=False,  stderr=subprocess.STDOUT)
+
         return_value = 'success'
     except:
+        log_output = log_output + '\n' + tile_id + ' calculation of proportions ' + prop_name + ' failed. gdalError \n'
         return_value = 'gdalError'
+
+    # Write log output to log file
+    log_file = open('log.txt', 'a+')
+    log_file.write(log_output)
+    log_file.close()
 
     return return_value
 
@@ -548,23 +557,25 @@ def odm_export_proportions(tile_id):
     # 0-2 m at 0.5 m intervals
     for lower in numpy.arange(0, 1.5, 0.5):
         veg_height_bin = 'vegetation_point_count_' + str(lower) + 'm-' + str(lower + 0.5) + 'm'
-        return_values.append(odm_calc_proportions(tile_id, 'canopy_openness', veg_height_bin,
+        prop_variable_bin = 'vegetation_proportion_' + str(lower) + 'm-' + str(lower + 0.5) + 'm'
+        return_values.append(odm_calc_proportions(tile_id, prop_variable_bin, veg_height_bin,
                                                   'vegetation_point_count_0m-50m'))
 
     # 2-20 m at 1 m intervals
     for lower in range(2, 19, 1):
-        veg_height_bin = 'vegetation_point_count_' + str(lower) + 'm-' + str(lower + 2) + 'm'
-        return_values.append(odm_calc_proportions(tile_id, 'canopy_openness', veg_height_bin,
+        veg_height_bin = 'vegetation_point_count_' + str(lower) + 'm-' + str(lower + 1) + 'm'
+        prop_variable_bin = 'vegetation_proportion_' + str(lower) + 'm-' + str(lower + 1) + 'm'
+        return_values.append(odm_calc_proportions(tile_id, prop_variable_bin, veg_height_bin,
                                                   'vegetation_point_count_0m-50m'))
 
-    return_values.append(odm_calc_proportions(tile_id, 'canopy_openness', 'vegetation_point_count_20m-25m',
+    return_values.append(odm_calc_proportions(tile_id, 'vegetation_proportion_20m-25m', 'vegetation_point_count_20m-25m',
                                               'vegetation_point_count_0m-50m'))
 
-    return_values.append(odm_calc_proportions(tile_id, 'canopy_openness', 'vegetation_point_count_25m-50m',
+    return_values.append(odm_calc_proportions(tile_id, 'vegetation_proportion_25m-50m', 'vegetation_point_count_25m-50m',
                                               'vegetation_point_count_0m-50m'))
 
     # Export building proportion
-    return_values.append(odm_calc_proportions(tile_id, 'canopy_openness', 'ground_and_water_point_count_-1m-1m',
+    return_values.append(odm_calc_proportions(tile_id, 'building_proportion', 'building_point_count_-1m-50m',
                                               'vegetation_point_count_0m-50m'))
 
     # Set return value status
