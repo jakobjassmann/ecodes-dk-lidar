@@ -193,7 +193,7 @@ if __name__ == '__main__':
     tiles_to_process = set(progress_df.index.values[progress_df['processing'] != 'complete'].tolist())
     # Set up processing pool
     multiprocessing.set_executable(settings.python_exec_path)
-    n_processes = 10 # 54
+    n_processes = 54 # 54
     pool = multiprocessing.Pool(processes=n_processes)
 
     # Execute processing of tiles

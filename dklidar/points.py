@@ -41,7 +41,7 @@ def odm_import_single_tile(tile_id):
         return_value = 'opalsError'
 
     # return execution status
-    return(return_value)
+    return return_value
 
 
 ## Define function to load neighbourhood of tiles into ODM
@@ -110,13 +110,14 @@ def odm_import_mosaic(tile_id):
     log_file.close()
 
     # return status output
-    return(return_value)
+    return return_value
+
 
 ## Def: Export tile footprint
 def odm_generate_footprint(tile_id):
     """
     Exports footprint from a laz file based on the tile_id in the DK nationwide dataset
-    :param laz_tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
     :return: returns execution status.
     """
 
@@ -169,7 +170,7 @@ def odm_generate_footprint(tile_id):
     os.remove(temp_tif_file)
 
     # return status output
-    return(return_value)
+    return return_value
 
 
 ## Def: Retrieve CRS
@@ -255,7 +256,7 @@ def odm_add_normalized_z(tile_id, mosaic = False):
         return_value = 'opalsError'
 
     # Return exist status
-    return(return_value)
+    return return_value
 
 
 def odm_export_normalized_z(tile_id):
@@ -314,7 +315,7 @@ def odm_export_normalized_z(tile_id):
         return_value = 'opalsError'
 
     # Return exist status
-    return (return_value)
+    return return_value
 
 
 def odm_export_canopy_height(tile_id):
@@ -384,7 +385,7 @@ def odm_export_canopy_height(tile_id):
     os.remove(temp_file)
 
     # Return exist status
-    return (return_value)
+    return return_value
 
 
 def odm_export_point_count(tile_id, name = 'vegetation_point_count', lower_limit = -1, upper_limit = 50.0, point_classes = None):
@@ -439,7 +440,8 @@ def odm_export_point_count(tile_id, name = 'vegetation_point_count', lower_limit
         return_value = 'opalsError'
 
     # Return exist status
-    return (return_value)
+    return return_value
+
 
 def odm_export_point_counts(tile_id):
     """
@@ -498,6 +500,7 @@ def odm_export_point_counts(tile_id):
 
     return return_value
 
+
 def odm_calc_proportions(tile_id, prop_name, point_count_id1, point_count_id2):
     """
     Function to calculate point count proportions
@@ -539,6 +542,7 @@ def odm_calc_proportions(tile_id, prop_name, point_count_id1, point_count_id2):
     log_file.close()
 
     return return_value
+
 
 def odm_export_proportions(tile_id):
     """
@@ -589,6 +593,7 @@ def odm_export_proportions(tile_id):
         return_value = list(return_values)[0]
 
     return return_value
+
 
 def odm_export_amplitude(tile_id):
     """
@@ -649,12 +654,14 @@ def odm_export_amplitude(tile_id):
         return_value = 'opalsError'
 
     # Return exist status
-    return (return_value)
+    return return_value
+
 
 def odm_export_point_source_info(tile_id):
     """
-
-    :return:
+    Extracts point source statistics for the 10 m x 10 m cells of the point cloud.
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+    :return: execution status
     """
 
     # Initate return value
@@ -824,3 +831,4 @@ def odm_export_point_source_info(tile_id):
         return_value = 'opalsError'
 
     return return_value
+
