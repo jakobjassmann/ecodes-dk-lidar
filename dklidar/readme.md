@@ -11,7 +11,6 @@ Global settings file with:
 - common crs as WKT string interpretable by OPALS.
 - nbThreads - number of subthreads used by OPALS.
 - out_cell-size - the default cell size for raster export with OPALS.
-- OPALS filter strings that are often used.
 
 ### common.py
 Functions for logging, process management etc.
@@ -35,8 +34,12 @@ odm_add_normalized_z | Adds normalised height attribute to an ODM point cloud (s
 odm_export_normalized_z | Exports mean and sd of normalised height for a given tile.
 odm_export_canopy_height | Exports canopy height as normalised height attribute of the 0.95th-quantile.
 odm_export_amplitude | Exports the mean and sd of all amplitude values in the cell.
-odm_export_point_count | Exports point count for a fiven height bracket defined by parameters.
-odm_export_point_counts | Exports point counts for a pre-defined set of height brackets, using the odm_expport_point_count function. 
+odm_export_point_count | Exports point count for a given height bracket and point class.
+odm_export_point_counts | Exports point counts for a set of pre-defined height-bins and point classes.
+odm_calc_proportions | Caluclates the proportions between two point counts.
+odm_export_proportions | Exports proportions for a pre-defined set of tuples of point counts.
+odm_export_point_source_info | Exports point source (flight line) stats for all cells in a tile.
+
 
 ### dtm.py
 Functions for processing raster DTM data.
