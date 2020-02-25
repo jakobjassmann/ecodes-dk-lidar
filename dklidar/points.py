@@ -526,7 +526,7 @@ def odm_calc_proportions(tile_id, prop_name, point_count_id1, point_count_id2):
     try:
         # Specify gdal command
         cmd = settings.gdal_calc_bin + '-A ' + num_file + ' -B ' + den_file + ' --outfile=' + out_file + \
-              ' --calc=1000*A/B' + ' --type=Int16' + ' --NoDataValue=-9999'
+              ' --calc=10000*A/B' + ' --type=Int16' + ' --NoDataValue=-9999'
         # Execute gdal command
         log_output = log_output + '\n' + tile_id + ' calculation of proportions ' + prop_name + '... \n' + \
             subprocess.check_output(cmd, shell=False,  stderr=subprocess.STDOUT)
@@ -667,17 +667,22 @@ def odm_export_point_source_info(tile_id):
     # Initate return value
     return_value = ''
 
+    # Initiate log output
+    log_output = ''
+
     # Set file path
     odm_file = settings.odm_folder + '/odm_' + tile_id + '.odm'
 
     # Set output paths
     out_folder = settings.output_folder + '/point_source_info'
     out_folder_ids = out_folder + '/point_source_ids'
+    out_folder_nids = out_folder + '/point_source_nids'
     out_folder_counts = out_folder + '/point_source_counts'
     out_folder_prop = out_folder + '/point_source_proportion'
 
     if not os.path.exists(out_folder): os.mkdir(out_folder)
     if not os.path.exists(out_folder_ids): os.mkdir(out_folder_ids)
+    if not os.path.exists(out_folder_nids): os.mkdir(out_folder_nids)
     if not os.path.exists(out_folder_counts): os.mkdir(out_folder_counts)
     if not os.path.exists(out_folder_prop): os.mkdir(out_folder_prop)
 
@@ -716,10 +721,15 @@ def odm_export_point_source_info(tile_id):
             # Initate opals cell module
             export_point_count = opals.Cell.Cell()
 
+            # Initate filter string
+            point_classes = [2,3,4,5,6,9]
+            class_filter = 'Generic[Classification == ' + \
+                           ' OR Classification == '.join([str(point_class) for point_class in point_classes]) + ']'
+
             # Export point count
             export_point_count.inFile = odm_file
             export_point_count.outFile = 'temp_count_' + str(point_source_id) + '.tif'
-            export_point_count.filter =  settings.ground_and_veg_classes_filter +\
+            export_point_count.filter =  class_filter +\
                                         ' AND Generic[PointSourceId == ' + str(point_source_id) + ']'
             export_point_count.feature = 'pcount'
             export_point_count.cellSize = settings.out_cell_size
@@ -741,7 +751,27 @@ def odm_export_point_source_info(tile_id):
               '/point_source_counts_' + tile_id + '.tif ' + in_files_string
 
         # Execute gdal command
-        subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+        log_output = log_output + '\n' + tile_id + ' merging point source point count files... \n' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+
+        ## Determine the number of uniuqe point source ids per cell
+        # Prep gdal command
+        alphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
+                    'U', 'V', 'W', 'X', 'Y', 'Z']
+        files_string = ''
+        sum_string = []
+        for i in range(len(point_source_ids)):
+            files_string = files_string + ' -' + alphabet[i] + ' ' + temp_wd + '/temp_count_' + str(
+                point_source_ids[i]) + '.tif '
+            sum_string.append(alphabet[i])
+        sum_string = '1*greater(' + ',0)+1*greater('.join(sum_string) + ',0)'
+
+        # Specify gdal command
+        cmd = settings.gdal_calc_bin + files_string + '--outfile=' + out_folder_nids + '/point_source_nids_' + tile_id + \
+              '.tif' + ' --calc=' + sum_string + ' --NoDataValue=-9999'
+        # Execute gdal command
+        log_output = log_output + '\n' + tile_id + ' extracting number of uniuqe point source ids... \n' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
 
         ## Calculate proportion of hits pre cell per point source
         # Prep gdal command
@@ -759,9 +789,10 @@ def odm_export_point_source_info(tile_id):
         cmd = settings.gdal_calc_bin + files_string + '--outfile=' + temp_wd + '/temp_total_points.tif --calc=' + sum_string + \
               ' --NoDataValue=-9999'
         # Execute gdal command
-        subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+        log_output = log_output + '\n' + tile_id + ' creating temporary total point count file... \n' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
 
-        # calculate proportions
+        ## Calculate proportions
         for point_source_id in point_source_ids:
             # Specify gdal command
             cmd = settings.gdal_calc_bin + '-A ' + temp_wd + '/temp_count_' + str(
@@ -769,7 +800,8 @@ def odm_export_point_source_info(tile_id):
                   '--outfile=' + temp_wd + '/point_source_prop_' + str(
                 point_source_id) + '.tif --calc=A/B ' + '--NoDataValue=-9999'
             # Execute gdal command
-            subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+            log_output = log_output + '\n' + tile_id + ' calculating proportions for ' + point_source_id + '... \n' + \
+                         subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
 
         # Merge files into one:
         # Specify gdal command
@@ -780,7 +812,8 @@ def odm_export_point_source_info(tile_id):
              in_files_string
 
         # Execute gdal command
-        subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+        log_output = log_output + '\n' + tile_id + ' merging point source proportions... \n' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
 
         ## Create a layer with presence / absence of point source id indicated by the point source id itself
         for point_source_id in point_source_ids:
@@ -790,7 +823,8 @@ def odm_export_point_source_info(tile_id):
                 point_source_id) + '*greater(A,0)' + \
                   ' --NoDataValue=-9999'
             # Execute gdal command
-            subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+            log_output = log_output + '\n' + tile_id + ' creating temporary presence layer for ' + point_source_id + '... \n' + \
+                         subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
 
         ## Merge files into one:
         # Specify gdal command
@@ -801,7 +835,8 @@ def odm_export_point_source_info(tile_id):
               in_files_string
 
         # Execute gdal command
-        subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+        log_output = log_output + '\n' + tile_id + ' merging temporary layers in point source ids file... \n' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
 
         # The 'majority' stat produced by opals is not reliable... leaving the below code for leagcy reasons.
         # 'majority statistics will have to be calculate from the above generated rasters by hand.
@@ -826,6 +861,11 @@ def odm_export_point_source_info(tile_id):
         temp_tifs = glob.glob('*.tif')
         for tif in temp_tifs: os.remove(tif)
 
+        # Write log output to log file
+        log_file = open('log.txt', 'a+')
+        log_file.write(log_output)
+        log_file.close()
+        
         return_value = 'success'
     except:
         return_value = 'opalsError'
