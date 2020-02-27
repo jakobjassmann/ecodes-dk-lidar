@@ -800,7 +800,7 @@ def odm_export_point_source_info(tile_id):
                   '--outfile=' + temp_wd + '/point_source_prop_' + str(
                 point_source_id) + '.tif --calc=A/B ' + '--NoDataValue=-9999'
             # Execute gdal command
-            log_output = log_output + '\n' + tile_id + ' calculating proportions for ' + point_source_id + '... \n' + \
+            log_output = log_output + '\n' + tile_id + ' calculating proportions for ' + str(point_source_id)  + '... \n' + \
                          subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
 
         # Merge files into one:
@@ -823,7 +823,7 @@ def odm_export_point_source_info(tile_id):
                 point_source_id) + '*greater(A,0)' + \
                   ' --NoDataValue=-9999'
             # Execute gdal command
-            log_output = log_output + '\n' + tile_id + ' creating temporary presence layer for ' + point_source_id + '... \n' + \
+            log_output = log_output + '\n' + tile_id + ' creating temporary presence layer for ' + str(point_source_id)  + '... \n' + \
                          subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
 
         ## Merge files into one:
@@ -865,7 +865,7 @@ def odm_export_point_source_info(tile_id):
         log_file = open('log.txt', 'a+')
         log_file.write(log_output)
         log_file.close()
-        
+
         return_value = 'success'
     except:
         return_value = 'opalsError'

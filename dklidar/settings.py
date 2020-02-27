@@ -16,6 +16,7 @@ gdaltlindex_bin = 'C:/OSGeo4W64/OSGeo4W.bat gdaltindex '
 gdal_translate_bin = 'C:/OSGeo4W64/OSGeo4W.bat gdal_translate '
 gdal_calc_bin = 'C:/OSGeo4W64/OSGeo4W.bat gdal_calc '
 gdal_merge_bin = 'C:/OSGeo4W64/OSGeo4W.bat gdal_merge '
+gdaltransform_bin = '"C:/OSGeo4W64/OSGeo4W.bat" gdaltransform'
 
 ### Set folder locations
 # Main working directory

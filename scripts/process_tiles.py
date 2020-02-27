@@ -154,7 +154,7 @@ def process_tile(tile_id):
     status_steps.append([return_value])
     # gather logs for step and tile]
     common.gather_logs('process_tiles', 'odm_export_point_source_info', tile_id)
-    #
+
     # ## Export amplitude mean and sd
     # return_value = points.odm_export_amplitude(tile_id)
     # # Update progress variables
