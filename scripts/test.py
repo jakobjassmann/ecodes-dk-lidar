@@ -7,68 +7,60 @@ import pandas
 #opals.loadAllModules()
 tile_id = '6210_570'
 
-# initiate return value and log ouptut
+"""
+Aggregates the 0.4 m DTM to 10 m size for final output and other calculations.
+:param tile_id: tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+:return: execution status
+"""
+
+# Initiate return valule and log output
 return_value = ''
 log_output = ''
 
-# Get current wd
+# get temporary work directory
 wd = os.getcwd()
 
+# Prepare output folder
+out_folder = settings.output_folder + '/dtm_10m'
+if not os.path.exists(out_folder): os.mkdir(out_folder)
+
 try:
-    # 1) Create raster with latitude of the centre of a cell
-    #Construct gdal command to export xyz file in utm
-
-    dtm_file = settings.dtm_folder + '/DTM_1km_' + tile_id + '.tif'
-    out_file = wd + '/xyz_' + tile_id + '.xyz'
-    cmd = settings.gdal_translate_bin + ' -of xyz -co COLUMN_SEPARATOR="," -co ADD_HEADER_LINE=YES ' + \
-          dtm_file + ' ' + \
-          out_file
+    ## Aggregate dtm to temporary file:
+    # Specify gdal command
+    cmd = settings.gdalwarp_bin + \
+          '-tr 10 10 -r average ' + \
+          settings.dtm_folder + '/DTM_1km_' + tile_id + '.tif ' + \
+          wd + '/dtm_10m_' + tile_id + '_float.tif '
     print cmd
-    log_output = tile_id + ' generating xyz... \n ' + subprocess.check_output(cmd, shell=False,
-                                                                                 stderr=subprocess.STDOUT)
+    # Execute gdal command
+    log_output = log_output + subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
+                 '\n' + tile_id + ' aggregating dtm_10m successful.\n\n'
 
-    # Read in xyz as a pandas dataframe
-    xyz = pandas.read_csv('xyz_' + tile_id + '.xyz')
-    xy = xyz[["X", "Y"]]
-    xy.to_csv('xy_' + tile_id + '.csv', index=False, header=False, sep=' ')
+    out_file = out_folder + '/dtm_10m_' + tile_id + '.tif'
 
-    # Construct gdal commands to transform cell coordinates from utm to lat long
-    in_file = wd + '/xy_' + tile_id + '.csv'
-    out_file ='xy_' + tile_id + '_latlong.csv'
-    cmd = '(' + settings.gdaltransform_bin + ' -s_srs EPSG:25832 -t_srs WGS84 ' + \
-          ' < ' + in_file + ') > ' + out_file
-    # And execute the gdal command
-    log_output = tile_id + ' transforming to lat long... \n ' + subprocess.check_output(cmd, shell=True)
-
-    # Load lat long file
-    xy_latlong = pandas.read_csv('xy_' + tile_id + '_latlong.csv', sep='\s+', names =['X','Y','return_status'], skiprows=1)
-
-    # check data frames are of the same lenght
-    if len(xyz.index) != len(xy_latlong.index):
-        log_output = log_output + '\n lenght of dataframes did not match \n'
-        raise Exception("")
-
-    # Assign lat (deg) to UTM z coordinate
-    xyz["Z"] = xy_latlong["Y"]
-    print xyz.head()
-    print xyz.tail()
-    xyz.to_csv('xyz_' + tile_id + '.xyz', index=False, header=False, sep=' ')
-
-    # Convert back to geotiff
-    in_file = wd + '/xyz_' + tile_id + '.xyz'
-    out_file = wd + '/lat_' + tile_id + '.tif'
-    cmd = settings.gdal_translate_bin + ' -of GTiff -a_srs EPSG:25832 ' + \
-          in_file + ' ' + out_file
+    # Multiply by 100 and store as int16
+    # Specify gdal command
+    cmd = settings.gdal_calc_bin + '-A ' + wd + '/dtm_10m_' + tile_id + '_float.tif ' + ' --outfile=' + out_file + \
+          ' --calc=100*A' + ' --type=Int16' + ' --NoDataValue=-9999'
     print cmd
-    log_output = tile_id + ' generating xyz... \n ' + subprocess.check_output(cmd, shell=False,
-                                                                                 stderr=subprocess.STDOUT)
+    # Execute gdal command
+    log_output = log_output + '\n' + tile_id + ' converting dtm_10m to int16... \n' + \
+                 subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+
+    return_value = 'success'
 except:
-    log_output = tile_id + ' generating xyz failed. \n '
-    return_value = 'gdal_error'
+    log_output = log_output + '\n' + tile_id + ' dtm_10m aggregation failed.\n\n'
+    return_value = 'gdalError'
 
 # Write log output to log file
 log_file = open('log.txt', 'a+')
 log_file.write(log_output)
 log_file.close()
 
-print(return_value)
+# Remove temporary files
+try:
+    os.remove(wd + '/dtm_10m_' + tile_id + '_float.tif')
+except:
+    pass
+
+print log_output

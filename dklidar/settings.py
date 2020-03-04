@@ -18,6 +18,9 @@ gdal_calc_bin = 'C:/OSGeo4W64/OSGeo4W.bat gdal_calc '
 gdal_merge_bin = 'C:/OSGeo4W64/OSGeo4W.bat gdal_merge '
 gdaltransform_bin = '"C:/OSGeo4W64/OSGeo4W.bat" gdaltransform'
 
+# Saga wetness index command
+saga_wetness_bin = 'C:/OSGeo4W64/apps/saga-ltr/saga_cmd.exe ta_hydrology 15 '
+
 ### Set folder locations
 # Main working directory
 wd = 'D:/Jakob/dk_nationwide_lidar'
