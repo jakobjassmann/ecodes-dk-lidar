@@ -16,10 +16,12 @@ gdaltlindex_bin = 'C:/OSGeo4W64/OSGeo4W.bat gdaltindex '
 gdal_translate_bin = 'C:/OSGeo4W64/OSGeo4W.bat gdal_translate '
 gdal_calc_bin = 'C:/OSGeo4W64/OSGeo4W.bat gdal_calc '
 gdal_merge_bin = 'C:/OSGeo4W64/OSGeo4W.bat gdal_merge '
-gdaltransform_bin = '"C:/OSGeo4W64/OSGeo4W.bat" gdaltransform'
+gdaltransform_bin = 'C:/OSGeo4W64/OSGeo4W.bat gdaltransform '
+gdalinfo_bin = 'C:/OSGeo4W64/OSGeo4W.bat gdalinfo '
 
-# Saga wetness index command
+# Saga binary commands
 saga_wetness_bin = 'C:/OSGeo4W64/apps/saga-ltr/saga_cmd.exe ta_hydrology 15 '
+saga_openness_bin = 'C:\OSGeo4W64/apps/saga-ltr/saga_cmd.exe ta_lighting 5 '
 
 ### Set folder locations
 # Main working directory
