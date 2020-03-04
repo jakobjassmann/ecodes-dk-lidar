@@ -7,7 +7,6 @@ import multiprocessing
 import re
 import pandas
 import opals
-from typing import Union
 
 from dklidar import settings
 
@@ -119,6 +118,67 @@ def dtm_mosaic_neighbours(tile_id):
     return return_value
 
 
+## Aggregate dem to 10 m
+def dtm_aggregate_tile(tile_id):
+    """
+    Aggregates the 0.4 m DTM to 10 m size for final output and other calculations.
+    :param tile_id: tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+    :return: execution status
+    """
+
+    # Initiate return valule and log output
+    return_value = ''
+    log_output = ''
+
+    # get temporary work directory
+    wd = os.getcwd()
+
+    # Prepare output folder
+    out_folder = settings.output_folder + '/dtm_10m'
+    if not os.path.exists(out_folder): os.mkdir(out_folder)
+
+    try:
+        ## Aggregate dtm to temporary file:
+        # Specify gdal command
+        cmd = settings.gdalwarp_bin + \
+              '-tr 10 10 -r average ' + \
+              settings.dtm_folder + '/DTM_1km_' + tile_id + '.tif ' + \
+              wd + '/dtm_10m_' + tile_id + '_float.tif '
+        print cmd
+        # Execute gdal command
+        log_output = log_output + subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
+                     '\n' + tile_id + ' aggregating dtm_10m successful.\n\n'
+
+        out_file = out_folder + '/dtm_10m_' + tile_id + '.tif'
+
+        # Multiply by 100 and store as int16
+        # Specify gdal command
+        cmd = settings.gdal_calc_bin + '-A ' + wd + '/dtm_10m_' + tile_id + '_float.tif ' + ' --outfile=' + out_file + \
+              ' --calc=rint(100*A)' + ' --type=Int16' + ' --NoDataValue=-9999'
+        print cmd
+        # Execute gdal command
+        log_output = log_output + '\n' + tile_id + ' converting dtm_10m to int16... \n' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+
+        return_value = 'success'
+    except:
+        log_output = log_output + '\n' + tile_id + ' dtm_10m aggregation failed.\n\n'
+        return_value = 'gdalError'
+
+        # Write log output to log file
+    log_file = open('log.txt', 'a+')
+    log_file.write(log_output)
+    log_file.close()
+
+    # Remove temporary files
+    try:
+        os.remove(wd + '/dtm_10m_' + tile_id + '_float.tif')
+    except:
+        pass
+
+    return return_value
+
+
 ## Calculcate heat index
 def dtm_calc_heat_index(tile_id):
     """
@@ -143,7 +203,7 @@ def dtm_calc_heat_index(tile_id):
         aspect_file = '-A ' + settings.output_folder + '/aspect/aspect_' + tile_id + '.tif '
 
         # Construct numpy equation
-        solar_rad_eq = '10000*((1-cos(radians(A-45)))/2)'
+        heat_index = 'rint(10000*((1-cos(radians(A-45)))/2))'
 
         # Specify output path
         out_file = out_folder + '/heat_load_index_' + tile_id + '.tif '
@@ -151,10 +211,10 @@ def dtm_calc_heat_index(tile_id):
         # Specify equation
         # Construct gdal command:
         cmd = settings.gdal_calc_bin + aspect_file + '--outfile=' + out_file + \
-              ' --calc=' + solar_rad_eq + ' --type=Int16' + ' --NoDataValue=-9999 --overwrite'
+              ' --calc=' + heat_index + ' --type=Int16' + ' --NoDataValue=-9999 --overwrite'
 
         # Execute gdal command
-        log_output = log_output + '\n' + tile_id + ' calculating solar radiation... \n' + \
+        log_output = log_output + '\n' + tile_id + ' calculating heat index success. \n' + \
                      subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
 
     except:
@@ -169,6 +229,8 @@ def dtm_calc_heat_index(tile_id):
     # Remove temporary file
     os.remove(settings.output_folder + '/dtm_slope/slope_' + tile_id + '_mosaic.tif ')
 
+
+## Calculate solar radiation
 def dtm_calc_solar_radiation(tile_id):
     """
     Returns cell by cell solar radiation following McCune and Keon 2002. Slope and aspect must have been calculated
@@ -269,8 +331,8 @@ def dtm_calc_solar_radiation(tile_id):
         # Specify path to aspect raster A
         aspect_file = '-A ' + settings.output_folder + '/aspect/aspect_' + tile_id + '.tif '
 
-        # Construct numpy equation
-        solar_rad_eq = '1000*(0.339+0.808*cos(radians(L))*cos(radians(S))-0.196*sin(radians(L))*sin(radians(S))-0.482*cos(radians(180-absolute(180-A)))*sin(radians(S)))'
+        # Construct numpy equation (stretch by 1000 and round to nearest int)
+        solar_rad_eq = 'rint(1000*(0.339+0.808*cos(radians(L))*cos(radians(S))-0.196*sin(radians(L))*sin(radians(S))-0.482*cos(radians(180-absolute(180-A)))*sin(radians(S))))'
 
         # Specify output path
         out_file = out_folder + '/solar_rad_' + tile_id + '.tif '
@@ -295,10 +357,7 @@ def dtm_calc_solar_radiation(tile_id):
     print(return_value)
 
 
-
-
-
-## Calculate slope parameter for file
+## Calculate slope for file
 def dtm_calc_slope(tile_id):
     """
     Calculates the slope parameter for a DTM neighbourhood mosaic and crops to original tile_size
@@ -330,9 +389,18 @@ def dtm_calc_slope(tile_id):
               ' -cutline ' + settings.dtm_footprint_folder + '/DTM_1km_' + tile_id + '_footprint.shp ' + \
                '-tr 10 10 -r med -ot Int16 ' + '-crop_to_cutline -overwrite ' + \
               wd + '/slope_' + tile_id + '_mosaic.tif ' + \
-              settings.output_folder + '/slope/slope_' + tile_id + '.tif '
+              wd + '/slope_' + tile_id + '_mosaic_cropped.tif '
         log_output = log_output + subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
-                     '\n' + tile_id + ' slope calculation successful.\n\n'
+                     '\n' + tile_id + 'cropping slope.\n\n'
+
+        # Round and store slope as int16
+        cmd = settings.gdal_calc_bin + \
+              '-A ' + wd + '/aspect_' + tile_id + '_mosaic_cropped.tif ' + \
+              ' --outfile=' + out_folder + '/slope_' + tile_id + '.tif ' + \
+              ' --calc=rint(A)' + ' --type=Int16' + ' --NoDataValue=-9999'
+        log_output = log_output + '\n' + tile_id + ' rounding slope and calculation successful. \n' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+
         return_value = 'success'
     except:
         log_output = log_output + '\n' + tile_id + ' slope calculation failed. \n\n'
@@ -346,6 +414,7 @@ def dtm_calc_slope(tile_id):
     # Remove temporary file
     try:
         os.remove(wd + '/slope_' + tile_id + '_mosaic.tif ')
+        os.remove(wd + '/slope_' + tile_id + '_mosaic_cropped.tif ')
     except:
         pass
 
@@ -353,7 +422,7 @@ def dtm_calc_slope(tile_id):
     return return_value
 
 
-## Calculate slope for a tile
+## Calculate aspect for a tile
 def dtm_calc_aspect(tile_id):
     """
     Calculates the slope parameter for a DTM neighbourhood mosaic and crops to original tile_size
@@ -373,24 +442,33 @@ def dtm_calc_aspect(tile_id):
     if not os.path.exists(out_folder): os.mkdir(out_folder)
 
     try:
-        # Calculate slope parameter
+        # Calculate aspect
         cmd = settings.gdaldem_bin + ' aspect -zero_for_flat ' + \
         settings.dtm_mosaics_folder + '/DTM_' + tile_id + '_mosaic.tif ' + \
         wd + '/aspect_' + tile_id + '_mosaic.tif '
         log_output = tile_id + ' aspect calculation... \n ' + \
                      subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
 
-        # Crop slope output to original tile size:
+        # Crop aspect output to original tile size and aggregate to 10 m:
         cmd = settings.gdalwarp_bin + \
           ' -cutline ' + settings.dtm_footprint_folder + '/DTM_1km_' + tile_id + '_footprint.shp ' + \
-           '-tr 10 10 -r med -ot Int16 ' + '-crop_to_cutline -overwrite ' + \
+          '-tr 10 10 -r med -ot Int16 ' + '-crop_to_cutline -overwrite ' + \
           wd + '/aspect_' + tile_id + '_mosaic.tif ' + \
-          settings.output_folder + '/aspect/aspect_' + tile_id + '.tif '
+          wd + '/aspect_' + tile_id + '_mosaic_cropped.tif '
         log_output = log_output + subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
-                 '\n' + tile_id + ' aspect calculation successful.\n\n'
+                 '\n' + tile_id + ' aspect mosaic cropped.\n\n'
+
+        # Round and store as intege
+        cmd = settings.gdal_calc_bin + \
+              '-A ' + wd + '/aspect_' + tile_id + '_mosaic_cropped.tif ' + \
+              ' --outfile=' + out_folder + '/aspect_' + tile_id + '_mosaic_deg.tif ' + \
+              ' --calc=rint(A)' + ' --type=Int16' + ' --NoDataValue=-9999'
+        log_output = log_output + '\n' + tile_id + ' rounding aspect to int16 and calculation success. \n' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+
         return_value = 'success'
     except:
-        log_output = log_output + '\n' + tile_id + ' slope calculation failed.\n\n'
+        log_output = log_output + '\n' + tile_id + ' aspect calculation failed.\n\n'
         return_value = 'gdalError'
 
     # Write log output to log file
@@ -401,10 +479,12 @@ def dtm_calc_aspect(tile_id):
     # Remove temporary file
     try:
         os.remove(wd + '/aspect_' + tile_id + '_mosaic.tif ')
+        os.remove(wd + '/aspect_' + tile_id + '_mosaic_cropped.tif ')
     except:
         pass
 
     return return_value
+
 
 ## Calculate SAGA Wetness Index for a tile
 def dtm_saga_wetness(tile_id):
@@ -428,20 +508,20 @@ def dtm_saga_wetness(tile_id):
     try:
         # Calculate wetness index at DTM scale
         cmd = settings.saga_wetness_bin + '-DEM ' + \
-        settings.dtm_mosaics_folder + '/DTM_' + tile_id + '_mosaic.tif ' + \
-        wd + '/wetness_index' + tile_id + '_mosaic.tif '
+              settings.dtm_mosaics_folder + '/DTM_' + tile_id + '_mosaic.tif ' + \
+              '-TWI ' + wd + '/wetness_index_' + tile_id + '_mosaic.tif'
         log_output = tile_id + ' wetness index calculation... \n ' + \
                      subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
 
-
         # Crop output to original tile size:
         cmd = settings.gdalwarp_bin + \
-          ' -cutline ' + settings.dtm_footprint_folder + '/DTM_1km_' + tile_id + '_footprint.shp ' + \
-            '-tr 10 10 -r med ' + '-crop_to_cutline -overwrite ' + \
-          wd + '/wetness_index' + tile_id + '_mosaic.tif ' + \
-          wd + '/wetness_index_' + tile_id + '.tif '
+              ' -cutline ' + settings.dtm_footprint_folder + '/DTM_1km_' + tile_id + '_footprint.shp ' + \
+              '-tr 10 10 -r med ' + '-crop_to_cutline -overwrite ' + \
+              wd + '/wetness_index_' + tile_id + '_mosaic.sdat ' + \
+              wd + '/wetness_index_' + tile_id + '.tif '
+
         log_output = log_output + subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
-                 '\n' + tile_id + ' cropping wetness index mosaic.\n\n'
+                     '\n' + tile_id + ' cropping wetness index mosaic.\n\n'
         return_value = 'success'
 
         # Set input file path
@@ -449,13 +529,13 @@ def dtm_saga_wetness(tile_id):
         # Set output file path
         out_file = out_folder + '/wetness_index_' + tile_id + '.tif '
 
-        # Stretch to by 10000 and convert to int 16
+        # Stretch to by 1000, round and convert to int 16
         # Construct gdal command:
-        cmd = settings.gdal_calc_bin +  + '--outfile=' + out_file + \
-              ' --calc=rint(10000*A) --type=Int16' + ' --NoDataValue=-9999 --overwrite'
+        cmd = settings.gdal_calc_bin + '-A ' + wd + '/wetness_index_' + tile_id + '.tif ' + '--outfile=' + out_file + \
+              ' --calc=rint(1000*A) --type=Int16' + ' --NoDataValue=-9999 --overwrite'
 
         # Execute gdal command
-        log_output = log_output + '\n' + tile_id + ' converting to integer... \n' + \
+        log_output = log_output + '\n' + tile_id + ' rounding and converting to integer... \n' + \
                      subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
 
     except:
@@ -469,7 +549,12 @@ def dtm_saga_wetness(tile_id):
 
     # Remove temporary file
     try:
-        os.remove(wd + '/wetness_index' + tile_id + '_mosaic.tif ' )
+        os.remove(wd + '/wetness_index_' + tile_id + '_mosaic.sdat ')
+        os.remove(wd + '/wetness_index_' + tile_id + '_mosaic.prj ')
+        os.remove(wd + '/wetness_index_' + tile_id + '_mosaic.sgrd ')
+        os.remove(wd + '/wetness_index_' + tile_id + '_mosaic.mgrd ')
+        os.remove(wd + '/wetness_index_' + tile_id + '_mosaic.tif ')
+        os.remove(wd + '/wetness_index_' + tile_id + '_mosaic.tif ')
         os.remove(wd + '/wetness_index_' + tile_id + '.tif ')
     except:
         pass
@@ -477,70 +562,10 @@ def dtm_saga_wetness(tile_id):
     return return_value
 
 
-## Aggregate dem to 10 m
-def dtm_aggregate(tile_id):
-    """
-    Aggregates the 0.4 m DTM to 10 m size for final output and other calculations.
-    :param tile_id: tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
-    :return: execution status
-    """
-
-    # Initiate return valule and log output
-    return_value = ''
-    log_output = ''
-
-    # get temporary work directory
-    wd = os.getcwd()
-
-    # Prepare output folder
-    out_folder = settings.output_folder + '/dtm_10m'
-    if not os.path.exists(out_folder): os.mkdir(out_folder)
-
-    try:
-        ## Aggregate dtm to temporary file:
-        # Specify gdal command
-        cmd = settings.gdalwarp_bin + \
-              '-tr 10 10 -r average ' + \
-              settings.dtm_folder + '/DTM_1km_' + tile_id + '.tif ' + \
-              wd + '/dtm_10m_' + tile_id + '_float.tif '
-        print cmd
-        # Execute gdal command
-        log_output = log_output + subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
-                     '\n' + tile_id + ' aggregating dtm_10m successful.\n\n'
-
-        out_file = out_folder + '/dtm_10m_' + tile_id + '.tif'
-
-        # Multiply by 100 and store as int16
-        # Specify gdal command
-        cmd = settings.gdal_calc_bin + '-A ' + wd + '/dtm_10m_' + tile_id + '_float.tif ' + ' --outfile=' + out_file + \
-              ' --calc=100*A' + ' --type=Int16' + ' --NoDataValue=-9999'
-        print cmd
-        # Execute gdal command
-        log_output = log_output + '\n' + tile_id + ' converting dtm_10m to int16... \n' + \
-                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
-
-        return_value = 'success'
-    except:
-        log_output = log_output + '\n' + tile_id + ' dtm_10m aggregation failed.\n\n'
-        return_value = 'gdalError'
-
-        # Write log output to log file
-    log_file = open('log.txt', 'a+')
-    log_file.write(log_output)
-    log_file.close()
-
-    # Remove temporary files
-    try:
-        os.remove(wd + '/dtm_10m_' + tile_id + '_float.tif')
-    except:
-        pass
-
-    return return_value
-
 ## Calculate landscape openness for 10 m dtm
 def dtm_landscape_openness(tile_id):
     """
-    Calculates landscape opennes following Yokoyama et al. 2002 based on an aggregated 10 m dtm.
+    Calculates landscape opennes following Yokoyama et al. 2002 based on an aggregated 10 m dtm and a 150 m search radius.
     :param tile_id: tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
     :return: execution status
     """
