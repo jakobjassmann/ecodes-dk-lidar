@@ -44,7 +44,7 @@ def odm_import_single_tile(tile_id):
     return return_value
 
 
-## Define function to load neighbourhood of tiles into ODM
+## Define function to load neighbourhood of tiles into ODM (this is currently not neede by any of the funcitons below)
 def odm_import_mosaic(tile_id):
     """
         Imports a tile (specified by tile_id) and it's 3 x 3 neighbourhood into a shared ODM file for subsequent
@@ -173,7 +173,7 @@ def odm_generate_footprint(tile_id):
     return return_value
 
 
-## Def: Retrieve CRS
+## Def: Validiate CRS
 def odm_validate_crs(tile_id):
     """
     Function to validate the crs for odm files (single tile and odm)
@@ -612,7 +612,7 @@ def odm_export_amplitude(tile_id):
     if not os.path.exists(out_folder + '/sd'): os.mkdir(out_folder + '/sd')
 
     out_file_mean = out_folder + '/mean/amplitude_mean_' + tile_id + '.tif'
-    out_file_sd = out_folder + '/sd/amplitude_mean_' + tile_id + '.tif'
+    out_file_sd = out_folder + '/sd/amplitude_sd_' + tile_id + '.tif'
 
     # Export normalized z raster mean and sd
     try:
@@ -625,7 +625,7 @@ def odm_export_amplitude(tile_id):
         export_amplitude.attribute = 'amplitude'
         export_amplitude.feature = 'mean'
         export_amplitude.cellSize = settings.out_cell_size
-        export_amplitude.filter = settings.ground_and_veg_classes_filter # ground and veg points only
+        export_amplitude.filter = settings.all_classes # all classes (2,3,4,5,6,9)
         export_amplitude.limit = 'corner'  # This switch is really important when working with tiles!
         # It sets the ROI to the extent to the bounding box of points in the ODM
         export_amplitude.commons.screenLogLevel = opals.Types.LogLevel.none
@@ -642,7 +642,7 @@ def odm_export_amplitude(tile_id):
         export_amplitude.attribute = 'amplitude'
         export_amplitude.feature = 'stdDev'
         export_amplitude.cellSize = settings.out_cell_size
-        export_amplitude.filter = settings.ground_and_veg_classes_filter  # ground and veg points only
+        export_amplitude.filter = settings.all_classes   # all classes (2,3,4,5,6,9)
         export_amplitude.limit = 'corner'  # This switch is really important when working with tiles!
         # It sets the ROI to the extent to the bounding box of points in the ODM
         export_amplitude.commons.screenLogLevel = opals.Types.LogLevel.none

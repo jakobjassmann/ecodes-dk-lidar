@@ -5,8 +5,13 @@ import glob
 import subprocess
 import re
 import pandas
+import datetime
 #opals.loadAllModules()
-tile_id = '6210_570'
+tile_id = '6212_573'
+## Start timer
+startTime = datetime.datetime.now()
+
+#-------------------------------
 
 # Initiate return valule and log output
 return_value = ''
@@ -68,9 +73,15 @@ try:
     os.remove(wd + '/wetness_index_' + tile_id + '_mosaic.sgrd ')
     os.remove(wd + '/wetness_index_' + tile_id + '_mosaic.mgrd ')
     os.remove(wd + '/wetness_index_' + tile_id + '_mosaic.tif ')
-    os.remove(wd + '/wetness_index_' + tile_id + '_mosaic.tif ')
     os.remove(wd + '/wetness_index_' + tile_id + '.tif ')
 except:
     pass
 
+#--------------
+print '#' * 80
 print log_output
+# Print out time elapsed:
+print '#' * 80
+print('\nTime elapsed: ' + str(datetime.datetime.now() - startTime))
+
+

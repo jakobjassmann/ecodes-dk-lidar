@@ -53,8 +53,9 @@ def dtm_mosaic_neighbours(tile_id):
     :return: execution status
     """
 
-    # Initate return value
+    # Initate return value and log
     return_value = ''
+    log_output = ''
 
     # Generate temporay wd for parallel worker, this will allow for smooth logging and opals sessions to run in parallel
     wd = os.getcwd()
@@ -151,7 +152,7 @@ def dtm_aggregate_tile(tile_id):
 
         out_file = out_folder + '/dtm_10m_' + tile_id + '.tif'
 
-        # Multiply by 100 and store as int16
+        # Stretch by 100, round and store as int16
         # Specify gdal command
         cmd = settings.gdal_calc_bin + '-A ' + wd + '/dtm_10m_' + tile_id + '_float.tif ' + ' --outfile=' + out_file + \
               ' --calc=rint(100*A)' + ' --type=Int16' + ' --NoDataValue=-9999'
@@ -202,14 +203,13 @@ def dtm_calc_heat_index(tile_id):
         # Specify path to aspect raster A
         aspect_file = '-A ' + settings.output_folder + '/aspect/aspect_' + tile_id + '.tif '
 
-        # Construct numpy equation
+        # Construct numpy equation, stretch by 10k and round
         heat_index = 'rint(10000*((1-cos(radians(A-45)))/2))'
 
         # Specify output path
         out_file = out_folder + '/heat_load_index_' + tile_id + '.tif '
 
-        # Specify equation
-        # Construct gdal command:
+        # Construct gdal command, save file as Int16:
         cmd = settings.gdal_calc_bin + aspect_file + '--outfile=' + out_file + \
               ' --calc=' + heat_index + ' --type=Int16' + ' --NoDataValue=-9999 --overwrite'
 
@@ -239,10 +239,9 @@ def dtm_calc_solar_radiation(tile_id):
     :return: execution status
     """
 
-    # The calculation of the solar radiation is a thre step process
+    # The calculation of the solar radiation is a two step process
     # 1) Obtain a raster with the latitude of the centre of the cell in radians
-    # 2) Fold the aspect around the North-South line (see McCune and Keon).
-    # 3) Calculate the solar radiation using the formula form McCune and Keom
+    # 2) Calculate the solar radiation using the formula form McCune and Keon 2002
 
     # initiate return value and log ouptut
     return_value = ''
@@ -311,7 +310,7 @@ def dtm_calc_solar_radiation(tile_id):
         del (xy_latlong)
         del (xyz)
 
-        ## Calculate Solar radiation
+        ## 2) Calculate Solar radiation
         # The equation from McCune and Keon goes as follows:
         # solar radiation =  0.339 +
         #                    0.808 x cos(lat) x cos(slope) +
@@ -321,6 +320,7 @@ def dtm_calc_solar_radiation(tile_id):
         # asp = 180 - |180 - asp|
         # and all values mus be in radians:
         # rad = deg * pi / 180 or using numpy simply: rad = radians(deg)
+        # Finally, the restult needs to be stretched by 1000 and rounded for storage as an Int16
 
         # Specify path to latitude raster L
         lat_file = '-L ' + wd + '/lat_' + tile_id + '.tif '
@@ -486,6 +486,224 @@ def dtm_calc_aspect(tile_id):
     return return_value
 
 
+## Calculate landscape openness (mean)
+def dtm_openness_mean(tile_id):
+    """
+    Exports the mean landscape openness for all eight cardinal directions with a 150 m search radius
+    using the OPALS Openness module.
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+    :return: execution status
+    """
+    # Initiate return value
+    return_value = ''
+    log_output = ''
+
+    # Get working directory
+    wd = os.getcwd()
+
+    # Generate folder paths
+    out_folder = settings.output_folder + '/openness_mean'
+    if not os.path.exists(out_folder): os.mkdir(out_folder)
+
+    # Attempt calculation of mean openness
+    try:
+
+        ## Aggregate dtm mosaic to temporary file:
+        # Specify gdal command
+        cmd = settings.gdalwarp_bin + \
+              '-tr 10 10 -r average ' + \
+              settings.dtm_mosaics_folder + '/DTM_' + tile_id + '_mosaic.tif ' + \
+              wd + '/dtm_10m_' + tile_id + '_mosaic_float.tif ' + ' -overwrite'
+
+        # Execute gdal command
+        log_output = log_output + subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
+                     '\n' + tile_id + ' aggregated dtm_10m mosaic.\n\n'
+
+        # Initialise Opals Openness Module
+        export_openness = opals.Openness.Openness()
+
+        # Export positive openness for a given cell cell with a search radius of 150 m (15 cells)
+        export_openness.inFile = wd + '/dtm_10m_' + tile_id + '_mosaic_float.tif '
+        export_openness.outFile = wd + '/openness_150m_' + tile_id + '_mosaic.tif '
+        export_openness.feature = opals.Types.OpennessFeature.positive
+        export_openness.kernelSize = 15  # 15 x 10 m = 150 m
+        export_openness.selMode = 0
+        export_openness.commons.screenLogLevel = opals.Types.LogLevel.none
+        export_openness.commons.nbThreads = settings.nbThreads
+        export_openness.run()
+
+        # Convert to degrees, round and store as int16
+        # Specify gdal command
+        cmd = settings.gdal_calc_bin + \
+              '-A ' + wd + '/openness_150m_' + tile_id + '_mosaic.tif ' + \
+              ' --outfile=' + wd + '/landscape_openness_' + tile_id + '_mosaic.tif ' + \
+              ' --calc=rint(degrees(A))' + ' --type=Int16' + ' --NoDataValue=-9999'
+
+        # Execute gdal command
+        log_output = log_output + '\n' + tile_id + ' converting and rounding to degreees. \n' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+
+        # Obtain file extent for cropping then remove outer 150 m of mosaic to avoid edge effects
+        cmd = settings.gdalinfo_bin + wd + '/landscape_openness_' + tile_id + '_mosaic.tif '
+
+        mosaic_info = subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+        upper_left = re.search("Upper *Left *\( *(\d+.\d+), *(\d+.\d+)\)", mosaic_info)
+        lower_right = re.search("Lower *Right *\( *(\d+.\d+), *(\d+.\d+)\)", mosaic_info)
+        xmin = float(upper_left.group(1)) + 150
+        ymax = float(upper_left.group(2)) - 150
+        xmax = float(lower_right.group(1)) - 150
+        ymin = float(lower_right.group(2)) + 150
+
+        # remove 150 m on outer edge using gdalwarp
+        cmd = settings.gdalwarp_bin + \
+              '-te ' + str(xmin) + ' ' + str(ymin) + ' ' + str(xmax) + ' ' + str(ymax) + ' -overwrite ' + \
+              wd + '/landscape_openness_' + tile_id + '_mosaic.tif ' + \
+              wd + '/landscape_openness_' + tile_id + '_mosaic_cropped.tif '
+
+        log_output = log_output + subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
+                     '\n' + tile_id + ' cropping landscape openness mosaic finished.\n\n'
+
+        # Crop openness mosaic to original tile size (this will set all edges removed earlier to NA)
+        cmd = settings.gdalwarp_bin + \
+              ' -cutline ' + settings.dtm_footprint_folder + '/DTM_1km_' + tile_id + '_footprint.shp ' + \
+              '-crop_to_cutline -overwrite ' + \
+              wd + '/landscape_openness_' + tile_id + '_mosaic_cropped.tif ' + \
+              out_folder + '/openness_mean' + tile_id + '.tif '
+        log_output = log_output + subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
+                     '\n' + tile_id + ' landscape openness calculation successful.\n\n'
+
+        return_value = 'success'
+
+    except:
+        return_value = 'opals/gdal/Error'
+
+    # Remove temporary files
+    try:
+        os.remove(wd + '/dtm_10m_' + tile_id + '_mosaic_float.tif ')
+        os.remove(wd + '/openness_150m_' + tile_id + '_mosaic.tif ')
+        os.remove(wd + '/landscape_openness_' + tile_id + '_mosaic.tif ')
+        os.remove(wd + '/landscape_openness_' + tile_id + '_mosaic_cropped.tif ')
+    except:
+        pass
+
+
+## Calculate landscape openness (difference)
+def dtm_openness_difference(tile_id):
+    """
+    Exports the difference between the minimum and maximum positive openness within a 50 m search radius
+    using the Opals Openness module.
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+    :return: execution status
+    """
+    # Initiate return value
+    return_value = ''
+    log_output = ''
+
+    # Get working directory
+    wd = os.getcwd()
+
+    # Generate folder paths
+    out_folder = settings.output_folder + '/openness_difference'
+    if not os.path.exists(out_folder): os.mkdir(out_folder)
+
+
+    # Attempt openness difference calculation
+    try:
+
+        ## Aggregate dtm mosaic to temporary file:
+        # Specify gdal command
+        cmd = settings.gdalwarp_bin + \
+              '-tr 10 10 -r average ' + \
+              settings.dtm_mosaics_folder + '/DTM_' + tile_id + '_mosaic.tif ' + \
+              wd + '/dtm_10m_' + tile_id + '_mosaic_float.tif ' + ' -overwrite'
+
+        # Execute gdal command
+        log_output = log_output + subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
+                     '\n' + tile_id + ' aggregated dtm_10m mosaic.\n\n'
+
+        # Initialise Opals Openness Module
+        export_openness = opals.Openness.Openness()
+
+        # Export minimum positive openness for a given cell cell with a kernel size of 50 m x 50 m
+        export_openness.inFile = wd + '/dtm_10m_' + tile_id + '_mosaic_float.tif '
+        export_openness.outFile = wd + '/openness_50m_min_' + tile_id + '_mosaic.tif '
+        export_openness.feature = opals.Types.OpennessFeature.positive
+        export_openness.kernelSize = 5  # 5 x 10 m = 50 m
+        export_openness.selMode = 1
+        export_openness.commons.screenLogLevel = opals.Types.LogLevel.none
+        export_openness.commons.nbThreads = settings.nbThreads
+        export_openness.run()
+
+        # Export maximum positive openness for a given cell with a kernel size of 50 m x 50 m
+        export_openness.inFile = wd + '/dtm_10m_' + tile_id + '_mosaic_float.tif '
+        export_openness.outFile = wd + '/openness_50m_max_' + tile_id + '_mosaic.tif '
+        export_openness.feature = opals.Types.OpennessFeature.positive
+        export_openness.kernelSize = 5  # 5 x 10 m = 50 m
+        export_openness.selMode = 2
+        export_openness.commons.screenLogLevel = opals.Types.LogLevel.none
+        export_openness.commons.nbThreads = settings.nbThreads
+        export_openness.run()
+
+        # Calculate difference, round and store as int16
+        # Specify gdal command
+        cmd = settings.gdal_calc_bin + \
+              '-A ' + wd + '/openness_50m_min_' + tile_id + '_mosaic.tif ' + \
+              '-B ' + wd + '/openness_50m_max_' + tile_id + '_mosaic.tif ' + \
+              ' --outfile=' + wd + '/diff_openness_' + tile_id + '_mosaic.tif ' + \
+              ' --calc=rint(degrees(B)-degrees(A))' + ' --type=Int16' + ' --NoDataValue=-9999'
+
+        # Execute gdal command
+        log_output = log_output + '\n' + tile_id + ' calculated difference openness. \n' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+
+        # Obtain file extent for cropping (remove outer 50 m of mosaic)
+        cmd = settings.gdalinfo_bin + wd + '/diff_openness_' + tile_id + '_mosaic.tif '
+
+        mosaic_info = subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+        upper_left = re.search("Upper *Left *\( *(\d+.\d+), *(\d+.\d+)\)", mosaic_info)
+        lower_right = re.search("Lower *Right *\( *(\d+.\d+), *(\d+.\d+)\)", mosaic_info)
+        xmin = float(upper_left.group(1)) + 50
+        ymax = float(upper_left.group(2)) - 50
+        xmax = float(lower_right.group(1)) - 50
+        ymin = float(lower_right.group(2)) + 50
+
+        # Remove 50 m on outer edge using gdalwarp
+        cmd = settings.gdalwarp_bin + \
+              '-te ' + str(xmin) + ' ' + str(ymin) + ' ' + str(xmax) + ' ' + str(ymax) + ' -overwrite ' + \
+              wd + '/diff_openness_' + tile_id + '_mosaic.tif ' + \
+              wd + '/diff_openness_' + tile_id + '_mosaic_cropped.tif '
+
+        log_output = log_output + subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
+                     '\n' + tile_id + ' cropped openness difference mosaic.\n\n'
+
+        # Crop diff openness to original tile size (this will set all edges removed earlier to NA)
+        cmd = settings.gdalwarp_bin + \
+              ' -cutline ' + settings.dtm_footprint_folder + '/DTM_1km_' + tile_id + '_footprint.shp ' + \
+              '-crop_to_cutline -overwrite ' + \
+              wd + '/diff_openness_' + tile_id + '_mosaic_cropped.tif ' + \
+              out_folder + '/openness_difference' + tile_id + '.tif '
+        log_output = log_output + subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
+                     '\n' + tile_id + ' openness calculation successful.\n\n'
+
+        return_value = 'success'
+
+    except:
+        return_value = 'opals/gdal/Error'
+
+    # Remove temporary files
+    try:
+        os.remove(wd + '/dtm_10m_' + tile_id + '_mosaic_float.tif ')
+        os.remove(wd + '/openness_50m_min_' + tile_id + '_mosaic.tif ')
+        os.remove(wd + '/openness_50m_max_' + tile_id + '_mosaic.tif ')
+        os.remove(wd + '/diff_openness_' + tile_id + '_mosaic.tif ')
+        os.remove(wd + '/diff_openness_' + tile_id + '_mosaic_cropped.tif ')
+    except:
+        pass
+
+    # Return exist status
+    return return_value
+
+
 ## Calculate SAGA Wetness Index for a tile
 def dtm_saga_wetness(tile_id):
     """
@@ -521,7 +739,7 @@ def dtm_saga_wetness(tile_id):
               wd + '/wetness_index_' + tile_id + '.tif '
 
         log_output = log_output + subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
-                     '\n' + tile_id + ' cropping wetness index mosaic.\n\n'
+                     '\n' + tile_id + ' cropping wetness index mosaic successful.\n\n'
         return_value = 'success'
 
         # Set input file path
@@ -535,7 +753,8 @@ def dtm_saga_wetness(tile_id):
               ' --calc=rint(1000*A) --type=Int16' + ' --NoDataValue=-9999 --overwrite'
 
         # Execute gdal command
-        log_output = log_output + '\n' + tile_id + ' rounding and converting to integer... \n' + \
+        log_output = log_output + '\n' + tile_id + ' rounding and conversion finished. ' \
+                                                   'Wetness index calculation successful. \n' + \
                      subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
 
     except:
@@ -554,7 +773,6 @@ def dtm_saga_wetness(tile_id):
         os.remove(wd + '/wetness_index_' + tile_id + '_mosaic.sgrd ')
         os.remove(wd + '/wetness_index_' + tile_id + '_mosaic.mgrd ')
         os.remove(wd + '/wetness_index_' + tile_id + '_mosaic.tif ')
-        os.remove(wd + '/wetness_index_' + tile_id + '_mosaic.tif ')
         os.remove(wd + '/wetness_index_' + tile_id + '.tif ')
     except:
         pass
@@ -562,8 +780,8 @@ def dtm_saga_wetness(tile_id):
     return return_value
 
 
-## Calculate landscape openness for 10 m dtm
-def dtm_landscape_openness(tile_id):
+## Calculate landscape openness (mean) using SAGA
+def dtm_saga_landscape_openness(tile_id):
     """
     Calculates landscape opennes following Yokoyama et al. 2002 based on an aggregated 10 m dtm and a 150 m search radius.
     :param tile_id: tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
@@ -587,11 +805,11 @@ def dtm_landscape_openness(tile_id):
         cmd = settings.gdalwarp_bin + \
               '-tr 10 10 -r average ' + \
               settings.dtm_mosaics_folder + '/DTM_' + tile_id + '_mosaic.tif ' + \
-              wd + '/dtm_10m_' + tile_id + '_mosaic_float.tif '
+              wd + '/dtm_10m_' + tile_id + '_mosaic_float.tif ' + ' -overwrite'
 
         # Execute gdal command
         log_output = log_output + subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
-                     '\n' + tile_id + ' aggregating dtm_10m successful.\n\n'
+                     '\n' + tile_id + ' aggregating dtm_10m mosaic successful.\n\n'
 
         # Use saga gis openness module for calculating the openness in 150 m
         cmd = settings.saga_openness_bin + \
@@ -599,11 +817,11 @@ def dtm_landscape_openness(tile_id):
               '-POS ' + wd + '/openness_10m_' + tile_id + '_mosaic.sdat ' + \
               '-RADIUS 150 -METHOD 1'
 
-        # Execute gdal command
+        # Execute saga command
         log_output = log_output + subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
-                     '\n' + tile_id + ' calculating openness successful.\n\n'
+                     '\n' + tile_id + ' openness from mosaic successful.\n\n'
 
-        # Obtain file extent for cropping (remove outer 15 m of mosaic)
+        # Obtain file extent for cropping (remove outer 150 m of mosaic)
         cmd = settings.gdalinfo_bin + wd + '/openness_10m_' + tile_id + '_mosaic.sdat '
 
         mosaic_info = subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
@@ -631,7 +849,7 @@ def dtm_landscape_openness(tile_id):
               ' --calc=rint(degrees(A))' + ' --type=Int16' + ' --NoDataValue=-9999'
 
         # Execute gdal command
-        log_output = log_output + '\n' + tile_id + ' converting dtm_10m to int16... \n' + \
+        log_output = log_output + '\n' + tile_id + ' converting dtm_10m to int16 successful. \n' + \
                      subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
 
         # Crop slope output to original tile size:
@@ -641,10 +859,10 @@ def dtm_landscape_openness(tile_id):
               wd + '/openness_10m_' + tile_id + '_mosaic_deg.tif ' + \
               out_folder + '/openness_10m_' + tile_id + '.tif '
         log_output = log_output + subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
-                     '\n' + tile_id + ' aspect calculation successful.\n\n'
+                     '\n' + tile_id + ' openness calculation successful.\n\n'
         return_value = 'success'
     except:
-        log_output = log_output + '\n' + tile_id + ' dtm_10m aggregation failed.\n\n'
+        log_output = log_output + '\n' + tile_id + ' opennes calculation failed.\n\n'
         return_value = 'gdalError'
 
         # Write log output to log file
@@ -665,3 +883,4 @@ def dtm_landscape_openness(tile_id):
         pass
 
     return return_value
+

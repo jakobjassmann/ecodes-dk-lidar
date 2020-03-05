@@ -20,8 +20,8 @@ gdaltransform_bin = 'C:/OSGeo4W64/OSGeo4W.bat gdaltransform '
 gdalinfo_bin = 'C:/OSGeo4W64/OSGeo4W.bat gdalinfo '
 
 # Saga binary commands
-saga_wetness_bin = 'C:/OSGeo4W64/apps/saga-ltr/saga_cmd.exe ta_hydrology 15 '
-saga_openness_bin = 'C:\OSGeo4W64/apps/saga-ltr/saga_cmd.exe ta_lighting 5 '
+saga_wetness_bin = 'C:/OSGeo4W64/apps/saga-ltr/saga_cmd.exe --cores=1 ta_hydrology 15 '
+saga_openness_bin = 'C:/OSGeo4W64/apps/saga-ltr/saga_cmd.exe --cores=1 ta_lighting 5 '
 
 ### Set folder locations
 # Main working directory
@@ -73,3 +73,4 @@ out_cell_size = 10
 # point filter for all three vegetation classes as OPALS WKT
 veg_classes_filter = "Generic[Classification == 3 OR Classification == 4 OR Classification == 5]"
 ground_and_veg_classes_filter = "Generic[Classification == 2 OR Classification == 3 OR Classification == 4 OR Classification == 5]"
+all_classes = "Generic[Classification == 2 OR Classification == 3 OR Classification == 4 OR Classification == 5 OR Classification == 6 OR Classification == 9]"
