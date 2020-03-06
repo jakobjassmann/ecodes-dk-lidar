@@ -7,6 +7,7 @@ import multiprocessing
 import re
 import pandas
 import opals
+import glob
 
 from dklidar import settings
 
@@ -45,7 +46,7 @@ def dtm_generate_footprint(tile_id):
 
 
 ## Create neighbourhood mosaic
-def dtm_mosaic_neighbours(tile_id):
+def dtm_neighbourhood_mosaic(tile_id):
     """
     Generates a tif mosaic with all existing 8 neighbouring cells
     :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
@@ -145,7 +146,7 @@ def dtm_aggregate_tile(tile_id):
               '-tr 10 10 -r average ' + \
               settings.dtm_folder + '/DTM_1km_' + tile_id + '.tif ' + \
               wd + '/dtm_10m_' + tile_id + '_float.tif '
-        print cmd
+
         # Execute gdal command
         log_output = log_output + subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
                      '\n' + tile_id + ' aggregating dtm_10m successful.\n\n'
@@ -154,9 +155,11 @@ def dtm_aggregate_tile(tile_id):
 
         # Stretch by 100, round and store as int16
         # Specify gdal command
-        cmd = settings.gdal_calc_bin + '-A ' + wd + '/dtm_10m_' + tile_id + '_float.tif ' + ' --outfile=' + out_file + \
+        cmd = settings.gdal_calc_bin + \
+              '-A ' + wd + '/dtm_10m_' + tile_id + '_float.tif ' + \
+              ' --outfile=' + out_file + \
               ' --calc=rint(100*A)' + ' --type=Int16' + ' --NoDataValue=-9999'
-        print cmd
+
         # Execute gdal command
         log_output = log_output + '\n' + tile_id + ' converting dtm_10m to int16... \n' + \
                      subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
@@ -178,183 +181,6 @@ def dtm_aggregate_tile(tile_id):
         pass
 
     return return_value
-
-
-## Calculcate heat index
-def dtm_calc_heat_index(tile_id):
-    """
-    Calculates the aspect from DTM neighbourhood mosaic and crops to original tile_size
-    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
-    :return: execution status
-    """
-    # Intialise return value and log
-    return_value = ''
-    log_output = ''
-
-    # Get current wd
-    wd = os.getcwd()
-
-    # Prepare output folder
-    out_folder = settings.output_folder + '/heat_load_index'
-    if not os.path.exists(out_folder): os.mkdir(out_folder)
-
-    try:
-
-        # Specify path to aspect raster A
-        aspect_file = '-A ' + settings.output_folder + '/aspect/aspect_' + tile_id + '.tif '
-
-        # Construct numpy equation, stretch by 10k and round
-        heat_index = 'rint(10000*((1-cos(radians(A-45)))/2))'
-
-        # Specify output path
-        out_file = out_folder + '/heat_load_index_' + tile_id + '.tif '
-
-        # Construct gdal command, save file as Int16:
-        cmd = settings.gdal_calc_bin + aspect_file + '--outfile=' + out_file + \
-              ' --calc=' + heat_index + ' --type=Int16' + ' --NoDataValue=-9999 --overwrite'
-
-        # Execute gdal command
-        log_output = log_output + '\n' + tile_id + ' calculating heat index success. \n' + \
-                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
-
-    except:
-        log_output = tile_id + ' calculating heat index failed. \n '
-        return_value = 'gdal_error'
-
-    # Write log output to log file
-    log_file = open('log.txt', 'a+')
-    log_file.write(log_output)
-    log_file.close()
-
-    # Remove temporary file
-    os.remove(settings.output_folder + '/dtm_slope/slope_' + tile_id + '_mosaic.tif ')
-
-
-## Calculate solar radiation
-def dtm_calc_solar_radiation(tile_id):
-    """
-    Returns cell by cell solar radiation following McCune and Keon 2002. Slope and aspect must have been calculated
-    beforehand using dtm_calc_slope and dtm_valc_aspect
-    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
-    :return: execution status
-    """
-
-    # The calculation of the solar radiation is a two step process
-    # 1) Obtain a raster with the latitude of the centre of the cell in radians
-    # 2) Calculate the solar radiation using the formula form McCune and Keon 2002
-
-    # initiate return value and log ouptut
-    return_value = ''
-    log_output = ''
-
-    # Get current wd
-    wd = os.getcwd()
-
-    # Prepare output folder
-    out_folder = settings.output_folder + '/solar_rad'
-    if not os.path.exists(out_folder): os.mkdir(out_folder)
-
-    try:
-        # 1) Create raster with latitude of the centre of a cell
-        # Construct gdal command to export xyz file in utm
-
-        dtm_file = settings.output_folder + '/slope/slope_' + tile_id + '.tif'
-        out_file = wd + '/xyz_' + tile_id + '.xyz'
-        cmd = settings.gdal_translate_bin + ' -of xyz -co COLUMN_SEPARATOR="," -co ADD_HEADER_LINE=YES ' + \
-              dtm_file + ' ' + \
-              out_file
-
-        log_output = tile_id + ' generating xyz... \n ' + subprocess.check_output(cmd, shell=False,
-                                                                                  stderr=subprocess.STDOUT)
-
-        # Read in xyz as a pandas dataframe
-        xyz = pandas.read_csv('xyz_' + tile_id + '.xyz')
-        xy = xyz[["X", "Y"]]
-        xy.to_csv('xy_' + tile_id + '.csv', index=False, header=False, sep=' ')
-
-        # Construct gdal commands to transform cell coordinates from utm to lat long
-        in_file = wd + '/xy_' + tile_id + '.csv'
-        out_file = 'xy_' + tile_id + '_latlong.csv'
-        cmd = '(' + settings.gdaltransform_bin + ' -s_srs EPSG:25832 -t_srs WGS84 ' + \
-              ' < ' + in_file + ') > ' + out_file
-
-        # And execute the gdal command
-        log_output = tile_id + ' transforming to lat long... \n ' + subprocess.check_output(cmd, shell=True)
-
-        # Load lat long file
-        xy_latlong = pandas.read_csv('xy_' + tile_id + '_latlong.csv', sep='\s+', names=['X', 'Y', 'return_status'],
-                                     skiprows=1)
-
-        # check data frames are of the same lenght
-        if len(xyz.index) != len(xy_latlong.index):
-            log_output = log_output + '\n lenght of dataframes did not match \n'
-            raise Exception("")
-
-        # Assign lat (deg) to UTM z coordinate
-        xyz["Z"] = xy_latlong["Y"]
-        xyz.to_csv('xyz_' + tile_id + '.xyz', index=False, header=False, sep=' ')
-
-        # Convert back to geotiff
-        in_file = wd + '/xyz_' + tile_id + '.xyz'
-        out_file = wd + '/lat_' + tile_id + '.tif'
-        cmd = settings.gdal_translate_bin + ' -of GTiff -a_srs EPSG:25832 ' + \
-              in_file + ' ' + out_file
-
-        log_output = tile_id + ' generating xyz... \n ' + subprocess.check_output(cmd, shell=False,
-                                                                                  stderr=subprocess.STDOUT)
-        # Intermediate clean up
-        os.remove('xyz_' + tile_id + '.xyz')
-        os.remove('xy_' + tile_id + '.csv')
-        os.remove('xy_' + tile_id + '_latlong.csv')
-        del (xy)
-        del (xy_latlong)
-        del (xyz)
-
-        ## 2) Calculate Solar radiation
-        # The equation from McCune and Keon goes as follows:
-        # solar radiation =  0.339 +
-        #                    0.808 x cos(lat) x cos(slope) +
-        #                   -0.196 x sin(lat) x sin(slope) +
-        #                   -0.482 x cos(asp) x sin(slope)
-        # Aspect must be foldered around the S-N line:
-        # asp = 180 - |180 - asp|
-        # and all values mus be in radians:
-        # rad = deg * pi / 180 or using numpy simply: rad = radians(deg)
-        # Finally, the restult needs to be stretched by 1000 and rounded for storage as an Int16
-
-        # Specify path to latitude raster L
-        lat_file = '-L ' + wd + '/lat_' + tile_id + '.tif '
-
-        # Specify path to slope raster as raster S
-        slope_file = '-S ' + settings.output_folder + '/slope/slope_' + tile_id + '.tif '
-
-        # Specify path to aspect raster A
-        aspect_file = '-A ' + settings.output_folder + '/aspect/aspect_' + tile_id + '.tif '
-
-        # Construct numpy equation (stretch by 1000 and round to nearest int)
-        solar_rad_eq = 'rint(1000*(0.339+0.808*cos(radians(L))*cos(radians(S))-0.196*sin(radians(L))*sin(radians(S))-0.482*cos(radians(180-absolute(180-A)))*sin(radians(S))))'
-
-        # Specify output path
-        out_file = out_folder + '/solar_rad_' + tile_id + '.tif '
-
-        # Construct gdal command:
-        cmd = settings.gdal_calc_bin + lat_file + slope_file + aspect_file + '--outfile=' + out_file + \
-              ' --calc=' + solar_rad_eq + ' --type=Int16' + ' --NoDataValue=-9999 --overwrite'
-
-        # Execute gdal command
-        log_output = log_output + '\n' + tile_id + ' calculating solar radiation... \n' + \
-                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
-
-    except:
-        log_output = tile_id + ' calculating solar radiation failed. \n '
-        return_value = 'gdal_error'
-
-    # Write log output to log file
-    log_file = open('log.txt', 'a+')
-    log_file.write(log_output)
-    log_file.close()
-
-    print(return_value)
 
 
 ## Calculate slope for file
@@ -382,22 +208,23 @@ def dtm_calc_slope(tile_id):
         cmd = settings.gdaldem_bin + ' slope ' + \
             settings.dtm_mosaics_folder + '/DTM_' + tile_id + '_mosaic.tif ' + \
             wd + '/slope_' + tile_id + '_mosaic.tif '
-        log_output = tile_id + ' slope calculation... \n ' + subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+        log_output = tile_id + ' slope calculation... \n ' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
 
         # Croping slope output to original tile size and aggregate to 10 m scale by median
         cmd = settings.gdalwarp_bin + \
               ' -cutline ' + settings.dtm_footprint_folder + '/DTM_1km_' + tile_id + '_footprint.shp ' + \
-               '-tr 10 10 -r med -ot Int16 ' + '-crop_to_cutline -overwrite ' + \
+               '-tr 10 10 -r med -ot Int16 -crop_to_cutline -overwrite ' + \
               wd + '/slope_' + tile_id + '_mosaic.tif ' + \
               wd + '/slope_' + tile_id + '_mosaic_cropped.tif '
         log_output = log_output + subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
-                     '\n' + tile_id + 'cropping slope.\n\n'
+                     '\n' + tile_id + ' cropped slope.\n\n'
 
         # Round and store slope as int16
         cmd = settings.gdal_calc_bin + \
-              '-A ' + wd + '/aspect_' + tile_id + '_mosaic_cropped.tif ' + \
+              '-A ' + wd + '/slope_' + tile_id + '_mosaic_cropped.tif ' + \
               ' --outfile=' + out_folder + '/slope_' + tile_id + '.tif ' + \
-              ' --calc=rint(A)' + ' --type=Int16' + ' --NoDataValue=-9999'
+              ' --calc=rint(A) --type=Int16 --NoDataValue=-9999'
         log_output = log_output + '\n' + tile_id + ' rounding slope and calculation successful. \n' + \
                      subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
 
@@ -444,25 +271,25 @@ def dtm_calc_aspect(tile_id):
     try:
         # Calculate aspect
         cmd = settings.gdaldem_bin + ' aspect -zero_for_flat ' + \
-        settings.dtm_mosaics_folder + '/DTM_' + tile_id + '_mosaic.tif ' + \
-        wd + '/aspect_' + tile_id + '_mosaic.tif '
+              settings.dtm_mosaics_folder + '/DTM_' + tile_id + '_mosaic.tif ' + \
+              wd + '/aspect_' + tile_id + '_mosaic.tif '
         log_output = tile_id + ' aspect calculation... \n ' + \
                      subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
 
         # Crop aspect output to original tile size and aggregate to 10 m:
         cmd = settings.gdalwarp_bin + \
-          ' -cutline ' + settings.dtm_footprint_folder + '/DTM_1km_' + tile_id + '_footprint.shp ' + \
-          '-tr 10 10 -r med -ot Int16 ' + '-crop_to_cutline -overwrite ' + \
-          wd + '/aspect_' + tile_id + '_mosaic.tif ' + \
-          wd + '/aspect_' + tile_id + '_mosaic_cropped.tif '
+              ' -cutline ' + settings.dtm_footprint_folder + '/DTM_1km_' + tile_id + '_footprint.shp ' + \
+              '-tr 10 10 -r med -ot Int16 -crop_to_cutline -overwrite ' + \
+              wd + '/aspect_' + tile_id + '_mosaic.tif ' + \
+              wd + '/aspect_' + tile_id + '_mosaic_cropped.tif '
         log_output = log_output + subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
                  '\n' + tile_id + ' aspect mosaic cropped.\n\n'
 
-        # Round and store as intege
+        # Round and store as int16
         cmd = settings.gdal_calc_bin + \
               '-A ' + wd + '/aspect_' + tile_id + '_mosaic_cropped.tif ' + \
-              ' --outfile=' + out_folder + '/aspect_' + tile_id + '_mosaic_deg.tif ' + \
-              ' --calc=rint(A)' + ' --type=Int16' + ' --NoDataValue=-9999'
+              ' --outfile=' + out_folder + '/aspect_' + tile_id + '.tif ' + \
+              ' --calc=rint(A) --type=Int16 --NoDataValue=-9999'
         log_output = log_output + '\n' + tile_id + ' rounding aspect to int16 and calculation success. \n' + \
                      subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
 
@@ -486,7 +313,204 @@ def dtm_calc_aspect(tile_id):
     return return_value
 
 
-## Calculate landscape openness (mean)
+## Calculcate heat index
+def dtm_calc_heat_index(tile_id):
+    """
+    Calculates the aspect from DTM neighbourhood mosaic and crops to original tile_size
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+    :return: execution status
+    """
+    # Intialise return value and log
+    return_value = ''
+    log_output = ''
+
+    # Get current wd
+    wd = os.getcwd()
+
+    # Prepare output folder
+    out_folder = settings.output_folder + '/heat_load_index'
+    if not os.path.exists(out_folder): os.mkdir(out_folder)
+
+    try:
+
+        # Specify path to aspect raster A
+        aspect_file = '-A ' + settings.output_folder + '/aspect/aspect_' + tile_id + '.tif '
+
+        # Construct numpy equation, stretch by 10k and round
+        heat_index = 'rint(10000*((1-cos(radians(A-45)))/2))'
+
+        # Specify output path
+        out_file = out_folder + '/heat_load_index_' + tile_id + '.tif '
+
+        # Construct gdal command, save file as Int16:
+        cmd = settings.gdal_calc_bin + \
+              aspect_file + \
+              '--outfile=' + out_file + \
+              ' --calc=' + heat_index + \
+              ' --type=Int16 --NoDataValue=-9999 --overwrite'
+
+        # Execute gdal command
+        log_output = log_output + '\n' + tile_id + ' calculating heat index success. \n' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+
+        return_value = 'success'
+    except:
+        log_output = tile_id + ' calculating heat index failed. \n '
+        return_value = 'gdal_error'
+
+    # Write log output to log file
+    log_file = open('log.txt', 'a+')
+    log_file.write(log_output)
+    log_file.close()
+
+    return return_value
+
+
+## Calculate solar radiation
+def dtm_calc_solar_radiation(tile_id):
+    """
+    Returns cell by cell solar radiation following McCune and Keon 2002. Slope and aspect must have been calculated
+    beforehand using dtm_calc_slope and dtm_valc_aspect
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+    :return: execution status
+    """
+
+    # The calculation of the solar radiation is a two step process
+    # 1) Obtain a raster with the latitude of the centre of the cell in radians
+    # 2) Calculate the solar radiation using the formula form McCune and Keon 2002
+
+    # initiate return value and log ouptut
+    return_value = ''
+    log_output = ''
+
+    # Get current wd
+    wd = os.getcwd()
+
+    # Prepare output folder
+    out_folder = settings.output_folder + '/solar_rad'
+    if not os.path.exists(out_folder): os.mkdir(out_folder)
+
+    try:
+        # 1) Create raster with latitude of the centre of a cell
+        # Construct gdal command to export xyz file in utm
+        dtm_file = settings.output_folder + '/slope/slope_' + tile_id + '.tif'
+        out_file = wd + '/xyz_' + tile_id + '.xyz'
+        cmd = settings.gdal_translate_bin + \
+              ' -of xyz -co COLUMN_SEPARATOR="," -co ADD_HEADER_LINE=YES ' + \
+              dtm_file + ' ' + \
+              out_file
+        # Execute gdal command and log
+        log_output = log_output + '\n' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
+                     '\n' + tile_id + ' generated xyz. \n\n '
+
+        # Read in xyz as a pandas dataframe
+        xyz = pandas.read_csv('xyz_' + tile_id + '.xyz')
+        xy = xyz[["X", "Y"]]
+        xy.to_csv('xy_' + tile_id + '.csv', index=False, header=False, sep=' ')
+
+        # Construct gdal commands to transform cell coordinates from utm to lat long
+        in_file = wd + '/xy_' + tile_id + '.csv'
+        out_file = 'xy_' + tile_id + '_latlong.csv'
+        cmd = '(' + settings.gdaltransform_bin + ' -s_srs EPSG:25832 -t_srs WGS84 ' + \
+              ' < ' + in_file + ') > ' + out_file
+        # And execute the gdal command
+        log_output = log_output + '\n' + \
+                     subprocess.check_output(cmd, shell=True) + \
+                     '\n' + tile_id + ' transformed to lat long. \n\n '
+
+        # Load lat long file as pandas df
+        xy_latlong = pandas.read_csv('xy_' + tile_id + '_latlong.csv', sep='\s+', names=['X', 'Y', 'return_status'],
+                                     skiprows=1)
+
+        # check data frames are of the same length
+        if len(xyz.index) != len(xy_latlong.index):
+            log_output = log_output + '\n lenght of dataframes did not match \n'
+            raise Exception("")
+
+        # Assign lat (deg) to UTM z coordinate
+        xyz["Z"] = xy_latlong["Y"]
+        xyz.to_csv('xyz_' + tile_id + '.xyz', index=False, header=False, sep=' ')
+
+        # Convert back to geotiff
+        in_file = wd + '/xyz_' + tile_id + '.xyz'
+        out_file = wd + '/lat_' + tile_id + '.tif'
+        cmd = settings.gdal_translate_bin + \
+              ' -of GTiff -a_srs EPSG:25832 ' + \
+              in_file + ' ' + \
+              out_file
+        # Execute command and log
+        log_output = log_output + '\n' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
+                     '\n' + tile_id + ' generated lat tif. \n\n'
+        # Intermediate clean up
+        os.remove(wd + '/xyz_' + tile_id + '.xyz')
+        os.remove(wd + '/xy_' + tile_id + '.csv')
+        os.remove(wd + '/xy_' + tile_id + '_latlong.csv')
+        del (xy)
+        del (xy_latlong)
+        del (xyz)
+
+        ## 2) Calculate Solar radiation
+
+        # The equation from McCune and Keon goes as follows:
+        # solar radiation =  0.339 +
+        #                    0.808 x cos(lat) x cos(slope) +
+        #                   -0.196 x sin(lat) x sin(slope) +
+        #                   -0.482 x cos(asp) x sin(slope)
+        # Aspect must be foldered around the S-N line:
+        # asp = 180 - |180 - asp|
+        # and all values mus be in radians:
+        # rad = deg * pi / 180 or using numpy simply: rad = radians(deg)
+        # Finally, the result needs to be stretched by 1000 and rounded for storage as an Int16
+
+        # Specify path to latitude raster L
+        lat_file = '-L ' + wd + '/lat_' + tile_id + '.tif '
+
+        # Specify path to slope raster as raster S
+        slope_file = '-S ' + settings.output_folder + '/slope/slope_' + tile_id + '.tif '
+
+        # Specify path to aspect raster A
+        aspect_file = '-A ' + settings.output_folder + '/aspect/aspect_' + tile_id + '.tif '
+
+        # Construct numpy equation (stretch by 1000 and round to nearest int)
+        solar_rad_eq = 'rint(1000*(0.339+0.808*cos(radians(L))*cos(radians(S))-0.196*sin(radians(L))*sin(radians(S))-0.482*cos(radians(180-absolute(180-A)))*sin(radians(S))))'
+
+        # Specify output path
+        out_file = out_folder + '/solar_rad_' + tile_id + '.tif '
+
+        # Construct gdal command:
+        cmd = settings.gdal_calc_bin + \
+              lat_file + \
+              slope_file + \
+              aspect_file + \
+              '--outfile=' + out_file + \
+              ' --calc=' + solar_rad_eq + \
+              ' --type=Int16 --NoDataValue=-9999 --overwrite'
+
+        # Execute gdal command
+        log_output = log_output + '\n' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
+                     '\n' + tile_id + ' calculated solar radiation. \n\n'
+
+        # Remove latitude tif
+        os.remove(wd + '/lat_' + tile_id + '.tif')
+
+        return_value = 'success'
+
+    except:
+        log_output = tile_id + ' calculating solar radiation failed. \n '
+        return_value = 'gdal_error'
+
+    # Write log output to log file
+    log_file = open('log.txt', 'a+')
+    log_file.write(log_output)
+    log_file.close()
+
+    return return_value
+
+
+## Calculate landscape openness mean
 def dtm_openness_mean(tile_id):
     """
     Exports the mean landscape openness for all eight cardinal directions with a 150 m search radius
@@ -537,7 +561,8 @@ def dtm_openness_mean(tile_id):
         cmd = settings.gdal_calc_bin + \
               '-A ' + wd + '/openness_150m_' + tile_id + '_mosaic.tif ' + \
               ' --outfile=' + wd + '/landscape_openness_' + tile_id + '_mosaic.tif ' + \
-              ' --calc=rint(degrees(A))' + ' --type=Int16' + ' --NoDataValue=-9999'
+              ' --calc=rint(degrees(A))' + \
+              ' --type=Int16 --NoDataValue=-9999'
 
         # Execute gdal command
         log_output = log_output + '\n' + tile_id + ' converting and rounding to degreees. \n' + \
@@ -583,11 +608,16 @@ def dtm_openness_mean(tile_id):
         os.remove(wd + '/openness_150m_' + tile_id + '_mosaic.tif ')
         os.remove(wd + '/landscape_openness_' + tile_id + '_mosaic.tif ')
         os.remove(wd + '/landscape_openness_' + tile_id + '_mosaic_cropped.tif ')
+        # and are super random files created by OPALS
+        for temp_file in glob.glob(wd + '/../*' + tile_id + '_mosaic_dz._dz.tif'):
+            os.remove(temp_file)
     except:
         pass
 
+    return return_value
 
-## Calculate landscape openness (difference)
+
+## Calculate landscape openness difference
 def dtm_openness_difference(tile_id):
     """
     Exports the difference between the minimum and maximum positive openness within a 50 m search radius
@@ -613,9 +643,9 @@ def dtm_openness_difference(tile_id):
         ## Aggregate dtm mosaic to temporary file:
         # Specify gdal command
         cmd = settings.gdalwarp_bin + \
-              '-tr 10 10 -r average ' + \
+              '-tr 10 10 -r average -overwrite ' + \
               settings.dtm_mosaics_folder + '/DTM_' + tile_id + '_mosaic.tif ' + \
-              wd + '/dtm_10m_' + tile_id + '_mosaic_float.tif ' + ' -overwrite'
+              wd + '/dtm_10m_' + tile_id + '_mosaic_float.tif '
 
         # Execute gdal command
         log_output = log_output + subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
@@ -650,7 +680,8 @@ def dtm_openness_difference(tile_id):
               '-A ' + wd + '/openness_50m_min_' + tile_id + '_mosaic.tif ' + \
               '-B ' + wd + '/openness_50m_max_' + tile_id + '_mosaic.tif ' + \
               ' --outfile=' + wd + '/diff_openness_' + tile_id + '_mosaic.tif ' + \
-              ' --calc=rint(degrees(B)-degrees(A))' + ' --type=Int16' + ' --NoDataValue=-9999'
+              ' --calc=rint(degrees(B)-degrees(A))' + \
+              ' --type=Int16 --NoDataValue=-9999'
 
         # Execute gdal command
         log_output = log_output + '\n' + tile_id + ' calculated difference openness. \n' + \
@@ -697,6 +728,9 @@ def dtm_openness_difference(tile_id):
         os.remove(wd + '/openness_50m_max_' + tile_id + '_mosaic.tif ')
         os.remove(wd + '/diff_openness_' + tile_id + '_mosaic.tif ')
         os.remove(wd + '/diff_openness_' + tile_id + '_mosaic_cropped.tif ')
+        # and are super random files created by OPALS
+        for temp_file in glob.glob(wd + '/../*' + tile_id + '_mosaic_dz._dz.tif'):
+            os.remove(temp_file)
     except:
         pass
 
@@ -734,7 +768,7 @@ def dtm_saga_wetness(tile_id):
         # Crop output to original tile size:
         cmd = settings.gdalwarp_bin + \
               ' -cutline ' + settings.dtm_footprint_folder + '/DTM_1km_' + tile_id + '_footprint.shp ' + \
-              '-tr 10 10 -r med ' + '-crop_to_cutline -overwrite ' + \
+              '-tr 10 10 -r med -crop_to_cutline -overwrite ' + \
               wd + '/wetness_index_' + tile_id + '_mosaic.sdat ' + \
               wd + '/wetness_index_' + tile_id + '.tif '
 
@@ -749,8 +783,10 @@ def dtm_saga_wetness(tile_id):
 
         # Stretch to by 1000, round and convert to int 16
         # Construct gdal command:
-        cmd = settings.gdal_calc_bin + '-A ' + wd + '/wetness_index_' + tile_id + '.tif ' + '--outfile=' + out_file + \
-              ' --calc=rint(1000*A) --type=Int16' + ' --NoDataValue=-9999 --overwrite'
+        cmd = settings.gdal_calc_bin + \
+              '-A ' + wd + '/wetness_index_' + tile_id + '.tif ' + \
+              '--outfile=' + out_file + \
+              ' --calc=rint(1000*A) --type=Int16 --NoDataValue=-9999 --overwrite'
 
         # Execute gdal command
         log_output = log_output + '\n' + tile_id + ' rounding and conversion finished. ' \
