@@ -299,6 +299,7 @@ def odm_export_normalized_z(tile_id):
         export_normalized_z.cellSize = settings.out_cell_size
         export_normalized_z.limit = 'corner' # This switch is really important when working with tiles!
                                     # It sets the ROI to the extent to the bounding box of points in the ODM
+        export_normalized_z.filter = settings.all_classes
         export_normalized_z.commons.screenLogLevel = opals.Types.LogLevel.none
         export_normalized_z.commons.nbThreads = settings.nbThreads
         export_normalized_z.run()
@@ -315,6 +316,7 @@ def odm_export_normalized_z(tile_id):
         export_normalized_z.cellSize = settings.out_cell_size
         export_normalized_z.limit = 'corner' # This switch is really important when working with tiles!
                                     # It sets the ROI to the extent to the bounding box of points in the ODM
+        export_normalized_z.filter = settings.all_classes
         export_normalized_z.commons.screenLogLevel = opals.Types.LogLevel.none
         export_normalized_z.commons.nbThreads = settings.nbThreads
         export_normalized_z.run()
@@ -604,7 +606,7 @@ def odm_export_proportions(tile_id):
     # Export building proportion
     return_values.append(odm_calc_proportions(tile_id, 'building_proportion',
                                               'building_point_count_-1m-50m',
-                                              'vegetation_point_count_0m-50m'))
+                                              'total_point_count_-1m-50m'))
 
     # Set return value status
     # There are only two return value states so if there is more than one return value in the list
@@ -884,10 +886,6 @@ def odm_export_point_source_info(tile_id):
         # export_point_mode.commons.nbThreads = settings.nbThreads
         # export_point_mode.run()
 
-        # Remove temp files
-        temp_tifs = glob.glob(temp_wd + '*.tif')
-        for tif in temp_tifs: os.remove(tif)
-
         # Write log output to log file
         log_file = open('log.txt', 'a+')
         log_file.write(log_output)
@@ -897,5 +895,11 @@ def odm_export_point_source_info(tile_id):
     except:
         return_value = 'opalsError'
 
+    # remove temporary files
+    for temp_file in glob.glob(temp_wd + '/*.tif'):
+        try:
+            os.remove(temp_file)
+        except:
+            pass
     return return_value
 

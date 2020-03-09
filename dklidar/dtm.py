@@ -495,11 +495,9 @@ def dtm_calc_solar_radiation(tile_id):
 
         # Remove latitude tif
         os.remove(wd + '/lat_' + tile_id + '.tif')
-
         return_value = 'success'
-
     except:
-        log_output = tile_id + ' calculating solar radiation failed. \n '
+        log_output = log_output + '\n\n' + tile_id + ' calculating solar radiation failed. \n '
         return_value = 'gdal_error'
 
     # Write log output to log file
