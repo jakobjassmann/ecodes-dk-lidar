@@ -30,8 +30,8 @@ if not os.path.exists(settings.dtm_folder):
     print('dtm_folder ' + settings.dtm_folder + ' does not exist. Exiting script...')
     exit()
 # Conmfirm other folders exists and if not create them
-for folder in [settings.dtm_mosaics_folder, settings.odm_folder, settings.odm_mosaics_folder,
-               settings.odm_footprint_folder, settings.output_folder]:
+for folder in [settings.dtm_mosaics_folder, settings.dtm_footprint_folder,
+               settings.odm_folder, settings.odm_footprint_folder, settings.output_folder]:
     if not os.path.exists(folder):
         os.mkdir(folder)
 
