@@ -16,7 +16,7 @@ from dklidar import settings
 ## Generate tile footprint
 def dtm_generate_footprint(tile_id):
     """
-    Generates a footprint file using gdal
+    Generates a footprint file using gdal.
     :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
     :return execution status
     """
@@ -58,13 +58,8 @@ def dtm_neighbourhood_mosaic(tile_id):
     return_value = ''
     log_output = ''
 
-    # Generate temporay wd for parallel worker, this will allow for smooth logging and opals sessions to run in parallel
-    wd = os.getcwd()
-    current_pid =  re.sub('[(),]', '', str(multiprocessing.current_process()._identity))
-    temp_wd = settings.scratch_folder + '/temp_' + current_pid
-    if not os.path.exists(temp_wd):
-        os.mkdir(temp_wd)
-    os.chdir(temp_wd)
+    # get current (temporary) work directory
+    temp_wd = os.getcwd()
 
     # Retrieve row and col numbers for the current tile_id
     center_row = int(re.sub('(\d+)_\d+', '\g<1>', tile_id))
@@ -97,8 +92,7 @@ def dtm_neighbourhood_mosaic(tile_id):
 
     # Construct command:
     cmd = settings.gdalwarp_bin + ' ' + tile_file_names + ' ' + \
-        settings.dtm_mosaics_folder + '/dtm_mosaic' + \
-        tile_id + '.tif '
+        settings.dtm_mosaics_folder + '/dtm_' + tile_id + '_mosaic.tif '
 
     # Execute command as subprocess and return message:
     try:
@@ -113,9 +107,6 @@ def dtm_neighbourhood_mosaic(tile_id):
     log_file = open('log.txt', 'a+')
     log_file.write(log_output)
     log_file.close()
-
-    # Change back to original working directory
-    os.chdir(wd)
 
     return return_value
 
@@ -206,15 +197,15 @@ def dtm_calc_slope(tile_id):
     try:
         # Calculate slope parameter
         cmd = settings.gdaldem_bin + ' slope ' + \
-            settings.dtm_mosaics_folder + '/DTM_' + tile_id + '_mosaic.tif ' + \
+            settings.dtm_mosaics_folder + '/dtm_' + tile_id + '_mosaic.tif ' + \
             wd + '/slope_' + tile_id + '_mosaic.tif '
         log_output = tile_id + ' slope calculation... \n ' + \
                      subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
 
-        # Croping slope output to original tile size and aggregate to 10 m scale by median
+        # Crop slope mosaic output to original tile size and aggregate to 10 m scale by median
         cmd = settings.gdalwarp_bin + \
               ' -cutline ' + settings.dtm_footprint_folder + '/DTM_1km_' + tile_id + '_footprint.shp ' + \
-               '-tr 10 10 -r med -ot Int16 -crop_to_cutline -overwrite ' + \
+               '-tr 10 10 -r med -crop_to_cutline -overwrite ' + \
               wd + '/slope_' + tile_id + '_mosaic.tif ' + \
               wd + '/slope_' + tile_id + '_mosaic_cropped.tif '
         log_output = log_output + subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
@@ -252,7 +243,7 @@ def dtm_calc_slope(tile_id):
 ## Calculate aspect for a tile
 def dtm_calc_aspect(tile_id):
     """
-    Calculates the slope parameter for a DTM neighbourhood mosaic and crops to original tile_size
+    Calculates the aspect for all 10 m cells in a DTM neighbourhood mosaic and crops to original tile_size
     :param tile_id: tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
     :return: execution status
     """
@@ -271,7 +262,7 @@ def dtm_calc_aspect(tile_id):
     try:
         # Calculate aspect
         cmd = settings.gdaldem_bin + ' aspect -zero_for_flat ' + \
-              settings.dtm_mosaics_folder + '/DTM_' + tile_id + '_mosaic.tif ' + \
+              settings.dtm_mosaics_folder + '/dtm_' + tile_id + '_mosaic.tif ' + \
               wd + '/aspect_' + tile_id + '_mosaic.tif '
         log_output = tile_id + ' aspect calculation... \n ' + \
                      subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
@@ -279,7 +270,7 @@ def dtm_calc_aspect(tile_id):
         # Crop aspect output to original tile size and aggregate to 10 m:
         cmd = settings.gdalwarp_bin + \
               ' -cutline ' + settings.dtm_footprint_folder + '/DTM_1km_' + tile_id + '_footprint.shp ' + \
-              '-tr 10 10 -r med -ot Int16 -crop_to_cutline -overwrite ' + \
+              '-tr 10 10 -r med -crop_to_cutline -overwrite ' + \
               wd + '/aspect_' + tile_id + '_mosaic.tif ' + \
               wd + '/aspect_' + tile_id + '_mosaic_cropped.tif '
         log_output = log_output + subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
@@ -316,7 +307,8 @@ def dtm_calc_aspect(tile_id):
 ## Calculcate heat index
 def dtm_calc_heat_index(tile_id):
     """
-    Calculates the aspect from DTM neighbourhood mosaic and crops to original tile_size
+    Calculates the heat index from McCune and Keon (2002) based on the aspect only. Aspect must have been
+    calculated using dtm_calc_aspect().
     :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
     :return: execution status
     """
@@ -332,7 +324,6 @@ def dtm_calc_heat_index(tile_id):
     if not os.path.exists(out_folder): os.mkdir(out_folder)
 
     try:
-
         # Specify path to aspect raster A
         aspect_file = '-A ' + settings.output_folder + '/aspect/aspect_' + tile_id + '.tif '
 
@@ -370,7 +361,7 @@ def dtm_calc_heat_index(tile_id):
 def dtm_calc_solar_radiation(tile_id):
     """
     Returns cell by cell solar radiation following McCune and Keon 2002. Slope and aspect must have been calculated
-    beforehand using dtm_calc_slope and dtm_valc_aspect
+    beforehand using dtm_calc_slope and dtm_calc_aspect.
     :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
     :return: execution status
     """
@@ -387,7 +378,7 @@ def dtm_calc_solar_radiation(tile_id):
     wd = os.getcwd()
 
     # Prepare output folder
-    out_folder = settings.output_folder + '/solar_rad'
+    out_folder = settings.output_folder + '/solar_radiation'
     if not os.path.exists(out_folder): os.mkdir(out_folder)
 
     try:
@@ -432,7 +423,7 @@ def dtm_calc_solar_radiation(tile_id):
         xyz["Z"] = xy_latlong["Y"]
         xyz.to_csv('xyz_' + tile_id + '.xyz', index=False, header=False, sep=' ')
 
-        # Convert back to geotiff
+        # Convert back to geotiff, prepare gdal translate command
         in_file = wd + '/xyz_' + tile_id + '.xyz'
         out_file = wd + '/lat_' + tile_id + '.tif'
         cmd = settings.gdal_translate_bin + \
@@ -473,7 +464,7 @@ def dtm_calc_solar_radiation(tile_id):
         # Specify path to aspect raster A
         aspect_file = '-A ' + settings.output_folder + '/aspect/aspect_' + tile_id + '.tif '
 
-        # Construct numpy equation (stretch by 1000 and round to nearest int)
+        # Construct numpy equation (based on McCune and Keon 2002) and stretch by 1000 and round to nearest int.
         solar_rad_eq = 'rint(1000*(0.339+0.808*cos(radians(L))*cos(radians(S))-0.196*sin(radians(L))*sin(radians(S))-0.482*cos(radians(180-absolute(180-A)))*sin(radians(S))))'
 
         # Specify output path
@@ -530,11 +521,11 @@ def dtm_openness_mean(tile_id):
     # Attempt calculation of mean openness
     try:
 
-        ## Aggregate dtm mosaic to temporary file:
+        ## Aggregate dtm mosaic to 10 m in a temporary file:
         # Specify gdal command
         cmd = settings.gdalwarp_bin + \
               '-tr 10 10 -r average ' + \
-              settings.dtm_mosaics_folder + '/DTM_' + tile_id + '_mosaic.tif ' + \
+              settings.dtm_mosaics_folder + '/dtm_' + tile_id + '_mosaic.tif ' + \
               wd + '/dtm_10m_' + tile_id + '_mosaic_float.tif ' + ' -overwrite'
 
         # Execute gdal command
@@ -550,6 +541,7 @@ def dtm_openness_mean(tile_id):
         export_openness.feature = opals.Types.OpennessFeature.positive
         export_openness.kernelSize = 15  # 15 x 10 m = 150 m
         export_openness.selMode = 0
+        export_openness.noData = -9999
         export_openness.commons.screenLogLevel = opals.Types.LogLevel.none
         export_openness.commons.nbThreads = settings.nbThreads
         export_openness.run()
@@ -563,7 +555,7 @@ def dtm_openness_mean(tile_id):
               ' --type=Int16 --NoDataValue=-9999'
 
         # Execute gdal command
-        log_output = log_output + '\n' + tile_id + ' converting and rounding to degreees. \n' + \
+        log_output = log_output + '\n' + tile_id + ' converted and rounded to degrees. \n' + \
                      subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
 
         # Obtain file extent for cropping then remove outer 150 m of mosaic to avoid edge effects
@@ -637,12 +629,11 @@ def dtm_openness_difference(tile_id):
 
     # Attempt openness difference calculation
     try:
-
-        ## Aggregate dtm mosaic to temporary file:
+        ## Aggregate dtm mosaic to 10 m in a temporary file:
         # Specify gdal command
         cmd = settings.gdalwarp_bin + \
               '-tr 10 10 -r average -overwrite ' + \
-              settings.dtm_mosaics_folder + '/DTM_' + tile_id + '_mosaic.tif ' + \
+              settings.dtm_mosaics_folder + '/dtm_' + tile_id + '_mosaic.tif ' + \
               wd + '/dtm_10m_' + tile_id + '_mosaic_float.tif '
 
         # Execute gdal command
@@ -658,9 +649,12 @@ def dtm_openness_difference(tile_id):
         export_openness.feature = opals.Types.OpennessFeature.positive
         export_openness.kernelSize = 5  # 5 x 10 m = 50 m
         export_openness.selMode = 1
+        export_openness.noData = -9999
         export_openness.commons.screenLogLevel = opals.Types.LogLevel.none
         export_openness.commons.nbThreads = settings.nbThreads
         export_openness.run()
+
+        export_openness.reset()
 
         # Export maximum positive openness for a given cell with a kernel size of 50 m x 50 m
         export_openness.inFile = wd + '/dtm_10m_' + tile_id + '_mosaic_float.tif '
@@ -668,6 +662,7 @@ def dtm_openness_difference(tile_id):
         export_openness.feature = opals.Types.OpennessFeature.positive
         export_openness.kernelSize = 5  # 5 x 10 m = 50 m
         export_openness.selMode = 2
+        export_openness.noData = -9999
         export_openness.commons.screenLogLevel = opals.Types.LogLevel.none
         export_openness.commons.nbThreads = settings.nbThreads
         export_openness.run()
@@ -758,9 +753,9 @@ def dtm_saga_wetness(tile_id):
     try:
         # Calculate wetness index at DTM scale
         cmd = settings.saga_wetness_bin + '-DEM ' + \
-              settings.dtm_mosaics_folder + '/DTM_' + tile_id + '_mosaic.tif ' + \
+              settings.dtm_mosaics_folder + '/dtm_' + tile_id + '_mosaic.tif ' + \
               '-TWI ' + wd + '/wetness_index_' + tile_id + '_mosaic.tif'
-        log_output = tile_id + ' wetness index calculation... \n ' + \
+        log_output = tile_id + ' wetness index calculation finished. \n ' + \
                      subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
 
         # Crop output to original tile size:
@@ -838,7 +833,7 @@ def dtm_saga_landscape_openness(tile_id):
         # Specify gdal command
         cmd = settings.gdalwarp_bin + \
               '-tr 10 10 -r average ' + \
-              settings.dtm_mosaics_folder + '/DTM_' + tile_id + '_mosaic.tif ' + \
+              settings.dtm_mosaics_folder + '/dtm_' + tile_id + '_mosaic.tif ' + \
               wd + '/dtm_10m_' + tile_id + '_mosaic_float.tif ' + ' -overwrite'
 
         # Execute gdal command

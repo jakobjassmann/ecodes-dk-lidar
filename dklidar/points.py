@@ -14,7 +14,7 @@ import glob
 
 ##### Function definitions
 
-## Functio to import a single tile into ODM
+## Import a single tile into ODM
 def odm_import_single_tile(tile_id):
     """
         Imports a single tile (specified by tile_id) into an ODM for subsequent processing
@@ -44,10 +44,10 @@ def odm_import_single_tile(tile_id):
     return return_value
 
 
-## Define function to load neighbourhood of tiles into ODM (this is currently not neede by any of the funcitons below)
+## Load neighbourhood of tiles into ODM (this is currently not neede by any of the funcitons below)
 def odm_import_mosaic(tile_id):
     """
-        Imports a tile (specified by tile_id) and it's 3 x 3 neighbourhood into a shared ODM file for subsequent
+        Imports a tile (specified by tile_id) and it's 3 x 3 neighbourhood into a mosaiced ODM file for subsequent
         processing.
     :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
     :return: returns execution status.
@@ -70,7 +70,6 @@ def odm_import_mosaic(tile_id):
             tile_to_load = str(row) + '_' + str(col)
             tiles_to_load.extend([tile_to_load])
 
-
     # Prep filenames and check if files exists:
     tile_file_names = []
     for tile_to_load in tiles_to_load:
@@ -84,7 +83,6 @@ def odm_import_mosaic(tile_id):
         log_output = tile_id + ' importing point clouds into ODM mosaic...\n' + 'Number of neighbours = ' + str(n_neighbours) + '. Complete!\n'
     else:
         log_output = tile_id + ' importing point clouds into ODM mosaic...\n' + 'Warning! Number of neighbours = ' + str(n_neighbours) + '. Incomplete. Edge effects possible!\n'
-
 
     # Generate output file name string
     odm_file = settings.odm_mosaics_folder + '/odm_mosaic_' + tile_id + '.odm'
@@ -116,7 +114,7 @@ def odm_import_mosaic(tile_id):
 ## Def: Export tile footprint
 def odm_generate_footprint(tile_id):
     """
-    Exports footprint from a laz file based on the tile_id in the DK nationwide dataset
+    Exports footprint from an odm file based on the tile_id in the DK nationwide dataset
     :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
     :return: returns execution status.
     """
@@ -179,7 +177,7 @@ def odm_generate_footprint(tile_id):
 ## Def: Validiate CRS
 def odm_validate_crs(tile_id):
     """
-    Function to validate the crs for odm files (single tile and odm)
+    Function to validate the crs for odm files (single tile and mosaic)
     :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
     :return: execution status
     """
@@ -187,7 +185,7 @@ def odm_validate_crs(tile_id):
     # Initiate return value
     return_value = ''
 
-    # Generate odm files pathnames
+    # Generate odm files path names
     odm_file = settings.odm_folder + '/odm_' + tile_id + '.odm'
     odm_mosaic = settings.odm_mosaics_folder + '/odm_mosaic_' + tile_id + '.odm'
 
@@ -226,9 +224,10 @@ def odm_validate_crs(tile_id):
     return return_value
 
 
+## Add height above ground (normalized z) to a tile odm
 def odm_add_normalized_z(tile_id, mosaic = False):
     """
-    Adds a adding a "normalizedZ' variable to each point in and ODM file by normalising the height using the DTM.
+    Adds a "normalizedZ' variable to each point in and ODM file by normalising the height using the 0.4 m DTM.
     Can deal with either single tile odms or neighbourhood mosaics (option mosaic).
     :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
     :param mosaic: boolean (true or false) specifies whether a single tile pointcloud or a neighbourhood mosaic
@@ -244,7 +243,7 @@ def odm_add_normalized_z(tile_id, mosaic = False):
         dtm_file = settings.dtm_folder + '/DTM_1km_' + tile_id + '.tif'
     else:
         odm_file = settings.odm_mosaics_folder + '/odm_mosaic_' + tile_id + '.odm'
-        dtm_file = settings.dtm_folder + '/dtm_mosaic_' + tile_id + '.tif'
+        dtm_file = settings.dtm_folder + '/dtm_' + tile_id + '_mosaic.tif'
 
     # Normalise the point cloud data
     try:
@@ -264,17 +263,21 @@ def odm_add_normalized_z(tile_id, mosaic = False):
     return return_value
 
 
+## Export mean and sd of height above ground for all 10 m cells in a tile
 def odm_export_normalized_z(tile_id):
     """
-    Exports mean and standard deviation of the normalisedZ variable to the 10 m x 10 m raster grid.
+    Exports mean and standard deviation of the normalisedZ variable for the 10 m x 10 m raster grid.
     :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
     :return: execution status
     """
     # Initiate return value
     return_value = ''
+    log_output = ''
 
     # Set file and folder paths
     odm_file = settings.odm_folder + '/odm_' + tile_id + '.odm'
+    temp_file_mean = os.getcwd() + '/temp_' + tile_id + '_mean.tif'
+    temp_file_sd = os.getcwd() + '/temp_' + tile_id + '_sd.tif'
     out_folder = settings.output_folder + '/normalized_z'
     out_file_mean = out_folder + '/mean/normalized_z_mean_' + tile_id + '.tif'
     out_file_sd = out_folder + '/sd/normalized_z_sd_' + tile_id + '.tif'
@@ -284,8 +287,6 @@ def odm_export_normalized_z(tile_id):
     if not os.path.exists(out_folder + '/mean'): os.mkdir(out_folder + '/mean')
     if not os.path.exists(out_folder + '/sd'): os.mkdir(out_folder + '/sd')
 
-
-
     # Export normalized z raster mean and sd
     try:
         # Initialise exporter
@@ -293,7 +294,7 @@ def odm_export_normalized_z(tile_id):
 
         # Export mean
         export_normalized_z.inFile = odm_file
-        export_normalized_z.outFile = out_file_mean
+        export_normalized_z.outFile = temp_file_mean
         export_normalized_z.attribute = 'normalizedZ'
         export_normalized_z.feature = 'mean'
         export_normalized_z.cellSize = settings.out_cell_size
@@ -310,7 +311,7 @@ def odm_export_normalized_z(tile_id):
         # Export sd
         export_normalized_z = opals.Cell.Cell()
         export_normalized_z.inFile = odm_file
-        export_normalized_z.outFile = out_file_sd
+        export_normalized_z.outFile = temp_file_sd
         export_normalized_z.attribute = 'normalizedZ'
         export_normalized_z.feature = 'stdDev'
         export_normalized_z.cellSize = settings.out_cell_size
@@ -324,13 +325,56 @@ def odm_export_normalized_z(tile_id):
     except:
         return_value = 'opalsError'
 
+    # Stretch and convert to 16 bit integer
+    try:
+        # Construct gdal command for mean
+        cmd = settings.gdal_calc_bin + \
+              '-A ' + temp_file_mean + ' ' + \
+              '--outfile=' + out_file_mean + \
+              '--calc=rint(A*100)' + \
+              '--type=Int16 --NoDataValue=-9999 '
+            # Execute and log command
+        log_output = log_output + '\n' + tile_id + ' rounding mean to int16 and calculation success. \n' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+
+        # Construct gdal command for sd
+        cmd = settings.gdal_calc_bin + \
+              '-A ' + temp_file_sd + ' ' + \
+              '--outfile=' + out_file_sd + \
+              '--calc=rint(A*100)' + \
+              '--type=Int16 --NoDataValue=-9999 '
+        # Execute and log command
+        log_output = log_output + '\n' + tile_id + ' rounding sd to int16 and calculation success. \n' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+        return_value = 'success'
+    except:
+        if return_value == 'opalsError':
+            pass
+        else:
+            return_value = 'gdalError'
+            log_output = log_output + '\n' + tile_id + ' normalized_z export failed. \n'
+
+        # Tidy up
+    try:
+        os.remove(temp_file_mean)
+        os.remove(temp_file_sd)
+    except:
+        pass
+
+    # Write log output
+    log_file = open('log.txt', 'a+')
+    log_file.write(log_output)
+    log_file.close()
+
     # Return exist status
     return return_value
 
 
+## Export canopy height for all 10 m cells in a tile
 def odm_export_canopy_height(tile_id):
     """
-    Exports the canopy height (95 percentile of normalised height only for points classified as vegetation) to the 10 m x 10 m raster grid.
+    Exports the canopy height (95 percentile of normalised height only for points classified as vegetation)
+    for the 10 m x 10 m raster grid.
     :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
     :return: execution status
     """
@@ -373,20 +417,31 @@ def odm_export_canopy_height(tile_id):
     except:
         return_value = 'opalsError'
 
-    # Use gdal_translate to set Nodata value to -9999 (this will not affect any cell values only the file header)
+    # Stretch by 100,  round to Int16 and set Nodata value to -9999
     try:
-        # Construct gdal command
+        # Construct gdal command to set no data value (this is done first to keep no data point counts as 0)
         cmd = settings.gdal_translate_bin + ' -a_nodata -9999 ' + temp_file + ' ' + out_file
 
         # Execute gdal commant and add to log output
         log_output = log_output + '\n' + tile_id + ' setting no data value... \n' + \
-            subprocess.check_output(cmd, shell=False,  stderr=subprocess.STDOUT) + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
                      tile_id + ' successful.\n\n'
+
+
+        # Construct gdal command to stredtch and round to int 16
+        cmd = settings.gdal_calc_bin + \
+              '-A ' + temp_file + ' ' + \
+              '--outfile=' + out_file + \
+              '--calc=rint(A*100)' + \
+              '--type=Int16 '
+        # Execute comman and log
+        log_output = log_output + '\n' + tile_id + ' stretching and rounding success. \n' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
 
         # set exit status
         return_value = 'success'
     except:
-        log_output = log_output + tile_id + ' setting no data value... \n' + tile_id + ' failed.\n\n'
+        log_output = log_output + tile_id + ' setting no data value for canopy height failed.\n\n'
         if return_value == 'opalsError': pass
         else: return_value = 'gdalError'
 
@@ -396,17 +451,22 @@ def odm_export_canopy_height(tile_id):
     log_file.close()
 
     # Remove temp raster file
-    os.remove(temp_file)
+    try:
+        os.remove(temp_file)
+    except:
+        pass
 
     # Return exist status
     return return_value
 
 
+## Export a point count for a specific height range and set of classes for all 10 m cells in a tile
 def odm_export_point_count(tile_id, name = 'vegetation_point_count',
                            lower_limit = -1, upper_limit = 50.0,
                            point_classes = None):
     """
-    Exports point count for a 10 m x 10 m cell and normalised hight interval specified by the lower and upper limit parameters.
+    Exports point count for a 10 m x 10 m cell in a given normalised height interval specified by
+    the lower and upper limit parameters and for a given set of point classes specified by the pint_classes parameter.
     :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
     :param name: identifier name for point count used in file and folder naming during export.
     :param lower_limit: lower limit for the height interval to count in (normalised height in m).
@@ -414,8 +474,12 @@ def odm_export_point_count(tile_id, name = 'vegetation_point_count',
     :param point_classes: classes to subset from
     :return: execution status
     """
-    # Initiate return value
+    # Initiate return value and log_output
     return_value = ''
+    log_output = ''
+
+    # Get temporary working directory
+    wd = os.getcwd()
 
     # Initiate point_classes default value if no value is provided:
     if point_classes is None: point_classes = [3,4,5] # Veg class points
@@ -424,13 +488,14 @@ def odm_export_point_count(tile_id, name = 'vegetation_point_count',
     odm_file = settings.odm_folder + '/odm_' + tile_id + '.odm'
     out_folder = settings.output_folder + '/point_count'
     prefix = name + '_' + str(lower_limit) + 'm-' + str(upper_limit) + 'm'
+    temp_file = wd + '/temp_' + tile_id +  '.tif'
     out_file = out_folder + '/' + prefix + '/' + prefix + '_' + tile_id + '.tif'
 
     # Create folders if they don't exist
     if not os.path.exists(out_folder): os.mkdir(out_folder)
     if not os.path.exists(out_folder + '/' + prefix): os.mkdir(out_folder + '/' + prefix)
 
-    # Export normalized z raster mean and sd
+    # Export point count
     try:
         # Initialise exporter
         export_point_count = opals.Cell.Cell()
@@ -442,12 +507,13 @@ def odm_export_point_count(tile_id, name = 'vegetation_point_count',
 
         # Export point count
         export_point_count.inFile = odm_file
-        export_point_count.outFile = out_file
+        export_point_count.outFile = temp_file
         export_point_count.filter =  height_filter + ' AND ' + class_filter
         export_point_count.feature = 'pcount'
         export_point_count.cellSize = settings.out_cell_size
         export_point_count.limit = 'corner' # This switch is really important when working with tiles!
                                     # It sets the ROI to the extent to the bounding box of points in the ODM
+        export_point_count.noData = 0
         export_point_count.commons.screenLogLevel = opals.Types.LogLevel.none
         export_point_count.commons.nbThreads = settings.nbThreads
         export_point_count.run()
@@ -456,13 +522,45 @@ def odm_export_point_count(tile_id, name = 'vegetation_point_count',
     except:
         return_value = 'opalsError'
 
+    # Convert to 16 bit integer and set no data value to -9999
+    try:
+        # Construct gdal command
+        cmd = settings.gdal_translate_bin + \
+              '-ot Int16 --NoDataValue=-9999 ' + \
+              temp_file + ' ' + \
+              out_file
+        # Execute and log command
+        log_output = log_output + '\n' + tile_id + ' converting to Int16 success. \n' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+
+        return_value = 'success'
+    except:
+        if return_value == 'opalsError':
+            pass
+        else:
+            log_output = log_output + '\n' + tile_id + ' converting to Int16 for ' + prefix + ' failed. \n'
+            return_value = 'gdalError'
+
+    # Tidy up
+    try:
+        os.remove(temp_file)
+    except:
+        pass
+
+    # Write log output
+    log_file = open('log.txt', 'a+')
+    log_file.write(log_output)
+    log_file.close()
+
     # Return exist status
     return return_value
 
 
+## Export point counts for a pre-defined set of height ranges and classes
 def odm_export_point_counts(tile_id):
     """
-    Exports point counts for multiple classes and pre defined height intervals by calling the odm_export_point_count function.
+    Exports point counts for multiple classes and pre defined height intervals by calling the
+    odm_export_point_count function.
     :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
     :return: execution status
     """
@@ -516,9 +614,10 @@ def odm_export_point_counts(tile_id):
     return return_value
 
 
+## Calculate proportions based on two point counts
 def odm_calc_proportions(tile_id, prop_name, point_count_id1, point_count_id2):
     """
-    Function to calculate point count proportions
+    Function to calculate point count proportions for two point counts.
     :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
     :param prop_name: name to be assinged to the proportions output
     :param point_count_id1: name of point count to be rationed (numerator)
@@ -561,6 +660,7 @@ def odm_calc_proportions(tile_id, prop_name, point_count_id1, point_count_id2):
     return return_value
 
 
+## Export a pre-defined list of proportions for a tile
 def odm_export_proportions(tile_id):
     """
     Exports proportions for: canopy openness, canopy height profile, buildings point counts
@@ -621,9 +721,10 @@ def odm_export_proportions(tile_id):
     return return_value
 
 
+## Export mean and sd in the amplitude variable for all 10 m cells in a tile
 def odm_export_amplitude(tile_id):
     """
-    Exports mean and variance(sd) for the lidar amplitude at the 10 m x 10 m grid cell.
+    Exports mean and variance(sd) for the lidar amplitude for all 10 m x 10 m cells in a tile.
     :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
     :return: execution status
     """
@@ -641,7 +742,7 @@ def odm_export_amplitude(tile_id):
     if not os.path.exists(out_folder + '/mean'): os.mkdir(out_folder + '/mean')
     if not os.path.exists(out_folder + '/sd'): os.mkdir(out_folder + '/sd')
 
-    # Export normalized z raster mean and sd using OPALS Cell
+    # Export amplitude mean and sd using OPALS Cell
     try:
         # Initialise exporter
         export_amplitude = opals.Cell.Cell()
@@ -684,6 +785,7 @@ def odm_export_amplitude(tile_id):
     return return_value
 
 
+## Export flight strip information for all 10 m cells in a tile
 def odm_export_point_source_info(tile_id):
     """
     Extracts point source statistics for the 10 m x 10 m cells of the point cloud.
@@ -762,6 +864,7 @@ def odm_export_point_source_info(tile_id):
             export_point_count.cellSize = settings.out_cell_size
             export_point_count.limit = 'corner'  # This switch is really important when working with tiles!
             # It sets the ROI to the extent to the bounding box of points in the ODM
+            export_point_count.noData = 0
             export_point_count.commons.screenLogLevel = opals.Types.LogLevel.none
             export_point_count.commons.nbThreads = settings.nbThreads
             export_point_count.run()
@@ -773,11 +876,11 @@ def odm_export_point_source_info(tile_id):
         in_files_string = '.tif ' + temp_wd + '/temp_count_'
         in_files_string = temp_wd + '/temp_count_' + in_files_string.join([str(i) for i in point_source_ids]) + '.tif'
         # construct gdal command string
-        cmd = settings.gdal_merge_bin + '-a_nodata -9999 -separate ' + '-o ' + out_folder_counts + \
+        cmd = settings.gdal_merge_bin + '-ot Int16 -a_nodata -9999 -separate ' + '-o ' + out_folder_counts + \
               '/point_source_counts_' + tile_id + '.tif ' + in_files_string
 
         # Execute gdal command
-        log_output = log_output + '\n' + tile_id + ' merging point source point count files... \n' + \
+        log_output = log_output + '\n' + tile_id + ' merged point source point count files. \n' + \
                      subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
 
         ## Determine the number of uniuqe point source ids per cell using gdal_calc.
@@ -795,13 +898,15 @@ def odm_export_point_source_info(tile_id):
         # Construct gdal command
         cmd = settings.gdal_calc_bin + files_string + \
               '--outfile=' + out_folder_nids + '/point_source_nids_' + tile_id + '.tif' +\
-              ' --calc=' + equation + ' --NoDataValue=-9999'
+              ' --calc=' + equation + \
+              ' --type=Int16 --NoDataValue=-9999'
         # Execute gdal command
-        log_output = log_output + '\n' + tile_id + ' extracting number of uniuqe point source ids... \n' + \
+        log_output = log_output + '\n' + tile_id + ' extracted number of unique point source ids. \n' + \
                      subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
 
         ## Calculate proportion of hits pre cell per point source using gdal_calc
-        # Prepare gdal command
+
+        # Calculate total sum of points per cell, prepare gdal command
         alphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
                     'U', 'V', 'W', 'X', 'Y', 'Z']
         files_string = ''
@@ -815,19 +920,19 @@ def odm_export_point_source_info(tile_id):
         cmd = settings.gdal_calc_bin + files_string + '--outfile=' + temp_wd + '/temp_total_points.tif ' + \
             '--calc=' + equation + ' --NoDataValue=-9999'
         # Execute gdal command
-        log_output = log_output + '\n' + tile_id + ' creating temporary total point count file... \n' + \
+        log_output = log_output + '\n' + tile_id + ' created temporary total point count file. \n' + \
                      subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
 
-        ## Calculate proportions using gdal_calc
+        ## Calculate proportions using gdal_calc, round, stretch by 10000 and convert to Int16
         for point_source_id in point_source_ids:
             # Construct gdal command
             cmd = settings.gdal_calc_bin + \
                   '-A ' + temp_wd + '/temp_count_' + str(point_source_id) + '.tif ' + \
                   '-B ' + temp_wd + '/temp_total_points.tif ' + \
                   '--outfile=' + temp_wd + '/point_source_prop_' + str(point_source_id) + '.tif ' + \
-                  '--calc=A/B ' + '--NoDataValue=-9999'
+                  '--calc=rint((A/B)*10000) ' + '--type=Int16 --NoDataValue=-9999'
             # Execute gdal command
-            log_output = log_output + '\n' + tile_id + ' calculating proportions for ' + str(point_source_id)  + '... \n' + \
+            log_output = log_output + '\n' + tile_id + ' calculated proportions for ' + str(point_source_id)  + '. \n' + \
                          subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
 
         ## Merge files into one using gdal_merge
@@ -840,7 +945,7 @@ def odm_export_point_source_info(tile_id):
               '-o ' + out_folder_prop + '/point_source_prop_' + tile_id + '.tif ' +\
              in_files_string
         # Execute gdal command
-        log_output = log_output + '\n' + tile_id + ' merging point source proportions... \n' + \
+        log_output = log_output + '\n' + tile_id + ' merged point source proportions. \n' + \
                      subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
 
         ## Create a layer with presence / absence of point source id indicated by the point source id itself
@@ -849,9 +954,11 @@ def odm_export_point_source_info(tile_id):
             cmd = settings.gdal_calc_bin + \
                   '-A ' + temp_wd + '/temp_count_' + str(point_source_id) + '.tif ' + \
                   '--outfile=' + temp_wd + '/temp_presence_' + str(point_source_id) + '.tif ' + \
-                  '--calc=' + str(point_source_id) + '*greater(A,0)' + ' --NoDataValue=-9999'
+                  '--calc=' + str(point_source_id) + '*greater(A,0)' + \
+                  ' --type=Int16 --NoDataValue=-9999'
             # Execute gdal command
-            log_output = log_output + '\n' + tile_id + ' creating temporary presence layer for ' + str(point_source_id)  + '... \n' + \
+            log_output = log_output + '\n' + tile_id + ' created temporary presence layer for ' + \
+                         str(point_source_id)  + '. \n' + \
                          subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
 
         ## Merge files into one using gdal_merge
@@ -864,7 +971,7 @@ def odm_export_point_source_info(tile_id):
               '-o ' + out_folder_ids + '/point_source_ids_' + tile_id + '.tif ' + \
               in_files_string
         # Execute gdal command
-        log_output = log_output + '\n' + tile_id + ' merging temporary layers in point source ids file... \n' + \
+        log_output = log_output + '\n' + tile_id + ' merged temporary layers in point source ids file. \n' + \
                      subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
 
         # The 'majority' stat produced by opals is not reliable... leaving the below code for leagcy reasons.
