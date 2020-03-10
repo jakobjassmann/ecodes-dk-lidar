@@ -1,6 +1,6 @@
 # DK Nationwide LiDAR Documentation
 
-*Version 0.5*
+*Version 0.4*
 
 *Work in progress...*
 
@@ -68,7 +68,7 @@ Files to support data access and handling.
 | ---- | ---- |
 | [tile\_footprints](#tile_footprints) | Tile footprints, allows for targeted subsetting of dataset |
 
-[Back to content](#content).
+[Back to content.](#content)
 
 ----
 ## Pointcloud derived variables
@@ -93,7 +93,7 @@ In the context of LiDAR, the amplitude represents the strenght of the signal rec
 **References:**
 No specific references available.
 
-[Back to content](#content).
+[Back to content.](#content)
 
 ----
 ### canopy\_height
@@ -115,7 +115,7 @@ Calculated with OPALS Cell for each tile individually. Vegetation points consist
 **References:**
 No specific references available.
 
-[Back to content](#content).
+[Back to content.](#content)
 
 ----
 ### normalized\_z\_mean and normalized\_z\_sd
@@ -139,7 +139,7 @@ The American spelling of the variable name is kept for legacy reasons.
 **References:**
 No specific references available.
 
-[Back to content](#content).
+[Back to content.](#content)
 
 ----
 ### point\_counts
@@ -194,11 +194,12 @@ The "punktsky" point clouds were pre-classified by Geodatasyrelsen. For this dat
 | vegetation\_point\_count\_20m\-25m | 20 m to 25 m | vegetation points (classes 3,4,5) |  
 | vegetation\_point\_count\_25m\-50m | 25 m to 50 m | vegetation points (classes 3,4,5) |
 
-**Figure:** A set of canopy type examples for visualisation of the point count variables (approximate height of large bounding boxes is 25 m). A) Agricultural field with no / very low vegetation, B) Understory / Shrub layer in mixed broad leaf woodland, C) Dense young-ish coniferous forest (plantation?), D) Old and tall mixed broadleaf woodland. 
-![Canopy Examples Figure](/documentation/figures/canopy_examples.png)
 
-**Figure:** Example of ehaviour of returns from shallow waters in a froest pond / marsh area. A) Prespective view of the forest pond (pink bounding box has a 10 m x 10 m footprint), B) Orthophotograph at NADIR view, C) Point count intensity of the derived water point count variable (black = low count, white = heigh count), D) NADIR view of point cloud. Notice particularly the many missing returns from the regions in the pond with deep water.
-![Forest Pond Figure](/documentation/figures/forest_pond.png)
+![Canopy Examples Figure](figures/canopy_examples.png)
+**Figure:** A set of canopy examples for visualisation of the point count variables. The approximate height of large bounding boxes is 25 m. A) agricultural field with no / very low vegetation, B) understory / shrub layer in mixed broad leaf woodland, C) dense young-ish coniferous forest (plantation?), D) old and tall mixed broadleaf woodland. 
+
+![Forest Pond Figure](figures/forest_pond.png)
+**Figure:** Example of the behaviour of returns from shallow waters in a froest pond / marsh area. A) prespective view of the forest pond (pink bounding box has a 10 m x 10 m footprint), B) orthophotograph at nadir view, C) point count intensity of the derived water point count variable (black = low count, white = heigh count), D) nadir view of point cloud. Notice particularly the many missing returns from the regions in the pond with deep water.
 
 **Issues:**
 - Water returns only come from shallow water and even these may not be consistent. 
@@ -208,7 +209,7 @@ The "punktsky" point clouds were pre-classified by Geodatasyrelsen. For this dat
 **References:**
 - Point classification outlined in: Geodatastyrelsen 2015. Danmarks Højdemodel, DHM/Punktsky Data version 2.0 - Januar 2015. Accessed online [7 March 2020]. https://kortforsyningen.dk/sites/default/files/old_gst/DOKUMENTATION/Data/dk_dhm_punktsky_v2_jan_2015.pdf
 
-[Back to content](#content).
+[Back to content.](#content)
 
 ----
 
@@ -244,7 +245,7 @@ No known issues so far.
 **References:**
 No relevant references.
 
-[Back to content](#content).
+[Back to content.](#content)
 
 ----
 
@@ -306,7 +307,7 @@ These proportions were calculated between the vegetation point count in the resp
 - Sasaki, T., Imanishi, J., Ioki, K., Song, Y., Morimoto, Y., 2016. Estimation of leaf area index and gap fraction in two broad-leaved forests by using small-footprint airborne LiDAR. Landscape Ecol Eng 12, 117–127. https://doi.org/10.1007/s11355-013-0222-y
 - Melin, M., Hinsley, S.A., Broughton, R.K., Bellamy, P., Hill, R.A., 2018. Living on the edge: utilising lidar data to assess the importance of vegetation structure for avian diversity in fragmented woodlands and their edges. Landscape Ecol 33, 895–910. https://doi.org/10.1007/s10980-018-0639-7
 
-[Back to content](#content).
+[Back to content.](#content)
 
 ----
 ## Terrain model derived variables
@@ -330,7 +331,7 @@ Calculated using gdaldem aspect on the original 0.4 m grain size DTM rasters. To
 **References:**
 No relevant references.
 
-[Back to content](#content).
+[Back to content.](#content)
 
 ----
 ### openness\_mean
@@ -345,7 +346,7 @@ No relevant references.
 Landscape openness calculated following Yokoyama et al. 2002 using the OPALS Openness module and a search radius of 150 m. Landform descriptor that indicates where valleys / ridges are found. 
 
 First, the 0.4 m DTM is aggregated to a grain size of 10 m. To reduce edge effects in subsequent calculations, this aggregatioon is carried out for a mosaic including the target tile and all available tiles in the direct neighbourhood (max. 8 neighbouring tiles). The mean of the positive openness for all eight cardinal directions with search radius of 150 m is then calculated for all cells in the tile mosaic using the OPALS Openness module (feature = 'positive', kernelSize = 15 and selMode = 0). The output is cropped to the extent of the target tile. 
-Should the neighbourhood mosaic be incomplete, i.e. contain less than 8 neighbouring tiles, cells within the first 150 m of all edges where a neighbourhood tile is missing are masked out (set to NA). Finally, the mean openness per cell is converted from radians to degrees and rounded to the nearest full degree. Documentation for the OPALS Openness module can be found [here](https://opals.geo.tuwien.ac.at/html/stable/ModuleOpenness.html)
+Should the neighbourhood mosaic be incomplete, i.e. contain less than 8 neighbouring tiles, cells within the first 150 m of all edges where a neighbourhood tile is missing are masked out (set to NA). Finally, the mean openness per cell is converted from radians to degrees and rounded to the nearest full degree. Documentation for the OPALS Openness module can be found [here](https://opals.geo.tuwien.ac.at/html/stable/ModuleOpenness.html).
 
 **Issues:**
 
@@ -354,7 +355,7 @@ No known issues with this variable.
 **References:**
 - Yokoyama, R. / Shirasawa, M. / Pike, R.J. (2002): Visualizing topography by openness: A new application of image processing to digital elevation models. Photogrammetric Engineering and Remote Sensing, Vol.68, pp.251-266.
 
-[Back to content](#content).
+[Back to content.](#content)
 
 ----
 
@@ -369,7 +370,7 @@ No known issues with this variable.
 
 Min/max difference in landscape openness based on Yokoyama et al. 2002 calculated using the OPALS Openness module and a search radius of 50 m. Indicates presence / absence of linear landscape features. 
 
-First, the 0.4 m DTM is aggregated to a grain size of 10 m. To reduce edge effects in subsequent calculations, this aggregatioon is carried out for a mosaic including the target tile and all available tiles in the direct neighbourhood (max. 8 neighbouring tiles). The min and max of the positive openness for all eight cardinal directions with search radius of 50 m are then calculated for all cells in the tile mosaic using the OPALS Openness module (feature = 'positive', kernelSize = 5 and selMode = 1/2). Next, the min & max values are converted to degrees, the difference is calculated and the result rounded to the nearest full degree. The output is cropped to the extent of the target tile. Should the neighbourhood mosaic be incomplete, i.e. contain less than 8 neighbouring tiles, cells within the first 50 m of all edges where a neighbourhood tile is missing are masked out (set to NA). Documentation for the OPALS Openness module can be found [here](https://opals.geo.tuwien.ac.at/html/stable/ModuleOpenness.html)
+First, the 0.4 m DTM is aggregated to a grain size of 10 m. To reduce edge effects in subsequent calculations, this aggregatioon is carried out for a mosaic including the target tile and all available tiles in the direct neighbourhood (max. 8 neighbouring tiles). The min and max of the positive openness for all eight cardinal directions with search radius of 50 m are then calculated for all cells in the tile mosaic using the OPALS Openness module (feature = 'positive', kernelSize = 5 and selMode = 1/2). Next, the min & max values are converted to degrees, the difference is calculated and the result rounded to the nearest full degree. The output is cropped to the extent of the target tile. Should the neighbourhood mosaic be incomplete, i.e. contain less than 8 neighbouring tiles, cells within the first 50 m of all edges where a neighbourhood tile is missing are masked out (set to NA). Documentation for the OPALS Openness module can be found [here](https://opals.geo.tuwien.ac.at/html/stable/ModuleOpenness.html).
 
 **Issues:**
 
@@ -378,7 +379,7 @@ No known issues with this variable.
 **References:**
 - Yokoyama, R. / Shirasawa, M. / Pike, R.J. (2002): Visualizing topography by openness: A new application of image processing to digital elevation models. Photogrammetric Engineering and Remote Sensing, Vol.68, pp.251-266.
 
-[Back to content](#content).
+[Back to content.](#content)
 
 ----
 
@@ -401,7 +402,7 @@ Calculated using gdaldem slope on the original 0.4 m grain size DTM rasters. To 
 **References:**
 No relevant references.
 
-[Back to content](#content).
+[Back to content.](#content)
 
 ----
 
@@ -429,7 +430,7 @@ The SAGA wetness index is an optimised version of the commonly used TWI. To redu
 - Boehner, J., Koethe, R. Conrad, O., Gross, J., Ringeler, A., Selige, T. (2002): Soil Regionalisation by Means of Terrain Analysis and Process Parameterisation. In: Micheli, E., Nachtergaele, F., Montanarella, L. [Ed.]: Soil Classification 2001. European Soil Bureau, Research Report No. 7, EUR 20398 EN, Luxembourg. pp.213-222.
 - Boehner, J. and Selige, T. (2006): Spatial prediction of soil attributes using terrain analysis and climate regionalisation. In: Boehner, J., McCloy, K.R., Strobl, J. [Ed.]: SAGA - Analysis and Modelling Applications, Goettinger Geographische Abhandlungen, Goettingen: 13-28.
 
-[Back to content](#content).
+[Back to content.](#content)
 
 ----
 
@@ -456,7 +457,7 @@ No known issues with this variable.
 - Anders, N. S. / Seijmonsbergen, A. C. / Bouten, W. (2009): Multi-Scale and Object-Oriented Image Analysis of High-Res LiDAR Data for Geomorphological Mapping in Alpine Mountains. Proceedings of Geomorphometry 2009.
 - Prima, O.D.A / Echigo, A. / Yokoyama, R. / Yoshida, T. (2006): Supervised landform classification of Northeast Honshu from DEM-derived thematic maps. Geomorphology, vol.78, pp.373-386.
 
-[Back to content](#content).
+[Back to content.](#content)
 
 ----
 
