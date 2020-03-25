@@ -476,8 +476,8 @@ def dtm_calc_solar_radiation(tile_id):
               slope_file + \
               aspect_file + \
               '--outfile=' + out_file + \
-              ' --calc=' + solar_rad_eq + \
-              ' --type=Int16 --NoDataValue=-9999 --overwrite'
+              '--calc=' + solar_rad_eq + ' ' + \
+              '--type=Int16 --NoDataValue=-9999 --overwrite'
 
         # Execute gdal command
         log_output = log_output + '\n' + \

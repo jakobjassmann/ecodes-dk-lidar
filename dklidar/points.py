@@ -330,19 +330,21 @@ def odm_export_normalized_z(tile_id):
         # Construct gdal command for mean
         cmd = settings.gdal_calc_bin + \
               '-A ' + temp_file_mean + ' ' + \
-              '--outfile=' + out_file_mean + \
-              '--calc=rint(A*100)' + \
+              '--outfile=' + out_file_mean + ' ' + \
+              '--calc=rint(A*100) ' + \
               '--type=Int16 --NoDataValue=-9999 '
-            # Execute and log command
+
+        # Execute and log command
         log_output = log_output + '\n' + tile_id + ' rounding mean to int16 and calculation success. \n' + \
                      subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
 
         # Construct gdal command for sd
         cmd = settings.gdal_calc_bin + \
               '-A ' + temp_file_sd + ' ' + \
-              '--outfile=' + out_file_sd + \
-              '--calc=rint(A*100)' + \
+              '--outfile=' + out_file_sd + ' ' + \
+              '--calc=rint(A*100) ' + \
               '--type=Int16 --NoDataValue=-9999 '
+
         # Execute and log command
         log_output = log_output + '\n' + tile_id + ' rounding sd to int16 and calculation success. \n' + \
                      subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
@@ -431,8 +433,8 @@ def odm_export_canopy_height(tile_id):
         # Construct gdal command to stredtch and round to int 16
         cmd = settings.gdal_calc_bin + \
               '-A ' + temp_file + ' ' + \
-              '--outfile=' + out_file + \
-              '--calc=rint(A*100)' + \
+              '--outfile=' + out_file + ' ' + \
+              '--calc=rint(A*100) ' + \
               '--type=Int16 '
         # Execute comman and log
         log_output = log_output + '\n' + tile_id + ' stretching and rounding success. \n' + \
@@ -526,7 +528,7 @@ def odm_export_point_count(tile_id, name = 'vegetation_point_count',
     try:
         # Construct gdal command
         cmd = settings.gdal_translate_bin + \
-              '-ot Int16 --NoDataValue=-9999 ' + \
+              '-ot Int16 -a_nodata -9999 ' + \
               temp_file + ' ' + \
               out_file
         # Execute and log command
@@ -627,7 +629,7 @@ def odm_calc_proportions(tile_id, prop_name, point_count_id1, point_count_id2):
     return_value = ''
     log_output = ''
 
-    # Generate paths
+    # Generate paths for numerator and denominator
     num_file = settings.output_folder + '/point_count/' + point_count_id1 + '/' + point_count_id1 + '_' + tile_id + '.tif'
     den_file = settings.output_folder + '/point_count/' + point_count_id2 + '/' + point_count_id2 + '_' + tile_id + '.tif'
 
@@ -641,8 +643,13 @@ def odm_calc_proportions(tile_id, prop_name, point_count_id1, point_count_id2):
     # Attempt calculating the proportions using gdal_calc
     try:
         # Construct gdal command
-        cmd = settings.gdal_calc_bin + '-A ' + num_file + ' -B ' + den_file + ' --outfile=' + out_file + \
-              ' --calc=10000*A/B' + ' --type=Int16' + ' --NoDataValue=-9999'
+        cmd = settings.gdal_calc_bin + \
+              '-A ' + num_file + ' ' +\
+              '-B ' + den_file + ' ' +\
+              '--outfile=' + out_file + ' ' + \
+              '--calc=rint(10000*A/B) ' + \
+              '--type=Int16 ' + \
+              '--NoDataValue=-9999'
         # Execute gdal command
         log_output = log_output + '\n' + tile_id + ' calculation of proportions ' + prop_name + '... \n' + \
             subprocess.check_output(cmd, shell=False,  stderr=subprocess.STDOUT)
