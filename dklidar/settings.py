@@ -18,6 +18,7 @@ gdal_calc_bin = 'C:/OSGeo4W64/OSGeo4W.bat gdal_calc '
 gdal_merge_bin = 'C:/OSGeo4W64/OSGeo4W.bat gdal_merge '
 gdaltransform_bin = 'C:/OSGeo4W64/OSGeo4W.bat gdaltransform '
 gdalinfo_bin = 'C:/OSGeo4W64/OSGeo4W.bat gdalinfo '
+gdal_rasterize_bin = 'C:/OSGeo4W64/OSGeo4W.bat gdal_rasterize '
 
 # Saga binary commands
 saga_wetness_bin = 'C:/OSGeo4W64/apps/saga-ltr/saga_cmd.exe --cores=1 ta_hydrology 15 '
@@ -38,7 +39,6 @@ dtm_footprint_folder = wd + '/data/sample/dtm_footprints'
 
 # ODM folder
 odm_folder = wd + '/data/sample/odm/'
-# odm_folder = 'O:/ST_Ecoinformatics/B_Read/Projects/LIDAR_ANDRAS_Project/DK_nationwide_output/dk_nationwide_odms'
 
 # ODM Mosaics and footprint
 odm_mosaics_folder = wd +'/data/sample/odm_mosaics'
@@ -52,6 +52,10 @@ scratch_folder =  wd + '/scratch'
 
 # Log folder for global log ouptus
 log_folder = wd + '/log'
+
+# Mask files
+dk_coastline_poly = 'D:/Jakob/dk_nationwide_lidar/data/masks/dk_bounds_jesper_poly.shp'
+dk_lakes_poly = 'D:/Jakob/dk_nationwide_lidar/data/masks/lake_mask_jesper.shp'
 
 ## Spatial reference settings
 

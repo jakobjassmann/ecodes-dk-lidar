@@ -2,10 +2,6 @@
 ### Jakob Assmann j.assann@bios.au.dk 29 January 2019
 
 ## Imports
-from dklidar import points
-from dklidar import dtm
-from dklidar import settings
-from dklidar import common
 import glob
 import re
 import os
@@ -13,6 +9,11 @@ import datetime
 import multiprocessing
 import pandas
 import opals
+
+from dklidar import points
+from dklidar import dtm
+from dklidar import settings
+from dklidar import common
 
 #### Prepare the environment
 

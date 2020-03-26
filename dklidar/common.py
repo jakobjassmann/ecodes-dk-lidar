@@ -2,13 +2,15 @@
 ### Jakob Assmann j.assmann@bios.au.dk 29 January 2019
 
 # Imports
-import settings
 import os
 import glob
 import pandas
 import re
 import shutil
 import datetime
+import subprocess
+
+from dklidar import settings
 
 ## Function definitons
 
@@ -174,4 +176,71 @@ def gather_logs(script_name, step_name, tile_id):
         # remove log file from temp directory
         os.remove(wd + '/opalsErrors.txt')
 
+def apply_mask(target_raster = '', sea_mask = True, inland_water_mask = True):
+    """
+    For a given target raster, this function masks all sea off the coastline of Denmark (sea_mask = True) or all inland water
+    bodies such as lakes or ponds (inland_water_mask = True) or both.
+    :param sea_mask: Boolean switch for applying sea mask
+    :param inland_water_mask: Boolean switch for applying the inland water mask
+    :param target_raster: target raster file path
+    :return: execution status
+    """
+    # initiate return value and log ouptut
+    return_value = ''
+    log_output = ''
 
+    # Check whether input raster was provided
+    if (target_raster == ''): raise Exception('No input raster provided.')
+
+    # Apply sea mask
+    if (sea_mask == True):
+        try:
+            # Construct gdal command
+            cmd = settings.gdal_rasterize_bin + \
+                  '-b 1 ' + '-burn -9999 ' + '-i ' + '-at ' + \
+                  settings.dk_coastline_poly + ' ' + \
+                  target_raster
+
+            log_output = log_output + '\n' + \
+                         subprocess.check_output(
+                             cmd,
+                             shell=False,
+                             stderr=subprocess.STDOUT) + \
+                         '\n' + target_raster + ' sea mask applied. \n\n '
+
+            return_value = 'success'
+        except:
+            log_output = log_output + '\n' + target_raster + ' applying sea mask failed. \n\n '
+            return_value = 'gdalError'
+
+    # Apply lake mask
+    if (inland_water_mask == True):
+        try:
+            # Construct gdal command
+            cmd = settings.gdal_rasterize_bin + \
+                  '-b 1 ' + '-burn -9999 ' + '-at ' + \
+                  settings.dk_lakes_poly + ' ' + \
+                  target_raster
+
+            log_output = log_output + '\n' + \
+                         subprocess.check_output(
+                             cmd,
+                             shell=False,
+                             stderr=subprocess.STDOUT) + \
+                         '\n' + target_raster + ' inland water mask applied. \n\n '
+
+            return_value = 'success'
+        except:
+            log_output = log_output + '\n' + target_raster + ' applying inland water mask failed. \n\n '
+            return_value = 'gdalError'
+
+    if (sea_mask == False & inland_water_mask == False):
+        log_output = log_output + '\n' + target_raster + ' no masks to be applied. \n\n '
+        return_value = 'success'
+
+    # Write log output to log file
+    log_file = open('log.txt', 'a+')
+    log_file.write(log_output)
+    log_file.close()
+
+    return return_value

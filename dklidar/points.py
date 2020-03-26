@@ -2,15 +2,15 @@
 ### Jakob Assmann j.assmann@bios.au.dk 29 January 2019
 
 ## Imports
-import multiprocessing
 import re
 import os
 import opals
 import subprocess
-import settings
-import time
 import numpy
 import glob
+
+from dklidar import common
+from dklidar import settings
 
 ##### Function definitions
 
@@ -279,13 +279,13 @@ def odm_export_normalized_z(tile_id):
     temp_file_mean = os.getcwd() + '/temp_' + tile_id + '_mean.tif'
     temp_file_sd = os.getcwd() + '/temp_' + tile_id + '_sd.tif'
     out_folder = settings.output_folder + '/normalized_z'
-    out_file_mean = out_folder + '/mean/normalized_z_mean_' + tile_id + '.tif'
-    out_file_sd = out_folder + '/sd/normalized_z_sd_' + tile_id + '.tif'
+    out_file_mean = out_folder + '/normalized_z_mean/normalized_z_mean_' + tile_id + '.tif'
+    out_file_sd = out_folder + '/normalized_z_sd/normalized_z_sd_' + tile_id + '.tif'
 
     # Create folders if they do not already exists
     if not os.path.exists(out_folder): os.mkdir(out_folder)
-    if not os.path.exists(out_folder + '/mean'): os.mkdir(out_folder + '/mean')
-    if not os.path.exists(out_folder + '/sd'): os.mkdir(out_folder + '/sd')
+    if not os.path.exists(out_folder + '/normalized_z_mean'): os.mkdir(out_folder + '/normalized_z_mean')
+    if not os.path.exists(out_folder + '/normalized_z_sd'): os.mkdir(out_folder + '/normalized_z_sd')
 
     # Export normalized z raster mean and sd
     try:
@@ -338,6 +338,9 @@ def odm_export_normalized_z(tile_id):
         log_output = log_output + '\n' + tile_id + ' rounding mean to int16 and calculation success. \n' + \
                      subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
 
+        # Apply mask(s)
+        common.apply_mask(out_file_mean)
+
         # Construct gdal command for sd
         cmd = settings.gdal_calc_bin + \
               '-A ' + temp_file_sd + ' ' + \
@@ -348,6 +351,10 @@ def odm_export_normalized_z(tile_id):
         # Execute and log command
         log_output = log_output + '\n' + tile_id + ' rounding sd to int16 and calculation success. \n' + \
                      subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+
+        # Apply masks
+        common.apply_mask(out_file_sd)
+
         return_value = 'success'
     except:
         if return_value == 'opalsError':
@@ -439,6 +446,9 @@ def odm_export_canopy_height(tile_id):
         # Execute comman and log
         log_output = log_output + '\n' + tile_id + ' stretching and rounding success. \n' + \
                      subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+
+        # Apply mask(s)
+        common.apply_mask(out_file)
 
         # set exit status
         return_value = 'success'
@@ -534,6 +544,9 @@ def odm_export_point_count(tile_id, name = 'vegetation_point_count',
         # Execute and log command
         log_output = log_output + '\n' + tile_id + ' converting to Int16 success. \n' + \
                      subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+
+        # Apply mask(s)
+        common.apply_mask(out_file)
 
         return_value = 'success'
     except:
@@ -654,6 +667,9 @@ def odm_calc_proportions(tile_id, prop_name, point_count_id1, point_count_id2):
         log_output = log_output + '\n' + tile_id + ' calculation of proportions ' + prop_name + '... \n' + \
             subprocess.check_output(cmd, shell=False,  stderr=subprocess.STDOUT)
 
+        # Apply mask(s)
+        common.apply_mask(out_file)
+
         return_value = 'success'
     except:
         log_output = log_output + '\n' + tile_id + ' calculation of proportions ' + prop_name + ' failed. gdalError \n'
@@ -741,13 +757,13 @@ def odm_export_amplitude(tile_id):
     # Generate file paths
     odm_file = settings.odm_folder + '/odm_' + tile_id + '.odm'
     out_folder = settings.output_folder + '/amplitude'
-    out_file_mean = out_folder + '/mean/amplitude_mean_' + tile_id + '.tif'
-    out_file_sd = out_folder + '/sd/amplitude_sd_' + tile_id + '.tif'
+    out_file_mean = out_folder + '/amplitude_mean/amplitude_mean_' + tile_id + '.tif'
+    out_file_sd = out_folder + '/amplitude_sd/amplitude_sd_' + tile_id + '.tif'
 
     # Create folders if they do not exist
     if not os.path.exists(out_folder): os.mkdir(out_folder)
-    if not os.path.exists(out_folder + '/mean'): os.mkdir(out_folder + '/mean')
-    if not os.path.exists(out_folder + '/sd'): os.mkdir(out_folder + '/sd')
+    if not os.path.exists(out_folder + '/amplitude_mean'): os.mkdir(out_folder + '/amplitude_mean')
+    if not os.path.exists(out_folder + '/amplitude_sd'): os.mkdir(out_folder + '/amplitude_sd')
 
     # Export amplitude mean and sd using OPALS Cell
     try:
@@ -783,6 +799,10 @@ def odm_export_amplitude(tile_id):
         export_amplitude.commons.screenLogLevel = opals.Types.LogLevel.none
         export_amplitude.commons.nbThreads = settings.nbThreads
         export_amplitude.run()
+
+        # Apply mask(s)
+        common.apply_mask(out_file_mean)
+        common.apply_mask(out_file_sd)
 
         return_value = 'success'
     except:
@@ -878,6 +898,9 @@ def odm_export_point_source_info(tile_id):
 
             export_point_count.reset()
 
+            # Apply mask(s)
+            common.apply_mask(temp_wd + '/temp_count_' + str(point_source_id) + '.tif')
+
         ## Merge the point count files for all point source ids into one using gdal_merge
         # construct infile string
         in_files_string = '.tif ' + temp_wd + '/temp_count_'
@@ -911,6 +934,9 @@ def odm_export_point_source_info(tile_id):
         log_output = log_output + '\n' + tile_id + ' extracted number of unique point source ids. \n' + \
                      subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
 
+        # Apply mask(s)
+        common.apply_mask(out_folder_nids + '/point_source_nids_' + tile_id + '.tif')
+
         ## Calculate proportion of hits pre cell per point source using gdal_calc
 
         # Calculate total sum of points per cell, prepare gdal command
@@ -929,6 +955,9 @@ def odm_export_point_source_info(tile_id):
         # Execute gdal command
         log_output = log_output + '\n' + tile_id + ' created temporary total point count file. \n' + \
                      subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+
+        # Apply mask(s)
+        common.apply_mask(temp_wd + '/temp_total_points.tif ')
 
         ## Calculate proportions using gdal_calc, round, stretch by 10000 and convert to Int16
         for point_source_id in point_source_ids:
@@ -981,7 +1010,7 @@ def odm_export_point_source_info(tile_id):
         log_output = log_output + '\n' + tile_id + ' merged temporary layers in point source ids file. \n' + \
                      subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
 
-        # The 'majority' stat produced by opals is not reliable... leaving the below code for leagcy reasons.
+        # The 'majority' stat produced by opals is not reliable... I'm leaving the below code for leagcy reasons.
         # 'majority statistics will have to be calculate from the above generated rasters by hand.
         # ## Extract mode of point count ids
         # # Initate opals cell module

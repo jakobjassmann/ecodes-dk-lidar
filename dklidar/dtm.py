@@ -3,13 +3,13 @@
 
 import os
 import subprocess
-import multiprocessing
 import re
 import pandas
 import opals
 import glob
 
 from dklidar import settings
+from dklidar import common
 
 #### Function definitions
 
@@ -155,6 +155,9 @@ def dtm_aggregate_tile(tile_id):
         log_output = log_output + '\n' + tile_id + ' converting dtm_10m to int16... \n' + \
                      subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
 
+        # Apply mask(s)
+        common.apply_mask(out_file)
+
         return_value = 'success'
     except:
         log_output = log_output + '\n' + tile_id + ' dtm_10m aggregation failed.\n\n'
@@ -218,6 +221,9 @@ def dtm_calc_slope(tile_id):
               ' --calc=rint(A) --type=Int16 --NoDataValue=-9999'
         log_output = log_output + '\n' + tile_id + ' rounding slope and calculation successful. \n' + \
                      subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+
+        # Apply mask(s)
+        common.apply_mask(out_folder + '/slope_' + tile_id + '.tif ')
 
         return_value = 'success'
     except:
@@ -284,6 +290,9 @@ def dtm_calc_aspect(tile_id):
         log_output = log_output + '\n' + tile_id + ' rounding aspect to int16 and calculation success. \n' + \
                      subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
 
+        # Apply mask(s)
+        common.apply_mask(out_folder + '/aspect_' + tile_id + '.tif ')
+
         return_value = 'success'
     except:
         log_output = log_output + '\n' + tile_id + ' aspect calculation failed.\n\n'
@@ -343,6 +352,9 @@ def dtm_calc_heat_index(tile_id):
         # Execute gdal command
         log_output = log_output + '\n' + tile_id + ' calculating heat index success. \n' + \
                      subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+
+        # Apply mask(s)
+        common.apply_mask(out_file)
 
         return_value = 'success'
     except:
@@ -484,6 +496,9 @@ def dtm_calc_solar_radiation(tile_id):
                      subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
                      '\n' + tile_id + ' calculated solar radiation. \n\n'
 
+        # Apply mask(s)
+        common.apply_mask(out_file)
+
         # Remove latitude tif
         os.remove(wd + '/lat_' + tile_id + '.tif')
         return_value = 'success'
@@ -586,6 +601,9 @@ def dtm_openness_mean(tile_id):
               out_folder + '/openness_mean' + tile_id + '.tif '
         log_output = log_output + subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
                      '\n' + tile_id + ' landscape openness calculation successful.\n\n'
+
+        # Apply mask(s)
+        common.apply_mask(out_folder + '/openness_mean' + tile_id + '.tif ')
 
         return_value = 'success'
 
@@ -708,6 +726,9 @@ def dtm_openness_difference(tile_id):
               out_folder + '/openness_difference' + tile_id + '.tif '
         log_output = log_output + subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
                      '\n' + tile_id + ' openness calculation successful.\n\n'
+
+        # Apply mask(s)
+        common.apply_mask(wd + '/diff_openness_' + tile_id + '_mosaic_cropped.tif ')
 
         return_value = 'success'
 
