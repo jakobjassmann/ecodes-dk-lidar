@@ -8,6 +8,8 @@ Functions for processing and rasterising DK's nationwide LiDAR data 'Punktsky'.
 - [points.py](#points.py)
 - [dtm.py](#dtm.py)
 
+----
+
 ### settings.py
 Global settings file with:
 - paths to system excutables (python, gdal, SAGA GIS).
