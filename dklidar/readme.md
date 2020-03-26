@@ -21,6 +21,8 @@ Global settings file with:
 - out_cell-size - the default cell size for raster export with OPALS.
 - filter strings for commonly used OPALS filters. 
 
+----
+
 ### common.py
 Functions for logging, process management etc.
 
@@ -30,6 +32,8 @@ init_log_folder | Initialises log folder for a processing script.
 update_progress_df | Updates progress data frame for process managment.
 gather_logs | Gathers logs for a tile after a processing step is completed.
 apply_mask | Applies water mask(s) (sea and/or in-lane water) to a raster file.
+
+----
 
 ### points.py
 Functions for processing pointcloud data.
@@ -50,6 +54,7 @@ odm_calc_proportions | Caluclates the proportions between two point counts.
 odm_export_amplitude | Exports the mean and sd of all amplitude values in the cell.
 odm_export_point_source_info | Exports point source (flight line) stats for all cells in a tile.
 
+----
 
 ### dtm.py
 Functions for processing raster DTM data.
@@ -67,3 +72,5 @@ dtm_openness_mean | Calculates the mean landscape openness following Yokoyama et
 dtm_openness_difference | Calculates the difference between min an max landscape openness following Yokoyama et al. 2002 for a 50 m radius.
 dtm_saga_wetness | Calculates the SAGA wetness index for a tile from the tile mosaic with default settings (computing intense!).
 dtm_saga_landscape_openness | Calclulates landscape openness following Yokoyama et al. 2002 using SAGA GIS with a search radius of 150 m (redundant).
+
+----
