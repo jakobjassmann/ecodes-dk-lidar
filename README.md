@@ -2,6 +2,7 @@
 Raster outputs for ecological and environmental variables derived from DK nationwide LiDAR data "Punktsky".
 
 ---
+
 __*NOTE: This repository is currently under development.*__
 
 ## General notes
@@ -17,7 +18,7 @@ This project has been developed with OPALS 2.3.2.0, Python 2.7 (as distributed w
 |- scripts/       contains all Batch and Python scritps for carrying out the processsing.
 ```
 ## Getting Started
-1. Set up your local environment and download data following the instructions in  */scritps/readme.md* .
+1. Set up your local environment and download data following the instructions in  */scripts/readme.md* .
 2. Basic processing for each tile is done with the */scripts/process_tile.py* script.
 3. See */dklidar/readme.md* for an overview of the modules and functions of the *dklidar* Python package.
 
