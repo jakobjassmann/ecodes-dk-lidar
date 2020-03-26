@@ -3,6 +3,11 @@ Functions for processing and rasterising DK's nationwide LiDAR data 'Punktsky'.
 
 ## Modules
 
+- [settings.py](#settings.py)
+- [common.py](#common.py)
+- [points.py](#points.py)
+- [dtm.py](#dtm.py)
+
 ### settings.py
 Global settings file with:
 - paths to system excutables (python, gdal, SAGA GIS).
@@ -17,7 +22,7 @@ Global settings file with:
 ### common.py
 Functions for logging, process management etc.
 
-Function nam| Description
+Function | Description
 --- | ---
 init_log_folder | Initialises log folder for a processing script.
 update_progress_df | Updates progress data frame for process managment.
