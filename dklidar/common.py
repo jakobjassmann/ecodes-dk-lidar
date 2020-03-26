@@ -14,6 +14,7 @@ from dklidar import settings
 
 ## Function definitons
 
+## Logging function to initalise logging process key to progress managment.
 def init_log_folder(script_name, tile_ids):
     """
     Initiates a log folder for storing the processing output and progress management
@@ -70,6 +71,8 @@ def init_log_folder(script_name, tile_ids):
     # return progress_df
     return(progress_df)
 
+
+## Function to gather progress update, key to progress management and logging.
 def update_progress_df(script_name, progress_df):
     """
     Searches a script's log folder for subfolders matching the tile_id_pattern(rrrr_ccc), then crawls these folders for
@@ -126,6 +129,7 @@ def update_progress_df(script_name, progress_df):
     # Return progress_df
     return(progress_df)
 
+
 ## Define function to gather logs
 def gather_logs(script_name, step_name, tile_id):
     """
@@ -176,6 +180,8 @@ def gather_logs(script_name, step_name, tile_id):
         # remove log file from temp directory
         os.remove(wd + '/opalsErrors.txt')
 
+
+## Function to apply water masks, sea or inland water.
 def apply_mask(target_raster = '', sea_mask = True, inland_water_mask = True):
     """
     For a given target raster, this function masks all sea off the coastline of Denmark (sea_mask = True) or all inland water

@@ -1,1 +1,0 @@
-@"C:\Program Files\opals_nightly_2.3.2\opals\python.exe" %*
