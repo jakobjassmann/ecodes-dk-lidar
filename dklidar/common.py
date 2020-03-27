@@ -181,6 +181,94 @@ def gather_logs(script_name, step_name, tile_id):
         os.remove(wd + '/opalsErrors.txt')
 
 
+## Function to generate sea and inland water masks for a tile
+def generate_water_masks(tile_id):
+    """
+    Generates both sea and inland water mask rasters based on the dtm as a template using the nationwide
+    sea and inland water masks vector files specified in the settings file.
+    :param tile_id: ide of the tile
+    :return: execution status
+    """
+
+    # Initiate return valule and log output
+    return_value = ''
+    log_output = ''
+
+    # get temporary work directory
+    wd = os.getcwd()
+
+    # Prepare output folder
+    sea_out_folder = settings.output_folder + '/masks/sea_mask'
+    inland_water_out_folder = settings.output_folder + '/masks/inland_water_mask'
+    if not os.path.exists(settings.output_folder + '/masks'): os.mkdir(settings.output_folder + '/masks')
+    if not os.path.exists(sea_out_folder): os.mkdir(sea_out_folder)
+    if not os.path.exists(inland_water_out_folder): os.mkdir(inland_water_out_folder)
+
+    sea_mask_file = sea_out_folder + '/sea_mask_' + tile_id + '.tif '
+    inland_mask_file = inland_water_out_folder + '/inland_water_mask_' + tile_id + '.tif '
+    temp_file = os.getcwd() + '/temp.tif'
+    try:
+        ## Aggregate dtm
+        cmd = settings.gdalwarp_bin + \
+              '-tr 10 10 -r min -ot Int16 -dstnodata -9999 -overwrite ' + \
+              settings.dtm_folder + '/DTM_1km_' + tile_id + '.tif ' + \
+              temp_file
+
+        # Execute gdal command
+        log_output = log_output + subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
+                     '\n' + tile_id + ' aggregating dtm to 10 m for mask successful.\n\n'
+
+        # Set all cells with data in raster to 0 and set it as no data value
+        cmd = settings.gdal_calc_bin + \
+              '--calc=0 --NoDataValue=0 --overwrite --type Int16 ' + \
+              '-A ' + temp_file + ' ' + \
+              '--outfile=' + sea_mask_file
+
+        # Execute gdal command
+        log_output = log_output + subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
+                     '\n' + tile_id + ' set all cells with data to 1.\n\n'
+
+        # Dublicate file
+        shutil.copyfile(sea_mask_file, inland_mask_file)
+
+        # Apply sea mask
+        cmd = settings.gdal_rasterize_bin + \
+              '-b 1 ' + '-burn -9999 ' + '-at ' + '-i ' + \
+              settings.dk_coastline_poly + ' ' + \
+              sea_mask_file
+
+        log_output = log_output + '\n' + \
+                     subprocess.check_output(
+                         cmd,
+                         shell=False,
+                         stderr=subprocess.STDOUT) + \
+                     '\n' + sea_mask_file + ' sea mask created. \n\n '
+
+        # Apply inland water mask
+        cmd = settings.gdal_rasterize_bin + \
+              '-b 1 ' + '-burn -9999 ' + '-at ' + \
+              settings.dk_lakes_poly + ' ' + \
+              inland_mask_file
+
+        log_output = log_output + '\n' + \
+                     subprocess.check_output(
+                         cmd,
+                         shell=False,
+                         stderr=subprocess.STDOUT) + \
+                     '\n' + inland_mask_file + ' inland water mask created. \n\n '
+
+        return_value = 'success'
+    except:
+        log_output = log_output + '\n' + tile_id + ' creating mask rasters failed.\n\n'
+        return_value = 'gdalError'
+
+        # Write log output to log file
+    log_file = open('log.txt', 'a+')
+    log_file.write(log_output)
+    log_file.close()
+
+    return return_value
+
 ## Function to apply water masks, sea or inland water.
 def apply_mask(target_raster = '', sea_mask = True, inland_water_mask = True):
     """
@@ -198,21 +286,38 @@ def apply_mask(target_raster = '', sea_mask = True, inland_water_mask = True):
     # Check whether input raster was provided
     if (target_raster == ''): raise Exception('No input raster provided.')
 
+    # Get current wd
+    temp_wd = os.getcwd()
+
+    # Get tile_id from path
+    tile_id = re.sub('.*_(\d*_\d*)\.tif ', '\g<1>', target_raster)
+
+    # set mask paths
+    sea_out_folder = settings.output_folder + '/masks/sea_mask'
+    inland_water_out_folder = settings.output_folder + '/masks/inland_water_mask'
+    sea_mask_file = sea_out_folder + '/sea_mask_' + tile_id + '.tif'
+    inland_mask_file = inland_water_out_folder + '/inland_water_mask_' + tile_id + '.tif'
+
+    temp_file = temp_wd + '/temp_raster.tif'
     # Apply sea mask
     if (sea_mask == True):
         try:
             # Construct gdal command
-            cmd = settings.gdal_rasterize_bin + \
-                  '-b 1 ' + '-burn -9999 ' + '-i ' + '-at ' + \
-                  settings.dk_coastline_poly + ' ' + \
-                  target_raster
+            cmd = settings.gdal_merge_bin + \
+                  '-a_nodata -9999 ' + \
+                  '-o ' + temp_file + ' ' + \
+                  ' ' + target_raster + ' ' + \
+                  ' ' + sea_mask_file + ' '
 
             log_output = log_output + '\n' + \
-                         subprocess.check_output(
-                             cmd,
-                             shell=False,
-                             stderr=subprocess.STDOUT) + \
-                         '\n' + target_raster + ' sea mask applied. \n\n '
+                 subprocess.check_output(
+                     cmd,
+                     shell=False,
+                     stderr=subprocess.STDOUT) + \
+                 '\n' + target_raster + ' sea mask applied. \n\n '
+
+            shutil.copyfile(temp_file, target_raster)
+            os.remove(temp_file)
 
             return_value = 'success'
         except:
@@ -223,19 +328,22 @@ def apply_mask(target_raster = '', sea_mask = True, inland_water_mask = True):
     if (inland_water_mask == True):
         try:
             # Construct gdal command
-            cmd = settings.gdal_rasterize_bin + \
-                  '-b 1 ' + '-burn -9999 ' + '-at ' + \
-                  settings.dk_lakes_poly + ' ' + \
-                  target_raster
+            cmd = settings.gdal_merge_bin + \
+                  '-a_nodata -9999 ' + \
+                  '-o ' + temp_file + ' ' + \
+                  ' ' + target_raster + ' ' + \
+                  ' ' + inland_mask_file + ' '
 
             log_output = log_output + '\n' + \
-                         subprocess.check_output(
-                             cmd,
-                             shell=False,
-                             stderr=subprocess.STDOUT) + \
-                         '\n' + target_raster + ' inland water mask applied. \n\n '
+                 subprocess.check_output(
+                     cmd,
+                     shell=False,
+                     stderr=subprocess.STDOUT) + \
+                 '\n' + target_raster + ' sea mask applied. \n\n '
 
-            return_value = 'success'
+            shutil.copyfile(temp_file, target_raster)
+            os.remove(temp_file)
+
         except:
             log_output = log_output + '\n' + target_raster + ' applying inland water mask failed. \n\n '
             return_value = 'gdalError'

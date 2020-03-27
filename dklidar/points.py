@@ -1046,3 +1046,32 @@ def odm_export_point_source_info(tile_id):
             pass
     return return_value
 
+
+def odm_remove_temp_files(tile_id):
+    """
+    Removes footprint and odm files to clear up space for subsequent processing.
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+    :return: execution status
+    """
+
+    # initiate return value
+    return_value = ''
+
+    odm_file = settings.odm_folder + '/odm_' + tile_id + '.odm'
+    odm_footprint_files = glob.glob(settings.odm_footprint_folder + '/footprint_' + tile_id + '.*')
+
+    try:
+        os.remove(odm_file)
+        return_value('success')
+    except:
+        return_value = 'unable to delete odm file'
+
+    try:
+        for file in odm_footprint_files: os.remove(file)
+        return_value('success')
+    except:
+        return_value = return_value + 'unable to delete odm footprint file'
+
+    # return execution status
+    return return_value
+

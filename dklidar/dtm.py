@@ -408,13 +408,13 @@ def dtm_calc_solar_radiation(tile_id):
                      '\n' + tile_id + ' generated xyz. \n\n '
 
         # Read in xyz as a pandas dataframe
-        xyz = pandas.read_csv('xyz_' + tile_id + '.xyz')
+        xyz = pandas.read_csv(wd + '/xyz_' + tile_id + '.xyz')
         xy = xyz[["X", "Y"]]
-        xy.to_csv('xy_' + tile_id + '.csv', index=False, header=False, sep=' ')
+        xy.to_csv(wd + '/xy_' + tile_id + '.csv', index=False, header=False, sep=' ')
 
         # Construct gdal commands to transform cell coordinates from utm to lat long
         in_file = wd + '/xy_' + tile_id + '.csv'
-        out_file = 'xy_' + tile_id + '_latlong.csv'
+        out_file = wd + '/xy_' + tile_id + '_latlong.csv'
         cmd = '(' + settings.gdaltransform_bin + ' -s_srs EPSG:25832 -t_srs WGS84 ' + \
               ' < ' + in_file + ') > ' + out_file
         # And execute the gdal command
@@ -423,7 +423,7 @@ def dtm_calc_solar_radiation(tile_id):
                      '\n' + tile_id + ' transformed to lat long. \n\n '
 
         # Load lat long file as pandas df
-        xy_latlong = pandas.read_csv('xy_' + tile_id + '_latlong.csv', sep='\s+', names=['X', 'Y', 'return_status'],
+        xy_latlong = pandas.read_csv(wd + '/xy_' + tile_id + '_latlong.csv', sep='\s+', names=['X', 'Y', 'return_status'],
                                      skiprows=1)
 
         # check data frames are of the same length
@@ -433,7 +433,7 @@ def dtm_calc_solar_radiation(tile_id):
 
         # Assign lat (deg) to UTM z coordinate
         xyz["Z"] = xy_latlong["Y"]
-        xyz.to_csv('xyz_' + tile_id + '.xyz', index=False, header=False, sep=' ')
+        xyz.to_csv(wd + '/xyz_' + tile_id + '.xyz', index=False, header=False, sep=' ')
 
         # Convert back to geotiff, prepare gdal translate command
         in_file = wd + '/xyz_' + tile_id + '.xyz'
@@ -932,5 +932,34 @@ def dtm_saga_landscape_openness(tile_id):
     except:
         pass
 
+    return return_value
+
+
+def dtm_remove_temp_files(tile_id):
+    """
+    Removes footprint and mosaic files for the dtm to clear up space for subsequent processing.
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+    :return: execution status
+    """
+
+    # initiate return value
+    return_value = ''
+
+    dtm_mosaic = settings.dtm_mosaics_folder + '/dtm_' + tile_id + '_mosaic.tif'
+    dtm_footprint_files = glob.glob(settings.dtm_footprint_folder + '/DTM_1km_' + tile_id + '_footprint.*')
+
+    try:
+        os.remove(dtm_mosaic)
+        return_value('success')
+    except:
+        return_value = 'unable to delete dtm mosaic file'
+
+    try:
+        for file in dtm_footprint_files: os.remove(file)
+        return_value('success')
+    except:
+        return_value = return_value + 'unable to delete dtm footprint file'
+
+    # return execution status
     return return_value
 

@@ -79,6 +79,14 @@ def process_tile(tile_id):
     steps = ['processing']
     status_steps = [['complete']]
 
+    ## Generate masks
+    return_value = common.generate_water_masks(tile_id)
+    # Update progress variables
+    steps.append('generate_water_masks')
+    status_steps.append([return_value])
+    # gather logs for step and tile
+    common.gather_logs('process_tiles', 'generate_water_masks', tile_id)
+
     ## Import tile to ODM
     return_value = points.odm_import_single_tile(tile_id)
     # Update progress variables
@@ -157,6 +165,15 @@ def process_tile(tile_id):
     # gather logs for step and tile]
     common.gather_logs('process_tiles', 'odm_export_amplitude', tile_id)
 
+    ## Remove unneeded odm files
+    return_value = points.odm_remove_temp_files(tile_id)
+    # Update progress variables
+    steps.append('odm_remove_temp_files')
+    status_steps.append([return_value])
+    # gather logs for step and tile]
+    common.gather_logs('process_tiles', 'odm_remove_temp_files', tile_id)
+
+
     ## Terrain model derived variables
 
     ## Generate tile footprint
@@ -230,6 +247,14 @@ def process_tile(tile_id):
     status_steps.append([return_value])
     # gather logs for step and tile]
     common.gather_logs('process_tiles', 'dtm_openness_difference', tile_id)
+
+    ## Remove unneeded dtm files
+    return_value = dtm.dtm_remove_temp_files(tile_id)
+    # Update progress variables
+    steps.append('dtm_remove_temp_files')
+    status_steps.append([return_value])
+    # gather logs for step and tile]
+    common.gather_logs('process_tiles', 'dtm_remove_temp_files', tile_id)
 
     ## Logging: finalise log outputs
     # Zip into pandas data frame
