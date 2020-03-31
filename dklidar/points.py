@@ -52,8 +52,9 @@ def odm_import_mosaic(tile_id):
     :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
     :return: returns execution status.
     """
-    # Initiate return value
+    # Initiate return value, open log file
     return_value = ''
+    log_file = open('log.txt', 'a+')
 
     # Retrieve row and col numbers for the current tile_id
     center_row = int(re.sub('(\d+)_\d+', '\g<1>', tile_id))
@@ -80,9 +81,12 @@ def odm_import_mosaic(tile_id):
 
     # Update log output depending of the number of valid neighbours
     if n_neighbours == 9:
-        log_output = tile_id + ' importing point clouds into ODM mosaic...\n' + 'Number of neighbours = ' + str(n_neighbours) + '. Complete!\n'
+        log_file.write(' importing point clouds into ODM mosaic...\n' +
+                       'Number of neighbours = ' + str(n_neighbours) + '. Complete!\n')
     else:
-        log_output = tile_id + ' importing point clouds into ODM mosaic...\n' + 'Warning! Number of neighbours = ' + str(n_neighbours) + '. Incomplete. Edge effects possible!\n'
+        log_file.write(tile_id + ' importing point clouds into ODM mosaic...\n' +
+                       'Warning! Number of neighbours = ' + str(n_neighbours) +
+                       '. Incomplete. Edge effects possible!\n')
 
     # Generate output file name string
     odm_file = settings.odm_mosaics_folder + '/odm_mosaic_' + tile_id + '.odm'
@@ -95,16 +99,14 @@ def odm_import_mosaic(tile_id):
         import_tile.outFile = odm_file
         import_tile.commons.screenLogLevel = opals.Types.LogLevel.none
         import_tile.run()
-        log_output = log_output + tile_id + ' success.\n\n'
+        log_file.write(tile_id + ' success.\n\n')
         return_value = return_value + 'complete'
         if n_neighbours != 9: return_value = 'Warning: Incomplete Neighbourhood!'
     except:
         return_value = 'opalsError'
-        log_output = log_output + tile_id + ' failed. OpalsError.\n\n'
+        log_file.write(tile_id + ' failed. OpalsError.\n\n')
 
     # Write log output to log file
-    log_file = open('log.txt', 'a+')
-    log_file.write(log_output)
     log_file.close()
 
     # return status output
@@ -121,6 +123,7 @@ def odm_generate_footprint(tile_id):
 
     # Initiate return value
     return_value = ''
+    log_file = open('log.txt', 'a+')
 
     # Generate relevant file names:
     odm_file = settings.odm_folder + '/odm_' + tile_id + '.odm'
@@ -139,29 +142,27 @@ def odm_generate_footprint(tile_id):
                                     # It sets the ROI to the extent to the bounding box of points in the ODM
         export_tif.commons.screenLogLevel = opals.Types.LogLevel.none
         export_tif.run()
-        log_output = '\n' + tile_id + ' temporary raster export successful.\n\n'
+        log_file.write('\n' + tile_id + ' temporary raster export successful.\n\n')
     except:
         return_value = 'opalsError'
-        log_output = '\n' + tile_id + ' temporary raster export failed.\n\n'
+        log_file.write('\n' + tile_id + ' temporary raster export failed.\n\n')
 
     # Try generating footprint from temp tif
     try:
         # Specify gdal command
         cmd = settings.gdaltlindex_bin + ' ' + footprint_file + ' ' + temp_tif_file
         # Execute gdal command
-        log_output = log_output + '\n' + tile_id + ' footprint generation... \n' + \
+        log_file.write('\n' + tile_id + ' footprint generation... \n' + \
             subprocess.check_output(cmd, shell=False,  stderr=subprocess.STDOUT) + \
-                     tile_id + ' successful.\n\n'
+                     tile_id + ' successful.\n\n')
         # set exit status
         return_value = 'complete'
     except:
-        log_output = log_output + '\n' + tile_id + ' footprint generation... \n' + tile_id + ' failed.\n\n'
+        log_file.write('\n' + tile_id + ' footprint generation... \n' + tile_id + ' failed.\n\n')
         if return_value == 'opalsError': pass
         else: return_value = 'gdalError'
 
-    # Write log output to log file
-    log_file = open('log.txt', 'a+')
-    log_file.write(log_output)
+    # Close log file
     log_file.close()
 
     # Remove temp raster file
@@ -272,7 +273,7 @@ def odm_export_normalized_z(tile_id):
     """
     # Initiate return value
     return_value = ''
-    log_output = ''
+    log_file = open('log.txt', 'a+')
 
     # Set file and folder paths
     odm_file = settings.odm_folder + '/odm_' + tile_id + '.odm'
@@ -335,8 +336,8 @@ def odm_export_normalized_z(tile_id):
               '--type=Int16 --NoDataValue=-9999 '
 
         # Execute and log command
-        log_output = log_output + '\n' + tile_id + ' rounding mean to int16 and calculation success. \n' + \
-                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+        log_file.write('\n' + tile_id + ' rounding mean to int16 and calculation success. \n' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT))
 
         # Apply mask(s)
         common.apply_mask(out_file_mean)
@@ -349,8 +350,8 @@ def odm_export_normalized_z(tile_id):
               '--type=Int16 --NoDataValue=-9999 '
 
         # Execute and log command
-        log_output = log_output + '\n' + tile_id + ' rounding sd to int16 and calculation success. \n' + \
-                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+        log_file.write('\n' + tile_id + ' rounding sd to int16 and calculation success. \n' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT))
 
         # Apply masks
         common.apply_mask(out_file_sd)
@@ -361,7 +362,7 @@ def odm_export_normalized_z(tile_id):
             pass
         else:
             return_value = 'gdalError'
-            log_output = log_output + '\n' + tile_id + ' normalized_z export failed. \n'
+            log_file.write('\n' + tile_id + ' normalized_z export failed. \n')
 
         # Tidy up
     try:
@@ -370,9 +371,7 @@ def odm_export_normalized_z(tile_id):
     except:
         pass
 
-    # Write log output
-    log_file = open('log.txt', 'a+')
-    log_file.write(log_output)
+    # Close log file
     log_file.close()
 
     # Return exist status
@@ -389,7 +388,7 @@ def odm_export_canopy_height(tile_id):
     """
     # Initiate return value
     return_value = ''
-    log_output = ''
+    log_file = open('log.txt', 'a+')
 
     # Generate file paths
     odm_file = settings.odm_folder + '/odm_' + tile_id + '.odm'
@@ -432,9 +431,9 @@ def odm_export_canopy_height(tile_id):
         cmd = settings.gdal_translate_bin + ' -a_nodata -9999 ' + temp_file + ' ' + out_file
 
         # Execute gdal commant and add to log output
-        log_output = log_output + '\n' + tile_id + ' setting no data value... \n' + \
+        log_file.write('\n' + tile_id + ' setting no data value... \n' + \
                      subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
-                     tile_id + ' successful.\n\n'
+                     tile_id + ' successful.\n\n')
 
 
         # Construct gdal command to stredtch and round to int 16
@@ -444,8 +443,8 @@ def odm_export_canopy_height(tile_id):
               '--calc=rint(A*100) ' + \
               '--type=Int16 '
         # Execute comman and log
-        log_output = log_output + '\n' + tile_id + ' stretching and rounding success. \n' + \
-                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+        log_file.write('\n' + tile_id + ' stretching and rounding success. \n' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT))
 
         # Apply mask(s)
         common.apply_mask(out_file)
@@ -453,13 +452,11 @@ def odm_export_canopy_height(tile_id):
         # set exit status
         return_value = 'success'
     except:
-        log_output = log_output + tile_id + ' setting no data value for canopy height failed.\n\n'
+        log_file.write(tile_id + ' setting no data value for canopy height failed.\n\n')
         if return_value == 'opalsError': pass
         else: return_value = 'gdalError'
 
-    # Write log output to log file
-    log_file = open('log.txt', 'a+')
-    log_file.write(log_output)
+    # Close log file
     log_file.close()
 
     # Remove temp raster file
@@ -488,7 +485,7 @@ def odm_export_point_count(tile_id, name = 'vegetation_point_count',
     """
     # Initiate return value and log_output
     return_value = ''
-    log_output = ''
+    log_file = open('log.txt', 'a+')
 
     # Get temporary working directory
     wd = os.getcwd()
@@ -542,8 +539,8 @@ def odm_export_point_count(tile_id, name = 'vegetation_point_count',
               temp_file + ' ' + \
               out_file
         # Execute and log command
-        log_output = log_output + '\n' + tile_id + ' converting to Int16 success. \n' + \
-                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+        log_file.write('\n' + tile_id + ' converting to Int16 success. \n' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT))
 
         # Apply mask(s)
         common.apply_mask(out_file)
@@ -553,7 +550,7 @@ def odm_export_point_count(tile_id, name = 'vegetation_point_count',
         if return_value == 'opalsError':
             pass
         else:
-            log_output = log_output + '\n' + tile_id + ' converting to Int16 for ' + prefix + ' failed. \n'
+            log_file.write('\n' + tile_id + ' converting to Int16 for ' + prefix + ' failed. \n')
             return_value = 'gdalError'
 
     # Tidy up
@@ -562,9 +559,7 @@ def odm_export_point_count(tile_id, name = 'vegetation_point_count',
     except:
         pass
 
-    # Write log output
-    log_file = open('log.txt', 'a+')
-    log_file.write(log_output)
+    # Close log file
     log_file.close()
 
     # Return exist status
@@ -640,7 +635,7 @@ def odm_calc_proportions(tile_id, prop_name, point_count_id1, point_count_id2):
     :return: execution status
     """
     return_value = ''
-    log_output = ''
+    log_file = open('log.txt', 'a+')
 
     # Generate paths for numerator and denominator
     num_file = settings.output_folder + '/point_count/' + point_count_id1 + '/' + point_count_id1 + '_' + tile_id + '.tif'
@@ -660,24 +655,22 @@ def odm_calc_proportions(tile_id, prop_name, point_count_id1, point_count_id2):
               '-A ' + num_file + ' ' +\
               '-B ' + den_file + ' ' +\
               '--outfile=' + out_file + ' ' + \
-              '--calc=rint(10000*A/B) ' + \
+              '--calc=rint(10000*(A/B)) ' + \
               '--type=Int16 ' + \
               '--NoDataValue=-9999'
         # Execute gdal command
-        log_output = log_output + '\n' + tile_id + ' calculation of proportions ' + prop_name + '... \n' + \
-            subprocess.check_output(cmd, shell=False,  stderr=subprocess.STDOUT)
+        log_file.write('\n' + tile_id + ' calculation of proportions ' + prop_name + '... \n' + \
+            subprocess.check_output(cmd, shell=False,  stderr=subprocess.STDOUT))
 
         # Apply mask(s)
         common.apply_mask(out_file)
 
         return_value = 'success'
     except:
-        log_output = log_output + '\n' + tile_id + ' calculation of proportions ' + prop_name + ' failed. gdalError \n'
+        log_file.write('\n' + tile_id + ' calculation of proportions ' + prop_name + ' failed. gdalError \n')
         return_value = 'gdalError'
 
-    # Write log output to log file
-    log_file = open('log.txt', 'a+')
-    log_file.write(log_output)
+    # Close log file
     log_file.close()
 
     return return_value
@@ -824,7 +817,7 @@ def odm_export_point_source_info(tile_id):
     return_value = ''
 
     # Initiate log output
-    log_output = ''
+    log_file = open('log.txt', 'a+')
 
     # get current work dir string
     temp_wd = os.getcwd()
@@ -910,8 +903,8 @@ def odm_export_point_source_info(tile_id):
               '/point_source_counts_' + tile_id + '.tif ' + in_files_string
 
         # Execute gdal command
-        log_output = log_output + '\n' + tile_id + ' merged point source point count files. \n' + \
-                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+        log_file.write('\n' + tile_id + ' merged point source point count files. \n' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT))
 
         ## Determine the number of uniuqe point source ids per cell using gdal_calc.
         # Prepare in file string and equation string
@@ -931,8 +924,8 @@ def odm_export_point_source_info(tile_id):
               ' --calc=' + equation + \
               ' --type=Int16 --NoDataValue=-9999'
         # Execute gdal command
-        log_output = log_output + '\n' + tile_id + ' extracted number of unique point source ids. \n' + \
-                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+        log_file.write('\n' + tile_id + ' extracted number of unique point source ids. \n' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT))
 
         # Apply mask(s)
         common.apply_mask(out_folder_nids + '/point_source_nids_' + tile_id + '.tif')
@@ -953,8 +946,8 @@ def odm_export_point_source_info(tile_id):
         cmd = settings.gdal_calc_bin + files_string + '--outfile=' + temp_wd + '/temp_total_points.tif ' + \
             '--calc=' + equation + ' --NoDataValue=-9999'
         # Execute gdal command
-        log_output = log_output + '\n' + tile_id + ' created temporary total point count file. \n' + \
-                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+        log_file.write('\n' + tile_id + ' created temporary total point count file. \n' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT))
 
         # Apply mask(s)
         common.apply_mask(temp_wd + '/temp_total_points.tif ')
@@ -968,8 +961,8 @@ def odm_export_point_source_info(tile_id):
                   '--outfile=' + temp_wd + '/point_source_prop_' + str(point_source_id) + '.tif ' + \
                   '--calc=rint((A/B)*10000) ' + '--type=Int16 --NoDataValue=-9999'
             # Execute gdal command
-            log_output = log_output + '\n' + tile_id + ' calculated proportions for ' + str(point_source_id)  + '. \n' + \
-                         subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+            log_file.write('\n' + tile_id + ' calculated proportions for ' + str(point_source_id)  + '. \n' + \
+                         subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT))
 
         ## Merge files into one using gdal_merge
         # Prepare gdal command
@@ -981,8 +974,8 @@ def odm_export_point_source_info(tile_id):
               '-o ' + out_folder_prop + '/point_source_prop_' + tile_id + '.tif ' +\
              in_files_string
         # Execute gdal command
-        log_output = log_output + '\n' + tile_id + ' merged point source proportions. \n' + \
-                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+        log_file.write('\n' + tile_id + ' merged point source proportions. \n' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT))
 
         ## Create a layer with presence / absence of point source id indicated by the point source id itself
         for point_source_id in point_source_ids:
@@ -993,9 +986,9 @@ def odm_export_point_source_info(tile_id):
                   '--calc=' + str(point_source_id) + '*greater(A,0)' + \
                   ' --type=Int16 --NoDataValue=-9999'
             # Execute gdal command
-            log_output = log_output + '\n' + tile_id + ' created temporary presence layer for ' + \
+            log_file.write('\n' + tile_id + ' created temporary presence layer for ' + \
                          str(point_source_id)  + '. \n' + \
-                         subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+                         subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT))
 
         ## Merge files into one using gdal_merge
         # Prepare gdal command
@@ -1007,8 +1000,8 @@ def odm_export_point_source_info(tile_id):
               '-o ' + out_folder_ids + '/point_source_ids_' + tile_id + '.tif ' + \
               in_files_string
         # Execute gdal command
-        log_output = log_output + '\n' + tile_id + ' merged temporary layers in point source ids file. \n' + \
-                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+        log_file.write('\n' + tile_id + ' merged temporary layers in point source ids file. \n' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT))
 
         # The 'majority' stat produced by opals is not reliable... I'm leaving the below code for leagcy reasons.
         # 'majority statistics will have to be calculate from the above generated rasters by hand.
@@ -1028,15 +1021,12 @@ def odm_export_point_source_info(tile_id):
         # export_point_mode.commons.screenLogLevel = opals.Types.LogLevel.none
         # export_point_mode.commons.nbThreads = settings.nbThreads
         # export_point_mode.run()
-
-        # Write log output to log file
-        log_file = open('log.txt', 'a+')
-        log_file.write(log_output)
-        log_file.close()
-
         return_value = 'success'
     except:
         return_value = 'opalsError'
+
+    # Close log file
+    log_file.close()
 
     # remove temporary files
     for temp_file in glob.glob(temp_wd + '/*.tif'):

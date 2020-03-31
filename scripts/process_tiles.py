@@ -6,6 +6,7 @@ import glob
 import re
 import os
 import datetime
+import time
 import multiprocessing
 import pandas
 import opals
@@ -19,6 +20,9 @@ from dklidar import common
 
 # Set working directory
 os.chdir(settings.wd)
+
+# Set number of parallel processes:
+n_processes = 54 # 54
 
 # Confirm essential folders exist
 if not os.path.exists(settings.wd):
@@ -71,6 +75,15 @@ def process_tile(tile_id):
     if not os.path.exists(tile_log_folder):
         os.mkdir(tile_log_folder)
 
+    # Stagger processing if this is the first turn during a processing id
+    # This is a crucial step to reduce the chance of the functions using gdal_rasterize to run directly in parallel
+    # (generate mask function), if more than 10 gdla_rasterize instances run in parallel there is a massive drop in
+    # performance for some reason
+    if not os.path.exists(temp_wd + '/first_go_complete.txt'):
+        # sleep for 5 seconds. Providing the maximum performance gain for all full integers < 6s = sequential
+        time.sleep(5 * int(re.sub('[(),]', '', str(multiprocessing.current_process()._identity))))
+        lock_file = open(temp_wd + '/first_go_complete.txt', 'w')
+        lock_file.close()
     # opals loadModules
     opals.loadAllModules()
 
@@ -280,13 +293,12 @@ if __name__ == '__main__':
     print('\n' + '-' * 80 + 'Starting process_tiles.py at ' + str(startTime.strftime('%c')) + '\n')
 
     ## Prepare process managment and logging
-    progress_df = common.init_log_folder('process_tiles', laz_tile_ids)
+    progress_df = common.init_log_folder('process_tiles', laz_tile_ids[0:2])
 
     ## Identify which tiles still require processing
     tiles_to_process = set(progress_df.index.values[progress_df['processing'] != 'complete'].tolist())
     # Set up processing pool
     multiprocessing.set_executable(settings.python_exec_path)
-    n_processes = 54 # 54
     pool = multiprocessing.Pool(processes=n_processes)
 
     # Execute processing of tiles

@@ -13,14 +13,13 @@ import shutil
 import datetime
 from dklidar import common
 #opals.loadAllModules()
-tile_id = '6210_571'
+tile_id = '6210_576'
 ## Start timer
 startTime = datetime.datetime.now()
 return_value = ''
 log_output = ''
 #-------------------------------
-dtm.dtm_remove_temp_files(tile_id)
-points.odm_remove_temp_files(tile_id)
+dtm.dtm_calc_solar_radiation(tile_id)
 #--------------
 print '#' * 80
 print log_output

@@ -23,23 +23,22 @@ def dtm_generate_footprint(tile_id):
 
     # Initiate return value and log output
     return_value = ''
-    log_output = ''
+    log_file = open('log.txt', 'a')
 
     try:
         cmd = settings.gdaltlindex_bin + \
           settings.dtm_footprint_folder + '/DTM_1km_' + tile_id + '_footprint.shp ' + \
           settings.dtm_folder + '/DTM_1km_' + tile_id + '.tif'
         cmd_return = subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
-        log_output = log_output + '\n' + tile_id + ' footprint generation... \n' + cmd_return + \
-                     '\n' + tile_id + ' successful.\n\n'
+        log_file.write( '\n' + tile_id + ' footprint generation... \n' +
+                        cmd_return + \
+                        '\n' + tile_id + ' successful.\n\n')
         return_value = 'success'
     except:
-        log_output = log_output + '\n' + tile_id + ' footprint generation failed. \n' + cmd_return
+        log_file.write('\n' + tile_id + ' footprint generation failed. \n')
         return_value = 'gdalError'
 
-    # Write log output to log file
-    log_file = open('log.txt', 'a+')
-    log_file.write(log_output)
+    # Close log file
     log_file.close()
 
     return return_value
@@ -54,9 +53,9 @@ def dtm_neighbourhood_mosaic(tile_id):
     :return: execution status
     """
 
-    # Initate return value and log
+    # Initate return value and open log file
     return_value = ''
-    log_output = ''
+    log_file = open('log.txt', 'a+')
 
     # get current (temporary) work directory
     temp_wd = os.getcwd()
@@ -86,9 +85,10 @@ def dtm_neighbourhood_mosaic(tile_id):
     tile_file_names = ' '.join(tile_file_names)
 
     if n_neighbours == 9:
-        log_output = tile_id + ' mosaicing...\n' + 'Number of neighbours = ' + str(n_neighbours) + '. Complete!\n'
+        log_file.write(tile_id + ' mosaicing...\n' + 'Number of neighbours = ' + str(n_neighbours) + '. Complete!\n')
     else:
-        log_output = tile_id + ' mosaicing...\n' + 'Warning! Number of neighbours = ' + str(n_neighbours) + '. Incomplete. Edge effects possible!\n'
+        log_file.write(tile_id + ' mosaicing...\n' + 'Warning! Number of neighbours = ' + str(n_neighbours) +
+                       '. Incomplete. Edge effects possible!\n')
 
     # Construct command:
     cmd = settings.gdalwarp_bin + ' ' + tile_file_names + ' ' + \
@@ -96,16 +96,14 @@ def dtm_neighbourhood_mosaic(tile_id):
 
     # Execute command as subprocess and return message:
     try:
-        log_output = log_output + subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
-        log_output = log_output + tile_id + ' successful.\n\n'
+        log_file.write(subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT))
+        log_file.write('\n' + tile_id + ' successful.\n\n')
         return_value = 'success'
     except:
-        log_output = log_output + tile_id + ' failed.\n\n'
+        log_file.write(tile_id + ' failed.\n\n')
         return_value = "gdalError"
 
-    # Write log output to log file
-    log_file = open('log.txt', 'a+')
-    log_file.write(log_output)
+    # Close log file
     log_file.close()
 
     return return_value
@@ -119,9 +117,9 @@ def dtm_aggregate_tile(tile_id):
     :return: execution status
     """
 
-    # Initiate return valule and log output
+    # Initiate return valule and open log file
     return_value = ''
-    log_output = ''
+    log_file = open('log.txt', 'a+')
 
     # get temporary work directory
     wd = os.getcwd()
@@ -139,8 +137,8 @@ def dtm_aggregate_tile(tile_id):
               wd + '/dtm_10m_' + tile_id + '_float.tif '
 
         # Execute gdal command
-        log_output = log_output + subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
-                     '\n' + tile_id + ' aggregating dtm_10m successful.\n\n'
+        log_file.write(subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
+                     '\n' + tile_id + ' aggregating dtm_10m successful.\n\n')
 
         out_file = out_folder + '/dtm_10m_' + tile_id + '.tif'
 
@@ -152,20 +150,18 @@ def dtm_aggregate_tile(tile_id):
               ' --calc=rint(100*A)' + ' --type=Int16' + ' --NoDataValue=-9999'
 
         # Execute gdal command
-        log_output = log_output + '\n' + tile_id + ' converting dtm_10m to int16... \n' + \
-                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+        log_file.write('\n' + tile_id + ' converting dtm_10m to int16... \n' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT))
 
         # Apply mask(s)
         common.apply_mask(out_file)
 
         return_value = 'success'
     except:
-        log_output = log_output + '\n' + tile_id + ' dtm_10m aggregation failed.\n\n'
+        log_file.write('\n' + tile_id + ' dtm_10m aggregation failed.\n\n')
         return_value = 'gdalError'
 
-        # Write log output to log file
-    log_file = open('log.txt', 'a+')
-    log_file.write(log_output)
+    # Close log file
     log_file.close()
 
     # Remove temporary files
@@ -188,7 +184,7 @@ def dtm_calc_slope(tile_id):
 
     # Initiate return value and log output
     return_value = ''
-    log_output = ''
+    log_file = open('log.txt', 'a+')
 
     # Get current wd
     wd = os.getcwd()
@@ -202,8 +198,8 @@ def dtm_calc_slope(tile_id):
         cmd = settings.gdaldem_bin + ' slope ' + \
             settings.dtm_mosaics_folder + '/dtm_' + tile_id + '_mosaic.tif ' + \
             wd + '/slope_' + tile_id + '_mosaic.tif '
-        log_output = tile_id + ' slope calculation... \n ' + \
-                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+        log_file.write(tile_id + ' slope calculation... \n ' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT))
 
         # Crop slope mosaic output to original tile size and aggregate to 10 m scale by median
         cmd = settings.gdalwarp_bin + \
@@ -211,28 +207,27 @@ def dtm_calc_slope(tile_id):
                '-tr 10 10 -r med -crop_to_cutline -overwrite ' + \
               wd + '/slope_' + tile_id + '_mosaic.tif ' + \
               wd + '/slope_' + tile_id + '_mosaic_cropped.tif '
-        log_output = log_output + subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
-                     '\n' + tile_id + ' cropped slope.\n\n'
+        log_file.write(subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
+                     '\n' + tile_id + ' cropped slope.\n\n')
 
         # Round and store slope as int16
         cmd = settings.gdal_calc_bin + \
               '-A ' + wd + '/slope_' + tile_id + '_mosaic_cropped.tif ' + \
               ' --outfile=' + out_folder + '/slope_' + tile_id + '.tif ' + \
               ' --calc=rint(A) --type=Int16 --NoDataValue=-9999'
-        log_output = log_output + '\n' + tile_id + ' rounding slope and calculation successful. \n' + \
-                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+        log_file.write('\n' + tile_id + ' rounding slope and calculation successful. \n' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT))
 
         # Apply mask(s)
         common.apply_mask(out_folder + '/slope_' + tile_id + '.tif ')
 
         return_value = 'success'
+
     except:
-        log_output = log_output + '\n' + tile_id + ' slope calculation failed. \n\n'
+        log_file.write('\n' + tile_id + ' slope calculation failed. \n\n')
         return_value = 'gdalError'
 
-    # Write log output to log file
-    log_file = open('log.txt', 'a+')
-    log_file.write(log_output)
+    # Close log file
     log_file.close()
 
     # Remove temporary file
@@ -256,7 +251,7 @@ def dtm_calc_aspect(tile_id):
 
     # Initiate return valule and log output
     return_value = ''
-    log_output = ''
+    log_file = open('log.txt', 'a+')
 
     # get temporary work directory
     wd = os.getcwd()
@@ -270,8 +265,8 @@ def dtm_calc_aspect(tile_id):
         cmd = settings.gdaldem_bin + ' aspect -zero_for_flat ' + \
               settings.dtm_mosaics_folder + '/dtm_' + tile_id + '_mosaic.tif ' + \
               wd + '/aspect_' + tile_id + '_mosaic.tif '
-        log_output = tile_id + ' aspect calculation... \n ' + \
-                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+        log_file.write(tile_id + ' aspect calculation... \n ' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT))
 
         # Crop aspect output to original tile size and aggregate to 10 m:
         cmd = settings.gdalwarp_bin + \
@@ -279,28 +274,26 @@ def dtm_calc_aspect(tile_id):
               '-tr 10 10 -r med -crop_to_cutline -overwrite ' + \
               wd + '/aspect_' + tile_id + '_mosaic.tif ' + \
               wd + '/aspect_' + tile_id + '_mosaic_cropped.tif '
-        log_output = log_output + subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
-                 '\n' + tile_id + ' aspect mosaic cropped.\n\n'
+        log_file.write(subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
+                 '\n' + tile_id + ' aspect mosaic cropped.\n\n')
 
         # Round and store as int16
         cmd = settings.gdal_calc_bin + \
               '-A ' + wd + '/aspect_' + tile_id + '_mosaic_cropped.tif ' + \
               ' --outfile=' + out_folder + '/aspect_' + tile_id + '.tif ' + \
               ' --calc=rint(A) --type=Int16 --NoDataValue=-9999'
-        log_output = log_output + '\n' + tile_id + ' rounding aspect to int16 and calculation success. \n' + \
-                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+        log_file.write('\n' + tile_id + ' rounding aspect to int16 and calculation success. \n' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT))
 
         # Apply mask(s)
         common.apply_mask(out_folder + '/aspect_' + tile_id + '.tif ')
 
         return_value = 'success'
     except:
-        log_output = log_output + '\n' + tile_id + ' aspect calculation failed.\n\n'
+        log_file.write('\n' + tile_id + ' aspect calculation failed.\n\n')
         return_value = 'gdalError'
 
-    # Write log output to log file
-    log_file = open('log.txt', 'a+')
-    log_file.write(log_output)
+    # Close log file
     log_file.close()
 
     # Remove temporary file
@@ -323,7 +316,7 @@ def dtm_calc_heat_index(tile_id):
     """
     # Intialise return value and log
     return_value = ''
-    log_output = ''
+    log_file = open('log.txt', 'a+')
 
     # Get current wd
     wd = os.getcwd()
@@ -350,20 +343,18 @@ def dtm_calc_heat_index(tile_id):
               ' --type=Int16 --NoDataValue=-9999 --overwrite'
 
         # Execute gdal command
-        log_output = log_output + '\n' + tile_id + ' calculating heat index success. \n' + \
-                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+        log_file.write('\n' + tile_id + ' calculating heat index success. \n' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT))
 
         # Apply mask(s)
         common.apply_mask(out_file)
 
         return_value = 'success'
     except:
-        log_output = tile_id + ' calculating heat index failed. \n '
+        log_file.write(tile_id + ' calculating heat index failed. \n ')
         return_value = 'gdal_error'
 
-    # Write log output to log file
-    log_file = open('log.txt', 'a+')
-    log_file.write(log_output)
+    # Close log file
     log_file.close()
 
     return return_value
@@ -384,7 +375,7 @@ def dtm_calc_solar_radiation(tile_id):
 
     # initiate return value and log ouptut
     return_value = ''
-    log_output = ''
+    log_file = open('log.txt', 'a')
 
     # Get current wd
     wd = os.getcwd()
@@ -402,34 +393,53 @@ def dtm_calc_solar_radiation(tile_id):
               ' -of xyz -co COLUMN_SEPARATOR="," -co ADD_HEADER_LINE=YES ' + \
               dtm_file + ' ' + \
               out_file
+
+        log_file.write('\n converting slope raster to xyz with gdal command: ' + cmd)
+
         # Execute gdal command and log
-        log_output = log_output + '\n' + \
+        log_file.write('\n' + \
                      subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
-                     '\n' + tile_id + ' generated xyz. \n\n '
+                     '\n' + tile_id + ' generated xyz. \n\n ')
+
+        log_file.write('\n conversion completed ')
 
         # Read in xyz as a pandas dataframe
         xyz = pandas.read_csv(wd + '/xyz_' + tile_id + '.xyz')
         xy = xyz[["X", "Y"]]
         xy.to_csv(wd + '/xy_' + tile_id + '.csv', index=False, header=False, sep=' ')
 
+        log_file.write('\n removed z coordinate. ')
+
         # Construct gdal commands to transform cell coordinates from utm to lat long
-        in_file = wd + '/xy_' + tile_id + '.csv'
-        out_file = wd + '/xy_' + tile_id + '_latlong.csv'
-        cmd = '(' + settings.gdaltransform_bin + ' -s_srs EPSG:25832 -t_srs WGS84 ' + \
-              ' < ' + in_file + ') > ' + out_file
+        in_file = wd + '\\xy_' + tile_id + '.csv'
+
+        cmd = settings.gdaltransform_bin + \
+              ' -s_srs EPSG:25832 -t_srs WGS84 ' + \
+              ' < ' + in_file
+        log_file.write('\n gdal transform command: ' + cmd)
+
         # And execute the gdal command
-        log_output = log_output + '\n' + \
-                     subprocess.check_output(cmd, shell=True) + \
-                     '\n' + tile_id + ' transformed to lat long. \n\n '
+        xy_transformed = subprocess.check_output(cmd, shell=False)
+        # Write to file
+        out_file = wd + '/xy_' + tile_id + '_latlong.csv'
+        xy_trans_file = open(out_file, 'w')
+        xy_trans_file.write(xy_transformed)
+        xy_trans_file.close()
+
+        log_file.write('\n gdal transform completed. ')
 
         # Load lat long file as pandas df
         xy_latlong = pandas.read_csv(wd + '/xy_' + tile_id + '_latlong.csv', sep='\s+', names=['X', 'Y', 'return_status'],
                                      skiprows=1)
 
+        log_file.write('\n check whether lenght matches. ')
+
         # check data frames are of the same length
         if len(xyz.index) != len(xy_latlong.index):
-            log_output = log_output + '\n lenght of dataframes did not match \n'
+            log_file.write('\n lenght of dataframes did not match \n')
             raise Exception("")
+
+        log_file.write('\n added latitude utm as z to latlong file. ')
 
         # Assign lat (deg) to UTM z coordinate
         xyz["Z"] = xy_latlong["Y"]
@@ -442,10 +452,13 @@ def dtm_calc_solar_radiation(tile_id):
               ' -of GTiff -a_srs EPSG:25832 ' + \
               in_file + ' ' + \
               out_file
+
+        log_file.write('\n converting to geotiff using gdal command:' + cmd)
+
         # Execute command and log
-        log_output = log_output + '\n' + \
+        log_file.write('\n' + \
                      subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
-                     '\n' + tile_id + ' generated lat tif. \n\n'
+                     '\n' + tile_id + ' generated lat tif. \n\n')
         # Intermediate clean up
         os.remove(wd + '/xyz_' + tile_id + '.xyz')
         os.remove(wd + '/xy_' + tile_id + '.csv')
@@ -453,6 +466,8 @@ def dtm_calc_solar_radiation(tile_id):
         del (xy)
         del (xy_latlong)
         del (xyz)
+
+        log_file.write('\n finished preparations. ')
 
         ## 2) Calculate Solar radiation
 
@@ -491,10 +506,12 @@ def dtm_calc_solar_radiation(tile_id):
               '--calc=' + solar_rad_eq + ' ' + \
               '--type=Int16 --NoDataValue=-9999 --overwrite'
 
+        log_file.write('\n calculating solar radiaiton with gdal calc: ' + cmd)
+
         # Execute gdal command
-        log_output = log_output + '\n' + \
+        log_file.write('\n' + \
                      subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
-                     '\n' + tile_id + ' calculated solar radiation. \n\n'
+                     '\n' + tile_id + ' calculated solar radiation. \n\n')
 
         # Apply mask(s)
         common.apply_mask(out_file)
@@ -502,13 +519,14 @@ def dtm_calc_solar_radiation(tile_id):
         # Remove latitude tif
         os.remove(wd + '/lat_' + tile_id + '.tif')
         return_value = 'success'
+
+        log_file.write('\n done. ')
+
     except:
-        log_output = log_output + '\n\n' + tile_id + ' calculating solar radiation failed. \n '
+        log_file.write(+ '\n\n' + tile_id + ' calculating solar radiation failed. \n ')
         return_value = 'gdal_error'
 
     # Write log output to log file
-    log_file = open('log.txt', 'a+')
-    log_file.write(log_output)
     log_file.close()
 
     return return_value
@@ -524,7 +542,7 @@ def dtm_openness_mean(tile_id):
     """
     # Initiate return value
     return_value = ''
-    log_output = ''
+    log_file = open('log.txt', 'a+')
 
     # Get working directory
     wd = os.getcwd()
@@ -544,8 +562,8 @@ def dtm_openness_mean(tile_id):
               wd + '/dtm_10m_' + tile_id + '_mosaic_float.tif ' + ' -overwrite'
 
         # Execute gdal command
-        log_output = log_output + subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
-                     '\n' + tile_id + ' aggregated dtm_10m mosaic.\n\n'
+        log_file.write(subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
+                     '\n' + tile_id + ' aggregated dtm_10m mosaic.\n\n')
 
         # Initialise Opals Openness Module
         export_openness = opals.Openness.Openness()
@@ -570,8 +588,8 @@ def dtm_openness_mean(tile_id):
               ' --type=Int16 --NoDataValue=-9999'
 
         # Execute gdal command
-        log_output = log_output + '\n' + tile_id + ' converted and rounded to degrees. \n' + \
-                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+        log_file.write('\n' + tile_id + ' converted and rounded to degrees. \n' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT))
 
         # Obtain file extent for cropping then remove outer 150 m of mosaic to avoid edge effects
         cmd = settings.gdalinfo_bin + wd + '/landscape_openness_' + tile_id + '_mosaic.tif '
@@ -590,8 +608,8 @@ def dtm_openness_mean(tile_id):
               wd + '/landscape_openness_' + tile_id + '_mosaic.tif ' + \
               wd + '/landscape_openness_' + tile_id + '_mosaic_cropped.tif '
 
-        log_output = log_output + subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
-                     '\n' + tile_id + ' cropping landscape openness mosaic finished.\n\n'
+        log_file.write(subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
+                     '\n' + tile_id + ' cropping landscape openness mosaic finished.\n\n')
 
         # Crop openness mosaic to original tile size (this will set all edges removed earlier to NA)
         cmd = settings.gdalwarp_bin + \
@@ -599,8 +617,8 @@ def dtm_openness_mean(tile_id):
               '-crop_to_cutline -overwrite ' + \
               wd + '/landscape_openness_' + tile_id + '_mosaic_cropped.tif ' + \
               out_folder + '/openness_mean' + tile_id + '.tif '
-        log_output = log_output + subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
-                     '\n' + tile_id + ' landscape openness calculation successful.\n\n'
+        log_file.write(subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
+                     '\n' + tile_id + ' landscape openness calculation successful.\n\n')
 
         # Apply mask(s)
         common.apply_mask(out_folder + '/openness_mean' + tile_id + '.tif ')
@@ -622,6 +640,9 @@ def dtm_openness_mean(tile_id):
     except:
         pass
 
+    # Close log file
+    log_file.close()
+
     return return_value
 
 
@@ -635,7 +656,7 @@ def dtm_openness_difference(tile_id):
     """
     # Initiate return value
     return_value = ''
-    log_output = ''
+    log_file = open('log.txt', 'a+')
 
     # Get working directory
     wd = os.getcwd()
@@ -655,8 +676,8 @@ def dtm_openness_difference(tile_id):
               wd + '/dtm_10m_' + tile_id + '_mosaic_float.tif '
 
         # Execute gdal command
-        log_output = log_output + subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
-                     '\n' + tile_id + ' aggregated dtm_10m mosaic.\n\n'
+        log_file.write(subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
+                     '\n' + tile_id + ' aggregated dtm_10m mosaic.\n\n')
 
         # Initialise Opals Openness Module
         export_openness = opals.Openness.Openness()
@@ -695,8 +716,8 @@ def dtm_openness_difference(tile_id):
               ' --type=Int16 --NoDataValue=-9999'
 
         # Execute gdal command
-        log_output = log_output + '\n' + tile_id + ' calculated difference openness. \n' + \
-                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+        log_file.write('\n' + tile_id + ' calculated difference openness. \n' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT))
 
         # Obtain file extent for cropping (remove outer 50 m of mosaic)
         cmd = settings.gdalinfo_bin + wd + '/diff_openness_' + tile_id + '_mosaic.tif '
@@ -715,8 +736,8 @@ def dtm_openness_difference(tile_id):
               wd + '/diff_openness_' + tile_id + '_mosaic.tif ' + \
               wd + '/diff_openness_' + tile_id + '_mosaic_cropped.tif '
 
-        log_output = log_output + subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
-                     '\n' + tile_id + ' cropped openness difference mosaic.\n\n'
+        log_file.write(subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
+                     '\n' + tile_id + ' cropped openness difference mosaic.\n\n')
 
         # Crop diff openness to original tile size (this will set all edges removed earlier to NA)
         cmd = settings.gdalwarp_bin + \
@@ -724,8 +745,8 @@ def dtm_openness_difference(tile_id):
               '-crop_to_cutline -overwrite ' + \
               wd + '/diff_openness_' + tile_id + '_mosaic_cropped.tif ' + \
               out_folder + '/openness_difference' + tile_id + '.tif '
-        log_output = log_output + subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
-                     '\n' + tile_id + ' openness calculation successful.\n\n'
+        log_file.write(subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
+                     '\n' + tile_id + ' openness calculation successful.\n\n')
 
         # Apply mask(s)
         common.apply_mask(wd + '/diff_openness_' + tile_id + '_mosaic_cropped.tif ')
@@ -748,6 +769,9 @@ def dtm_openness_difference(tile_id):
     except:
         pass
 
+    # Close log file
+    log_file.close()
+
     # Return exist status
     return return_value
 
@@ -762,7 +786,7 @@ def dtm_saga_wetness(tile_id):
 
     # Initiate return valule and log output
     return_value = ''
-    log_output = ''
+    log_file = open('log.txt', 'a+')
 
     # get temporary work directory
     wd = os.getcwd()
@@ -776,8 +800,8 @@ def dtm_saga_wetness(tile_id):
         cmd = settings.saga_wetness_bin + '-DEM ' + \
               settings.dtm_mosaics_folder + '/dtm_' + tile_id + '_mosaic.tif ' + \
               '-TWI ' + wd + '/wetness_index_' + tile_id + '_mosaic.tif'
-        log_output = tile_id + ' wetness index calculation finished. \n ' + \
-                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+        log_file.write(tile_id + ' wetness index calculation finished. \n ' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT))
 
         # Crop output to original tile size:
         cmd = settings.gdalwarp_bin + \
@@ -786,8 +810,8 @@ def dtm_saga_wetness(tile_id):
               wd + '/wetness_index_' + tile_id + '_mosaic.sdat ' + \
               wd + '/wetness_index_' + tile_id + '.tif '
 
-        log_output = log_output + subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
-                     '\n' + tile_id + ' cropping wetness index mosaic successful.\n\n'
+        log_file.write(subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
+                     '\n' + tile_id + ' cropping wetness index mosaic successful.\n\n')
         return_value = 'success'
 
         # Set input file path
@@ -803,17 +827,15 @@ def dtm_saga_wetness(tile_id):
               ' --calc=rint(1000*A) --type=Int16 --NoDataValue=-9999 --overwrite'
 
         # Execute gdal command
-        log_output = log_output + '\n' + tile_id + ' rounding and conversion finished. ' \
+        log_file.write('\n' + tile_id + ' rounding and conversion finished. ' \
                                                    'Wetness index calculation successful. \n' + \
-                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT))
 
     except:
-        log_output = log_output + '\n' + tile_id + ' wetness index calculation failed.\n\n'
+        log_file.write('\n' + tile_id + ' wetness index calculation failed.\n\n')
         return_value = 'gdalError'
 
-    # Write log output to log file
-    log_file = open('log.txt', 'a+')
-    log_file.write(log_output)
+    # Close log file
     log_file.close()
 
     # Remove temporary file
@@ -840,7 +862,7 @@ def dtm_saga_landscape_openness(tile_id):
 
     # Initiate return valule and log output
     return_value = ''
-    log_output = ''
+    log_file = open('log.txt', 'a+')
 
     # get temporary work directory
     wd = os.getcwd()
@@ -858,8 +880,8 @@ def dtm_saga_landscape_openness(tile_id):
               wd + '/dtm_10m_' + tile_id + '_mosaic_float.tif ' + ' -overwrite'
 
         # Execute gdal command
-        log_output = log_output + subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
-                     '\n' + tile_id + ' aggregating dtm_10m mosaic successful.\n\n'
+        log_file.write(subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
+                     '\n' + tile_id + ' aggregating dtm_10m mosaic successful.\n\n')
 
         # Use saga gis openness module for calculating the openness in 150 m
         cmd = settings.saga_openness_bin + \
@@ -868,8 +890,8 @@ def dtm_saga_landscape_openness(tile_id):
               '-RADIUS 150 -METHOD 1'
 
         # Execute saga command
-        log_output = log_output + subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
-                     '\n' + tile_id + ' openness from mosaic successful.\n\n'
+        log_file.write(subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
+                     '\n' + tile_id + ' openness from mosaic successful.\n\n')
 
         # Obtain file extent for cropping (remove outer 150 m of mosaic)
         cmd = settings.gdalinfo_bin + wd + '/openness_10m_' + tile_id + '_mosaic.sdat '
@@ -888,8 +910,8 @@ def dtm_saga_landscape_openness(tile_id):
               wd + '/openness_10m_' + tile_id + '_mosaic.sdat ' + \
               wd + '/openness_10m_' + tile_id + '_mosaic.tif '
 
-        log_output = log_output + subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
-                     '\n' + tile_id + ' cropping wetness index mosaic.\n\n'
+        log_file.write(subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
+                     '\n' + tile_id + ' cropping wetness index mosaic.\n\n')
 
         # Convert to degrees, round and store as int16
         # Specify gdal command
@@ -899,8 +921,8 @@ def dtm_saga_landscape_openness(tile_id):
               ' --calc=rint(degrees(A))' + ' --type=Int16' + ' --NoDataValue=-9999'
 
         # Execute gdal command
-        log_output = log_output + '\n' + tile_id + ' converting dtm_10m to int16 successful. \n' + \
-                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+        log_file.write('\n' + tile_id + ' converting dtm_10m to int16 successful. \n' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT))
 
         # Crop slope output to original tile size:
         cmd = settings.gdalwarp_bin + \
@@ -908,16 +930,14 @@ def dtm_saga_landscape_openness(tile_id):
               '-crop_to_cutline -overwrite ' + \
               wd + '/openness_10m_' + tile_id + '_mosaic_deg.tif ' + \
               out_folder + '/openness_10m_' + tile_id + '.tif '
-        log_output = log_output + subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
-                     '\n' + tile_id + ' openness calculation successful.\n\n'
+        log_file.write(subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
+                     '\n' + tile_id + ' openness calculation successful.\n\n')
         return_value = 'success'
     except:
-        log_output = log_output + '\n' + tile_id + ' opennes calculation failed.\n\n'
+        log_file.write('\n' + tile_id + ' opennes calculation failed.\n\n')
         return_value = 'gdalError'
 
-        # Write log output to log file
-    log_file = open('log.txt', 'a+')
-    log_file.write(log_output)
+    # Close log file
     log_file.close()
 
     # Remove temporary files
