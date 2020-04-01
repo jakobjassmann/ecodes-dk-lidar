@@ -8,6 +8,7 @@ import opals
 import subprocess
 import numpy
 import glob
+import shutil
 
 from dklidar import common
 from dklidar import settings
@@ -648,20 +649,39 @@ def odm_calc_proportions(tile_id, prop_name, point_count_id1, point_count_id2):
     if not os.path.exists(out_folder): os.mkdir(out_folder)
     if not os.path.exists(out_folder + '/' + prop_name): os.mkdir(out_folder + '/' + prop_name)
 
+    # get wd
+    temp_wd = os.getcwd()
+
+    # specify temp file path
+    temp_file = temp_wd + '/temp.tif'
+
     # Attempt calculating the proportions using gdal_calc
     try:
-        # Construct gdal command
+        # Construct gdal command nb. needed to use true_divide here which then requires a cast into int16
         cmd = settings.gdal_calc_bin + \
               '-A ' + num_file + ' ' +\
               '-B ' + den_file + ' ' +\
-              '--outfile=' + out_file + ' ' + \
-              '--calc=rint(10000*(A/B)) ' + \
-              '--type=Int16 ' + \
+              '--outfile=' + temp_file + ' ' + \
+              '--type=Float32 ' +\
+              '--calc=rint(10000*true_divide(A,B)) ' + \
               '--NoDataValue=-9999'
+        log_file.write(cmd)
         # Execute gdal command
-        log_file.write('\n' + tile_id + ' calculation of proportions ' + prop_name + '... \n' + \
+        log_file.write('\n' + tile_id + ' calculated proportions ' + prop_name + '... \n' + \
             subprocess.check_output(cmd, shell=False,  stderr=subprocess.STDOUT))
 
+        # Round and convert to int16
+        cmd = settings.gdal_translate_bin + \
+              '-ot Int16 ' + \
+              '-a_nodata -9999 ' +\
+              temp_file + ' ' +\
+              out_file + ' '
+        log_file.write(cmd)
+        # Execute gdal command
+        log_file.write('\n' + tile_id + ' calculated proportions ' + prop_name + '... \n' + \
+            subprocess.check_output(cmd, shell=False,  stderr=subprocess.STDOUT))
+
+        os.remove(temp_file)
         # Apply mask(s)
         common.apply_mask(out_file)
 

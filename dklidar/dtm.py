@@ -7,6 +7,7 @@ import re
 import pandas
 import opals
 import glob
+import time
 
 from dklidar import settings
 from dklidar import common
@@ -413,13 +414,19 @@ def dtm_calc_solar_radiation(tile_id):
         # Construct gdal commands to transform cell coordinates from utm to lat long
         in_file = wd + '\\xy_' + tile_id + '.csv'
 
+        # Script used to break here insert a pause
+        time.sleep(1)
+
         cmd = settings.gdaltransform_bin + \
               ' -s_srs EPSG:25832 -t_srs WGS84 ' + \
               ' < ' + in_file
         log_file.write('\n gdal transform command: ' + cmd)
 
         # And execute the gdal command
-        xy_transformed = subprocess.check_output(cmd, shell=False)
+        xy_transformed = subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
+
+        log_file.write(xy_transformed[0:200] + '\n')
+
         # Write to file
         out_file = wd + '/xy_' + tile_id + '_latlong.csv'
         xy_trans_file = open(out_file, 'w')
@@ -523,8 +530,8 @@ def dtm_calc_solar_radiation(tile_id):
         log_file.write('\n done. ')
 
     except:
-        log_file.write(+ '\n\n' + tile_id + ' calculating solar radiation failed. \n ')
-        return_value = 'gdal_error'
+       log_file.write('\n\n' + tile_id + ' calculating solar radiation failed. \n ')
+       return_value = 'gdal_error'
 
     # Write log output to log file
     log_file.close()

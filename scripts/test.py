@@ -13,12 +13,16 @@ import shutil
 import datetime
 from dklidar import common
 #opals.loadAllModules()
-tile_id = '6210_576'
+tile_id = '6210_573'
 ## Start timer
 startTime = datetime.datetime.now()
 return_value = ''
 log_output = ''
 #-------------------------------
+dtm.dtm_neighbourhood_mosaic(tile_id)
+dtm.dtm_generate_footprint(tile_id)
+dtm.dtm_calc_slope(tile_id)
+dtm.dtm_calc_aspect(tile_id)
 dtm.dtm_calc_solar_radiation(tile_id)
 #--------------
 print '#' * 80
