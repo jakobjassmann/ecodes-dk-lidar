@@ -39,3 +39,28 @@ ggplot(veg_profile_prop, aes(x = variable, y = value))+ geom_col() +theme_cowplo
   theme(axis.text.x = element_text(angle = 90))
 veg_profile2 <- row_max_height %>% select(contains("count")) %>% 
   pivot_longer(cols = everything(), names_to = "variable", values_to = "value")
+
+sample_df_long <- sample_df %>% 
+         pivot_longer(cols = everything(), 
+                      names_to = "variable", 
+                      values_to = "value") %>%
+         mutate(variable_fac = ordered(variable, 
+                                       levels = unique(variable)))
+       
+list_hist_plots <- lapply(
+  levels(sample_df_long$variable_fac), 
+  function(x) {
+    data <- sample_df_long %>% filter(variable == x)
+    if(x == "amplitude_mean") data <- data %>% filter(value <= 1000)
+    if(x == "amplitude_sd") data <- data %>% filter(value <= 1000)
+    hist_plot <- ggplot(data, 
+                       aes(x = value)) +
+      ggtitle(x) +
+      geom_histogram() +
+      theme_cowplot(15) +
+      theme(plot.title= element_text(size= 10))
+    return(hist_plot)
+  })
+hist_grid <- plot_grid(plotlist = list_hist_plots, nrow = 8, ncol = 9)
+save_plot("D:/Jakob/dk_nationwide_lidar/qa_local/hist_plot.png", hist_grid,
+          base_height = 20)
