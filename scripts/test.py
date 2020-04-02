@@ -13,7 +13,7 @@ import shutil
 import datetime
 from dklidar import common
 #opals.loadAllModules()
-tile_id = '6210_573'
+tile_id = '6210_570'
 ## Start timer
 startTime = datetime.datetime.now()
 return_value = ''
