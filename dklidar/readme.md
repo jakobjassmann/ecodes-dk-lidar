@@ -18,7 +18,7 @@ Global settings file with:
 - paths to mask files.
 - common crs as WKT string interpretable by OPALS.
 - nbThreads - number of subthreads used by OPALS.
-- out_cell-size - the default cell size for raster export with OPALS.
+- out\_cell\_size - the default cell size for raster export with OPALS.
 - filter strings for commonly used OPALS filters. 
 
 [\[to top\]](#modules)
