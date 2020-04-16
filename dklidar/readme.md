@@ -34,7 +34,7 @@ init_log_folder | Initialises log folder for a processing script.
 update_progress_df | Updates progress data frame for process managment.
 gather_logs | Gathers logs for a tile after a processing step is completed.
 generate_water_masks | Generates sea and inland water masks for a tile. 
-apply_mask | Applies water mask(s) (sea and/or in-lane water) to a raster file. Called for each final raster output. Default is to apply neither of the two mask. 
+apply_mask | Applies water mask(s) (sea and/or in-lane water) to a raster file. Called for each raster output. Default is to apply neither of the two mask. 
 
 [\[to top\]](#modules)
 
