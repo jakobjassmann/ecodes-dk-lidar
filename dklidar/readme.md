@@ -18,7 +18,7 @@ Global settings file with:
 - paths to mask files.
 - common crs as WKT string interpretable by OPALS.
 - nbThreads - number of subthreads used by OPALS.
-- out_cell-size - the default cell size for raster export with OPALS.
+- out\_cell\_size - the default cell size for raster export with OPALS.
 - filter strings for commonly used OPALS filters. 
 
 [\[to top\]](#modules)
@@ -33,7 +33,8 @@ Function | Description
 init_log_folder | Initialises log folder for a processing script.
 update_progress_df | Updates progress data frame for process managment.
 gather_logs | Gathers logs for a tile after a processing step is completed.
-apply_mask | Applies water mask(s) (sea and/or in-lane water) to a raster file.
+generate_water_masks | Generates sea and inland water masks for a tile. 
+apply_mask | Applies water mask(s) (sea and/or in-lane water) to a raster file. Called for each raster output. Default is to apply neither of the two mask. 
 
 [\[to top\]](#modules)
 
