@@ -311,7 +311,7 @@ def apply_mask(target_raster = '', sea_mask = True, inland_water_mask = True):
     temp_wd = os.getcwd()
 
     # Get tile_id from path
-    tile_id = re.sub('.*_(\d*_\d*)\.tif *', '\g<1>', target_raster)
+    tile_id = re.sub('.*?_(\d*_)(\d*)(_\d*)?\.tif *', '\g<1>\g<2>', target_raster)
 
     # set mask paths
     sea_out_folder = settings.output_folder + '/masks/sea_mask'

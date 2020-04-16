@@ -177,10 +177,11 @@ def odm_generate_footprint(tile_id):
 
 
 ## Def: Validiate CRS
-def odm_validate_crs(tile_id):
+def odm_validate_crs(tile_id, mosaic = False):
     """
     Function to validate the crs for odm files (single tile and mosaic)
     :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+    :param mosaic: if Ture validates crs for mosaic also, default: False.
     :return: execution status
     """
 
@@ -196,10 +197,10 @@ def odm_validate_crs(tile_id):
         odm_dm = opals.pyDM.Datamanager.load(odm_file)
         crs_str = odm_dm.getCRS()
         # Check whether CRS exists, if not assign, if different throw error.
-        if crs_str == settings.crs:
+        if crs_str == settings.crs_wkt_opals:
             return_value = 'Single: match; '
         elif crs_str == '':
-            odm_dm.setCRS(settings.crs)
+            odm_dm.setCRS(settings.crs_wkt_opals)
             return_value = 'Single: empty - set; '
         else:
             return_value = 'Single: warning - no match; '
@@ -208,20 +209,21 @@ def odm_validate_crs(tile_id):
         return_value = 'Single: error; '
 
     # Retrieve CRS string for mosaic
-    try:
-        odm_dm = opals.pyDM.Datamanager.load(odm_mosaic)
-        crs_str = odm_dm.getCRS()
-        # Check whether CRS exists, if not assign, if different throw error.
-        if crs_str == settings.crs:
-            return_value = return_value + 'Mosaic: match;'
-        elif crs_str == '':
-            odm_dm.setCRS(settings.crs)
-            return_value = return_value + 'Mosaic: empty - set;'
-        else:
-            return_value = return_value + 'Mosaic: warning - no match;'
-        odm_dm = None  # This is needed as opals locks the file connection otherwise.
-    except:
-        return_value = return_value + 'Mosaic: error;'
+    if mosaic == True:
+        try:
+            odm_dm = opals.pyDM.Datamanager.load(odm_mosaic)
+            crs_str = odm_dm.getCRS()
+            # Check whether CRS exists, if not assign, if different throw error.
+            if crs_str == settings.crs_wkt_opals:
+                return_value = return_value + 'Mosaic: match;'
+            elif crs_str == '':
+                odm_dm.setCRS(settings.crs_wkt_opals)
+                return_value = return_value + 'Mosaic: empty - set;'
+            else:
+                return_value = return_value + 'Mosaic: warning - no match;'
+            odm_dm = None  # This is needed as opals locks the file connection otherwise.
+        except:
+            return_value = return_value + 'Mosaic: error;'
 
     return return_value
 
@@ -503,7 +505,9 @@ def odm_export_point_count(tile_id, name = 'vegetation_point_count',
     out_folder = settings.output_folder + '/point_count'
 
     if lower_limit < 10 and lower_limit >= 0: lower_limit_str = '0' + str(lower_limit)
+    elif lower_limit == -1: lower_limit_str = '-01'
     else: lower_limit_str = str(lower_limit)
+
     if upper_limit < 10 and upper_limit >= 0: upper_limit_str = '0' + str(upper_limit)
     else: upper_limit_str = str(upper_limit)
 
@@ -717,12 +721,12 @@ def odm_export_proportions(tile_id):
     return_values = []
 
     ## Export canopy openness
-    return_values.append(odm_calc_proportions(tile_id, 'canopy_openness', 'ground_and_water_point_count_-1m-1m',
-                                              'total_point_count_-1m-50m'))
+    return_values.append(odm_calc_proportions(tile_id, 'canopy_openness', 'ground_and_water_point_count_-01m-01m',
+                                              'total_point_count_-01m-50m'))
 
     ## Export vegeation density
-    return_values.append(odm_calc_proportions(tile_id, 'vegetation_density', 'vegetation_point_count_0m-50m',
-                                              'total_point_count_-1m-50m'))
+    return_values.append(odm_calc_proportions(tile_id, 'vegetation_density', 'vegetation_point_count_00m-50m',
+                                              'total_point_count_-01m-50m'))
 
     ## Export canopy height profile
     # 0-2 m at 0.5 m intervals
@@ -730,41 +734,41 @@ def odm_export_proportions(tile_id):
         veg_height_bin = 'vegetation_point_count_0' + str(lower) + 'm-0' + str(lower + 0.5) + 'm'
         prop_variable_bin = 'vegetation_proportion_0' + str(lower) + 'm-0' + str(lower + 0.5) + 'm'
         return_values.append(odm_calc_proportions(tile_id, prop_variable_bin, veg_height_bin,
-                                                  'vegetation_point_count_0m-50m'))
+                                                  'vegetation_point_count_00m-50m'))
 
     # 2-9 m at 1 m intervals
     for lower in range(2, 8, 1):
-        veg_height_bin = 'vegetation_point_count_' + str(lower) + 'm-' + str(lower + 1) + 'm'
-        prop_variable_bin = 'vegetation_proportion_' + str(lower) + 'm-' + str(lower + 1) + 'm'
+        veg_height_bin = 'vegetation_point_count_0' + str(lower) + 'm-0' + str(lower + 1) + 'm'
+        prop_variable_bin = 'vegetation_proportion_0' + str(lower) + 'm-0' + str(lower + 1) + 'm'
         return_values.append(odm_calc_proportions(tile_id, prop_variable_bin, veg_height_bin,
-                                                   'vegetation_point_count_0m-50m'))
+                                                   'vegetation_point_count_00m-50m'))
 
     # 9-10 m
     return_values.append(odm_calc_proportions(tile_id, 'vegetation_proportion_09m-10m',
                                               'vegetation_point_count_09m-10m',
-                                              'vegetation_point_count_0m-50m'))
+                                              'vegetation_point_count_00m-50m'))
 
     # 10-20 m at 1 m intervals
     for lower in range(10, 19, 1):
         veg_height_bin = 'vegetation_point_count_' + str(lower) + 'm-' + str(lower + 1) + 'm'
         prop_variable_bin = 'vegetation_proportion_' + str(lower) + 'm-' + str(lower + 1) + 'm'
         return_values.append(odm_calc_proportions(tile_id, prop_variable_bin, veg_height_bin,
-                                                  'vegetation_point_count_0m-50m'))
+                                                  'vegetation_point_count_00m-50m'))
 
     # 20-25 m
     return_values.append(odm_calc_proportions(tile_id, 'vegetation_proportion_20m-25m',
                                               'vegetation_point_count_20m-25m',
-                                              'vegetation_point_count_0m-50m'))
+                                              'vegetation_point_count_00m-50m'))
 
     # 25-50 m
     return_values.append(odm_calc_proportions(tile_id, 'vegetation_proportion_25m-50m',
                                               'vegetation_point_count_25m-50m',
-                                              'vegetation_point_count_0m-50m'))
+                                              'vegetation_point_count_00m-50m'))
 
     # Export building proportion
     return_values.append(odm_calc_proportions(tile_id, 'building_proportion',
-                                              'building_point_count_-1m-50m',
-                                              'total_point_count_-1m-50m'))
+                                              'building_point_count_-01m-50m',
+                                              'total_point_count_-01m-50m'))
 
     # Set return value status
     # There are only two return value states so if there is more than one return value in the list

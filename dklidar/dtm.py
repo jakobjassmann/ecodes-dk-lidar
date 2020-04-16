@@ -109,6 +109,56 @@ def dtm_neighbourhood_mosaic(tile_id):
 
     return return_value
 
+## Validate crs
+def dtm_validate_crs(tile_id, mosaic = True):
+    """
+    Function to validate the crs for dtm files (single tile and mosaic)
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+    :param mosaic: if Ture validates crs for mosaic also, default: True.
+    :return: execution status
+    """
+
+    # Initiate return value
+    return_value = ''
+
+    # Generate odm files path names
+    dtm_file = settings.dtm_folder + '/DTM_1km_' + tile_id + '.tif'
+    dtm_mosaic = settings.dtm_mosaics_folder + '/dtm_' + tile_id + '_mosaic.tif'
+
+    # Retrieve CRS string for single tile
+    try:
+        odm_dm = opals.pyDM.Datamanager.load(dtm_file)
+        crs_str = odm_dm.getCRS()
+        # Check whether CRS exists, if not assign, if different throw error.
+        if crs_str == settings.crs_wkt_gdal:
+            return_value = 'Single: match; '
+        elif crs_str == '':
+            odm_dm.setCRS(settings.crs_wkt_gdal)
+            return_value = 'Single: empty - set; '
+        else:
+            return_value = 'Single: warning - no match; '
+        odm_dm = None  # This is needed as opals locks the file connection otherwise.
+    except:
+        return_value = 'Single: error; '
+
+    # Retrieve CRS string for mosaic
+    if mosaic == True:
+        try:
+            odm_dm = opals.pyDM.Datamanager.load(dtm_mosaic)
+            crs_str = odm_dm.getCRS()
+            # Check whether CRS exists, if not assign, if different throw error.
+            if crs_str == settings.crs_wkt_gdal:
+                return_value = return_value + 'Mosaic: match;'
+            elif crs_str == '':
+                odm_dm.setCRS(settings.crs_wkt_gdal)
+                return_value = return_value + 'Mosaic: empty - set;'
+            else:
+                return_value = return_value + 'Mosaic: warning - no match;'
+            odm_dm = None  # This is needed as opals locks the file connection otherwise.
+        except:
+            return_value = return_value + 'Mosaic: error;'
+
+    return return_value
 
 ## Aggregate dem to 10 m
 def dtm_aggregate_tile(tile_id):
