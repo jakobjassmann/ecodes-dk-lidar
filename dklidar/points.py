@@ -676,7 +676,7 @@ def odm_calc_proportions(tile_id, prop_name, point_count_id1, point_count_id2):
               '-A ' + num_file + ' ' +\
               '-B ' + den_file + ' ' +\
               '--outfile=' + temp_file + ' ' + \
-              '--type=Float32 ' +\
+              '--type=Int16 ' +\
               '--calc=rint(10000*true_divide(A,B)) ' + \
               '--NoDataValue=-9999'
         log_file.write(cmd)

@@ -19,8 +19,7 @@ startTime = datetime.datetime.now()
 return_value = ''
 log_output = ''
 #-------------------------------
-print dtm.dtm_neighbourhood_mosaic(tile_id)
-print dtm.dtm_validate_crs(tile_id)
+print points.odm_export_proportions(tile_id)
 #--------------
 print '#' * 80
 print log_output
