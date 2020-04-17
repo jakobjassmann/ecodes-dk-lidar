@@ -988,7 +988,7 @@ def odm_export_point_source_info(tile_id):
         cmd = settings.gdal_calc_bin + files_string + '--outfile=' + temp_wd + '/temp_total_points.tif ' + \
               '--calc=' + equation + ' --NoDataValue=-9999'
         # Execute gdal command
-        
+
         log_file.write('\n' + tile_id + ' created temporary total point count file. \n' + \
                        subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT))
 

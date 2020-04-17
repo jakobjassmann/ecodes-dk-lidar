@@ -291,7 +291,7 @@ def generate_water_masks(tile_id):
     return return_value
 
 ## Function to apply water masks, sea or inland water.
-def apply_mask(target_raster = '', sea_mask = True, inland_water_mask = True):
+def apply_mask(target_raster = '', sea_mask = False, inland_water_mask = False):
     """
     For a given target raster, this function masks all sea off the coastline of Denmark (sea_mask = True) or all inland water
     bodies such as lakes or ponds (inland_water_mask = True) or both.
