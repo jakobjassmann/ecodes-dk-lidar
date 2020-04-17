@@ -198,12 +198,12 @@ def odm_validate_crs(tile_id, mosaic = False):
         crs_str = odm_dm.getCRS()
         # Check whether CRS exists, if not assign, if different throw error.
         if crs_str == settings.crs_wkt_opals:
-            return_value = 'Single: match; '
+            return_value = 'Tile: match'
         elif crs_str == '':
             odm_dm.setCRS(settings.crs_wkt_opals)
-            return_value = 'Single: empty - set; '
+            return_value = 'Tile: empty - set'
         else:
-            return_value = 'Single: warning - no match; '
+            return_value = 'Tile: warning - no match'
         odm_dm = None  # This is needed as opals locks the file connection otherwise.
     except:
         return_value = 'Single: error; '
@@ -215,12 +215,12 @@ def odm_validate_crs(tile_id, mosaic = False):
             crs_str = odm_dm.getCRS()
             # Check whether CRS exists, if not assign, if different throw error.
             if crs_str == settings.crs_wkt_opals:
-                return_value = return_value + 'Mosaic: match;'
+                return_value = return_value + '; Mosaic: match'
             elif crs_str == '':
                 odm_dm.setCRS(settings.crs_wkt_opals)
-                return_value = return_value + 'Mosaic: empty - set;'
+                return_value = return_value + '; Mosaic: empty - set'
             else:
-                return_value = return_value + 'Mosaic: warning - no match;'
+                return_value = return_value + '; Mosaic: warning - no match'
             odm_dm = None  # This is needed as opals locks the file connection otherwise.
         except:
             return_value = return_value + 'Mosaic: error;'

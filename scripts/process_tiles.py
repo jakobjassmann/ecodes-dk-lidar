@@ -205,6 +205,14 @@ def process_tile(tile_id):
     # gather logs for step and tile]
     common.gather_logs('process_tiles', 'dtm_neighbourhood_mosaic', tile_id)
 
+    ## Validate CRS
+    return_value = dtm.dtm_validate_crs(tile_id)
+    # Update progress variables
+    steps.append('dtm_validate_crs')
+    status_steps.append([return_value])
+    # gather logs for step and tile]
+    common.gather_logs('process_tiles', 'dtm_validate_crs', tile_id)
+
     ## Generate 10 m aggregate of DEM
     return_value = dtm.dtm_aggregate_tile(tile_id)
     # Update progress variables

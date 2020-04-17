@@ -12,14 +12,15 @@ import pandas
 import shutil
 import datetime
 from dklidar import common
-opals.loadAllModules()
+#opals.loadAllModules()
 tile_id = '6210_570'
 ## Start timer
 startTime = datetime.datetime.now()
 return_value = ''
 log_output = ''
 #-------------------------------
-points.odm_export_point_source_info(tile_id)
+print dtm.dtm_neighbourhood_mosaic(tile_id)
+print dtm.dtm_validate_crs(tile_id)
 #--------------
 print '#' * 80
 print log_output

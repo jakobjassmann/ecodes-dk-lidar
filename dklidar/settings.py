@@ -19,7 +19,7 @@ gdal_merge_bin = 'C:/OSGeo4W64/OSGeo4W.bat gdal_merge '
 gdaltransform_bin = 'C:/OSGeo4W64/OSGeo4W.bat gdaltransform '
 gdalinfo_bin = 'C:/OSGeo4W64/OSGeo4W.bat gdalinfo '
 gdal_rasterize_bin = 'C:/OSGeo4W64/OSGeo4W.bat gdal_rasterize '
-
+gdalsrsinfo_bin = 'C:/OSGeo4W64/OSGeo4W.bat gdalsrsinfo '
 # Saga binary commands
 saga_wetness_bin = 'C:/OSGeo4W64/apps/saga-ltr/saga_cmd.exe --cores=1 ta_hydrology 15 '
 saga_openness_bin = 'C:/OSGeo4W64/apps/saga-ltr/saga_cmd.exe --cores=1 ta_lighting 5 '
