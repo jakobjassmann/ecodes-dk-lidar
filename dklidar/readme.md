@@ -48,7 +48,7 @@ Function | Description
 odm_import_single_tile | Imports a laz pointcloud file into ODM for a single tile.
 odm_import_mosaic | Creates an odm tile mosaic by importing the whole neighbourhood of a tile.
 odm_generate_footprint | Generates the footprint for the odm of a single tile.
-odm_validate_crs | validates the crs for single tile odm or neigbourhood mosaic odm.
+odm_validate_crs | validates the crs for single tile odm or neigbourhood mosaic odm (default: only tile).
 odm_add_normalized_z | Adds normalised height attribute to an ODM point cloud (single or mosaic).
 odm_export_normalized_z | Exports mean and sd of normalised height for a given tile.
 odm_export_canopy_height | Exports canopy height as normalised height attribute of the 0.95th-quantile.
@@ -70,6 +70,7 @@ Function | Description
 --- | ---
 dtm_generate_footprint | Generates footprint for a single dtm tile.
 dtm_neighbourhood_mosaic | Creates neigbhourhood mosaic of dtm tiles.
+dtm_validate_crs | Validates crs for single tiles and mosaics (both switched on by default).
 dtm_aggregate_tile | Generates a 10 m aggregate of the 0.4 m dtm tiles.
 dtm_calc_slope | Calculates the slope from a dtm neighbourhood mosaic, aggregates and crops oupput to a 10 msingle tile raster.
 dtm_calc_aspect | Calculates the aspect from a dtm neighbourhood mosaic, aggregates and crops oupput to a 10 msingle tile raster.
