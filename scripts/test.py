@@ -19,7 +19,12 @@ startTime = datetime.datetime.now()
 return_value = ''
 log_output = ''
 #-------------------------------
-print points.odm_export_proportions(tile_id)
+out_folder = settings.output_folder + '/openness_mean'
+common.apply_mask(out_folder + '/openness_mean_' + tile_id + '.tif ',  sea_mask = True, inland_water_mask = True)
+out_folder = settings.output_folder + '/openness_difference'
+print common.apply_mask(out_folder + '/openness_difference_' + tile_id + '.tif ',
+                        sea_mask=True, inland_water_mask=True
+                        )
 #--------------
 print '#' * 80
 print log_output

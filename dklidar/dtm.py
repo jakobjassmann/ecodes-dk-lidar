@@ -670,12 +670,12 @@ def dtm_openness_mean(tile_id):
               ' -cutline ' + settings.dtm_footprint_folder + '/DTM_1km_' + tile_id + '_footprint.shp ' + \
               '-crop_to_cutline -overwrite ' + \
               wd + '/landscape_openness_' + tile_id + '_mosaic_cropped.tif ' + \
-              out_folder + '/openness_mean' + tile_id + '.tif '
+              out_folder + '/openness_mean_' + tile_id + '.tif '
         log_file.write(subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
                      '\n' + tile_id + ' landscape openness calculation successful.\n\n')
 
         # Apply mask(s)
-        common.apply_mask(out_folder + '/openness_mean' + tile_id + '.tif ')
+        common.apply_mask(out_folder + '/openness_mean_' + tile_id + '.tif ')
 
         return_value = 'success'
 
@@ -798,12 +798,12 @@ def dtm_openness_difference(tile_id):
               ' -cutline ' + settings.dtm_footprint_folder + '/DTM_1km_' + tile_id + '_footprint.shp ' + \
               '-crop_to_cutline -overwrite ' + \
               wd + '/diff_openness_' + tile_id + '_mosaic_cropped.tif ' + \
-              out_folder + '/openness_difference' + tile_id + '.tif '
+              out_folder + '/openness_difference_' + tile_id + '.tif '
         log_file.write(subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
                      '\n' + tile_id + ' openness calculation successful.\n\n')
 
         # Apply mask(s)
-        common.apply_mask(wd + '/diff_openness_' + tile_id + '_mosaic_cropped.tif ')
+        common.apply_mask(out_folder + '/openness_difference_' + tile_id + '.tif ')
 
         return_value = 'success'
 
