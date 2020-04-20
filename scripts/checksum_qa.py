@@ -7,14 +7,15 @@ import os
 import glob
 import numpy as np
 import pandas
+from dklidar import settings
 
 # Read in filenames using unix filename extensions from glob
 # 1) Pointcloud files (laz)
-orig_md5_files = glob.glob("data/laz/*.md5")
-local_md5_files = glob.glob("data/laz/*.local_md5")
+orig_md5_files = glob.glob(settings.laz_folder + '*.md5')
+local_md5_files = glob.glob(settings.laz_folder + '*.local_md5')
 # 2) DTM files (tif)
-orig_md5_files.extend(glob.glob("data/dtm/*.md5"))
-local_md5_files.extend(glob.glob("data/dtm/*.local_md5"))
+orig_md5_files.extend(glob.glob(settings.dtm_folder + "*.md5"))
+local_md5_files.extend(glob.glob(settings.dtm_folder + "*.local_md5"))
 
 # Initiate empty lists
 md5_orig = list()
