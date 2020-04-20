@@ -23,7 +23,9 @@ update_interval = 60 # 60 s
 laz_files = glob.glob(settings.laz_folder + '/*.laz')
 n_total = len(laz_files)
 
-# Initate progress variable
+# set start date and time:
+start_time = datetime.datetime.fromtimestamp(os.path.getmtime(settings.log_folder + '/process_tiles/overall_progress.csv'))
+# Initate progress variables
 progress = 0
 
 # Update progress till complete
@@ -34,28 +36,37 @@ while progress < 1:
     n_processed = n_sum - n_processes
     progress = float(n_processed) / float(n_total)
 
+    # Calculate time differences
+    time_passed = datetime.datetime.now() - start_time
+    time_estimated = (time_passed / n_processed) * (n_total - n_processed)
+
     # Print stats on screen
     os.system('cls')
     print('\n')
     print('-' * 80),
     print(' ' * (79 - len('Jakob Assmann j.assmann@bios.au.dk 2020 ')) +
           'Jakob Assmann j.assmann@bios.au.dk 2020 ')
-    print(' \'process_tiles.py\' progress...')
+    print(' \'process_tiles.py\' progress:')
     print('  - processing with ' + str(n_processes) + ' parallel threads')
+    print('  - start time: ' + str(start_time.ctime()))
     print('  - execute \'stop.bat\' to pause \ interrupt processing')
     print('\n')
     print(' update interval: ' + str(update_interval) + ' s' +
           ' ' * (79 - len(' update interval: ' + str(update_interval) + ' s' + 'last update: ' + str(datetime.datetime.now().ctime()))) +
           'last update: ' + str(datetime.datetime.now().ctime()))
     print('-' * 80)
-    print('\n' * 4)
+    print('\n' * 2)
     print(' ' + str(n_processed) + ' / ' + str(n_total) + ' tiles' +
           ' ' * (80 - len(' ' + str(n_processed) + ' / ' + str(n_total) + ' tiles' + str(int(round(progress * 100))) + '% ')) +
-          str(int(round(progress * 100))) + '% ')
+          str(int(round(progress * 100))) + '%'),
     print('-' * 80),
     print('#' * int(round(78*progress)))
-    print('-' * 80)
-    print(' ' * (79 - len('press CRTL+C to exit progress monitor ')) + 'press CRTL+C to exit progress monitor '),
+    print('-' * 80),
+    print('passed: ' + str(time_passed).split('.')[0] +
+          ' ' * (79 - len('passed: ' + str(time_passed).split('.')[0] +
+                          'remaining (estimate): ' + str(time_estimated).split('.')[0] + ' ')) +
+          'remaining (estimate): ' + str(time_estimated).split('.')[0] + ' ')
+    print(' ' * (79 - len('press CRTL+C to exit progress monitor ')) + 'press CRTL+C to exit progress monitor ')
     # Wait for next update
     time.sleep(update_interval)
 
