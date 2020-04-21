@@ -40,6 +40,14 @@ while progress < 1:
     time_passed = datetime.datetime.now() - start_time
     time_estimated = (time_passed / n_processed) * (n_total - n_processed)
 
+    # Check whether the overall_progress.csv has been updated, if so
+    # assume the processing of the last 54 files is done
+    overal_progress_timestamp = datetime.datetime.fromtimestamp(
+        os.path.getmtime(settings.log_folder + '/process_tiles/overall_progress.csv'))
+    if not overal_progress_timestamp == start_time:
+        progress = 1
+        n_processed = n_total
+
     # Print stats on screen
     os.system('cls')
     print('\n')
@@ -67,6 +75,7 @@ while progress < 1:
                           'remaining (estimate): ' + str(time_estimated).split('.')[0] + ' ')) +
           'remaining (estimate): ' + str(time_estimated).split('.')[0] + ' ')
     print(' ' * (79 - len('press CRTL+C to exit progress monitor ')) + 'press CRTL+C to exit progress monitor ')
+
     # Wait for next update
     time.sleep(update_interval)
 

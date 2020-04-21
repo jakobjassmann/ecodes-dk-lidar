@@ -15,7 +15,7 @@ mkdir %data_path_laz%
 mkdir %data_path_dtm%
 
 REM download and unzip LAZ files
-FOR /F %%A in (D:\Jakob\dk_nationwide_lidar\data\kortforsyningen_file_lists\all_laz_files.txt) DO (
+FOR /F %%A in (D:\Jakob\dk_nationwide_lidar\data\file_lists_kortforsyningen\all_laz_files.txt) DO (
   echo downloading %%A ... 
   REM NB: A cookie is needd to access the data. To generate the following curl command you can use Google Chrome.
   REM     First, log into the kortforsyningen website then select one tile from the laz files in the catalogues and check out
@@ -31,7 +31,7 @@ FOR /F %%A in (D:\Jakob\dk_nationwide_lidar\data\kortforsyningen_file_lists\all_
 )
 
 REM download and unzip DTM files
-FOR /F %%A in (D:\Jakob\dk_nationwide_lidar\data\kortforsyningen_file_lists\all_dtm_files.txt) DO (
+FOR /F %%A in (D:\Jakob\dk_nationwide_lidar\data\file_lists_kortforsyningen\all_dtm_files.txt) DO (
   echo downloading %%A ... 
   REM See not above on how to construct the following curl command. Here replace the URI with "%remote_url_dtm%%%A"  and
   REM add --output "%data_path_dtm%%%A to the curl command retrieved from Google Chrome. 
