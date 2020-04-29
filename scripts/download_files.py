@@ -26,14 +26,13 @@ def download_file(file_name):
     :param file_name - file name on server and to be saved as
     :returns exit code of curl download command
     """
-    file_type = re.sub('.*_([A-Z]{3})_.*', '\g<1>', file_name)
     remote_url = 'empty_url'
     local_path = '/empty_path'
 
-    if file_type == "LAZ":
+    if not(re.match('.*LAZ.*', file_name) is None):
         remote_url = remote_url_laz + file_name
         local_path = settings.laz_folder + file_name
-    if file_type == "DTM":
+    if not (re.match('.*DTM.*', file_name) is None):
         remote_url = remote_url_dtm + file_name
         local_path = settings.dtm_folder + file_name
 
@@ -68,14 +67,13 @@ def extract_file(file_name):
     :param file_name - file name on server and to be saved as
     :returns exit code of curl download command
     """
-    file_type = re.sub('.*_([A-Z]{3})_.*', '\g<1>', file_name)
     local_path = '/empty_path'
+    dest_folder = '/empty_path'
 
-    print file_type
-    if file_type == "LAZ":
+    if not(re.match('.*LAZ.*', file_name) is None):
         local_path = settings.laz_folder + file_name
         dest_folder = settings.laz_folder
-    if file_type == "DTM":
+    if not (re.match('.*DTM.*', file_name) is None):
         local_path = settings.dtm_folder + file_name
         dest_folder = settings.dtm_folder
 
@@ -117,54 +115,54 @@ if __name__ == '__main__':
 
     # Prepare download lists
     laz_files_to_download = laz_files_df['file_name'][laz_files_df['download'] != 'success'].tolist()
-    dtm_files_to_download = laz_files_df['file_name'][laz_files_df['download'] != 'success'].tolist()
-
-    laz_files_to_download = laz_files_to_download[0:6]
-    dtm_files_to_download = dtm_files_to_download[0:6]
+    dtm_files_to_download = dtm_files_df['file_name'][laz_files_df['download'] != 'success'].tolist()
 
     # Prep processing pool
     multiprocessing.set_executable(settings.python_exec_path)
-    pool = multiprocessing.Pool(processes=6)
+    pool = multiprocessing.Pool(processes=4)
 
     # Download LAZ files
-    print(datetime.datetime.now().strftime('%X') + ' Downloading ' +  str(len(laz_files_to_download)) + ' laz files: '),
-    download_pool = pool.map_async(download_file, laz_files_to_download)
-    download_pool.wait()
-    laz_files_df['download'][0:6] = download_pool.get()
+    if len(laz_files_to_download) > 0:
+        print(datetime.datetime.now().strftime('%X') + ' Downloading ' +  str(len(laz_files_to_download)) + ' laz files: '),
+        download_pool = pool.map_async(download_file, laz_files_to_download)
+        download_pool.wait()
+        laz_files_df['download'] = download_pool.get()
+    else: print('No LAZ files to download.')
     print('\n')
 
     # Download DTM files
-    print(datetime.datetime.now().strftime('%X') + ' Downloading ' + str(len(dtm_files_to_download)) + ' dtm files: '),
-    download_pool = pool.map_async(download_file, dtm_files_to_download)
-    download_pool.wait()
-    dtm_files_df['download'][0:6] = download_pool.get()
+    if len(dtm_files_to_download) > 0:
+        print(datetime.datetime.now().strftime('%X') + ' Downloading ' + str(len(dtm_files_to_download)) + ' dtm files: '),
+        download_pool = pool.map_async(download_file, dtm_files_to_download)
+        download_pool.wait()
+        dtm_files_df['download'] = download_pool.get()
+    else: print('No DTM files to download.')
     print('\n')
 
     # Prepare extraction lists
     laz_files_to_extract = laz_files_df['file_name'][laz_files_df['extraction'] != 'success'].tolist()
-    dtm_files_to_extract = laz_files_df['file_name'][laz_files_df['extraction'] != 'success'].tolist()
+    dtm_files_to_extract = dtm_files_df['file_name'][dtm_files_df['extraction'] != 'success'].tolist()
 
-    laz_files_to_extract = laz_files_to_extract[0:6]
-    dtm_files_to_extract = dtm_files_to_extract[0:6]
 
-    # Extract LAZ files
-    print(datetime.datetime.now().strftime('%X') + ' Extracting ' + str(len(laz_files_to_extract)) + ' laz files: '),
-    download_pool = pool.map_async(extract_file, laz_files_to_extract)
-    download_pool.wait()
-    laz_files_df['extraction'][0:6] = download_pool.get()
+    # # Extract LAZ files
+    if len(laz_files_to_extract) > 0:
+        print(datetime.datetime.now().strftime('%X') + ' Extracting ' + str(len(laz_files_to_extract)) + ' laz files: '),
+        download_pool = pool.map_async(extract_file, laz_files_to_extract)
+        download_pool.wait()
+        laz_files_df['extraction'] = download_pool.get()
+    else: print('No LAZ files to extract.')
     print('\n')
 
     # Extract DTM files
-    print(datetime.datetime.now().strftime('%X') + ' Extracting ' + str(len(dtm_files_to_extract)) + ' dtm files: '),
-    download_pool = pool.map_async(extract_file, dtm_files_to_extract)
-    download_pool.wait()
-    dtm_files_df['extraction'][0:6] = download_pool.get()
+    if len(dtm_files_to_extract) > 0:
+        print(datetime.datetime.now().strftime('%X') + ' Extracting ' + str(len(dtm_files_to_extract)) + ' dtm files: '),
+        download_pool = pool.map_async(extract_file, dtm_files_to_extract)
+        download_pool.wait()
+        dtm_files_df['extraction'][dtm_files_df['extraction'] != 'success'] = download_pool.get()
+    else: print('No LAZ files to extract.')
     print('\n')
 
-    #laz_files_df.to_csv(file_list_laz, index=False, header=False)
-    #dtm_files_df.to_csv(file_list_dtm, index=False, header=False)
-
-    print laz_files_df.head()
-    print dtm_files_df.head()
+    laz_files_df.to_csv(file_list_laz, index=False, header=True)
+    dtm_files_df.to_csv(file_list_dtm, index=False, header=True)
 
     print('-' * 80 + '\nDone.\nTime elapsed: ' + str(datetime.datetime.now() - startTime))

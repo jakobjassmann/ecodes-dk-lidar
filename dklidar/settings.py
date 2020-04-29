@@ -31,7 +31,7 @@ wd = 'D:/Jakob/dk_nationwide_lidar'
 # Point cloud folder
 laz_folder = wd + '/data/laz/'
 # DTM folder
-dtm_folder = wd + '/data/dtm'
+dtm_folder = wd + '/data/dtm/'
 
 # DTM mosaics and footprints
 dtm_mosaics_folder = wd + '/data/sample/dtm_mosaics'

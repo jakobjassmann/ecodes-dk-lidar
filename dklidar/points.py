@@ -617,7 +617,7 @@ def odm_export_point_counts(tile_id):
         return_values.append(odm_export_point_count(tile_id, 'vegetation_point_count', lower, lower + 0.5, [3,4,5]))
 
     # 2-20 m at 1 m intervals
-    for lower in range(2, 19, 1):
+    for lower in range(2, 20, 1):
         return_values.append(odm_export_point_count(tile_id, 'vegetation_point_count', lower, lower + 1, [3,4,5]))
 
     # 20-25 m at 5 m interval
@@ -749,7 +749,7 @@ def odm_export_proportions(tile_id):
                                               'vegetation_point_count_00m-50m'))
 
     # 10-20 m at 1 m intervals
-    for lower in range(10, 19, 1):
+    for lower in range(10, 20, 1):
         veg_height_bin = 'vegetation_point_count_' + str(lower) + 'm-' + str(lower + 1) + 'm'
         prop_variable_bin = 'vegetation_proportion_' + str(lower) + 'm-' + str(lower + 1) + 'm'
         return_values.append(odm_calc_proportions(tile_id, prop_variable_bin, veg_height_bin,
