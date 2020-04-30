@@ -37,7 +37,7 @@ def odm_import_single_tile(tile_id):
         import_tile.outFile = odm_file
         import_tile.commons.screenLogLevel = opals.Types.LogLevel.none
         import_tile.run()
-        return_value = 'complete'
+        return_value = 'success'
     except:
         return_value = 'opalsError'
 
@@ -101,7 +101,7 @@ def odm_import_mosaic(tile_id):
         import_tile.commons.screenLogLevel = opals.Types.LogLevel.none
         import_tile.run()
         log_file.write(tile_id + ' success.\n\n')
-        return_value = return_value + 'complete'
+        return_value = return_value + 'success'
         if n_neighbours != 9: return_value = 'Warning: Incomplete Neighbourhood!'
     except:
         return_value = 'opalsError'
@@ -157,7 +157,7 @@ def odm_generate_footprint(tile_id):
             subprocess.check_output(cmd, shell=False,  stderr=subprocess.STDOUT) + \
                      tile_id + ' successful.\n\n')
         # set exit status
-        return_value = 'complete'
+        return_value = 'success'
     except:
         log_file.write('\n' + tile_id + ' footprint generation... \n' + tile_id + ' failed.\n\n')
         if return_value == 'opalsError': pass
@@ -1092,13 +1092,13 @@ def odm_remove_temp_files(tile_id):
 
     try:
         os.remove(odm_file)
-        return_value('success')
+        return_value = 'success'
     except:
         return_value = 'unable to delete odm file'
 
     try:
         for file in odm_footprint_files: os.remove(file)
-        return_value('success')
+        return_value = 'success'
     except:
         return_value = return_value + 'unable to delete odm footprint file'
 

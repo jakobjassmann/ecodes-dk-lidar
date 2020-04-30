@@ -1024,13 +1024,13 @@ def dtm_remove_temp_files(tile_id):
 
     try:
         os.remove(dtm_mosaic)
-        return_value('success')
+        return_value = 'success'
     except:
         return_value = 'unable to delete dtm mosaic file'
 
     try:
         for file in dtm_footprint_files: os.remove(file)
-        return_value('success')
+        return_value = 'success'
     except:
         return_value = return_value + 'unable to delete dtm footprint file'
 
