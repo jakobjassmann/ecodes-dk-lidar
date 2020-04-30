@@ -12,19 +12,20 @@ import pandas
 import shutil
 import datetime
 from dklidar import common
-#opals.loadAllModules()
-tile_id = '6210_570'
+opals.loadAllModules()
+tile_id = '6211_579'
 ## Start timer
 startTime = datetime.datetime.now()
 return_value = ''
 log_output = ''
 #-------------------------------
-out_folder = settings.output_folder + '/openness_mean'
-common.apply_mask(out_folder + '/openness_mean_' + tile_id + '.tif ',  sea_mask = True, inland_water_mask = True)
-out_folder = settings.output_folder + '/openness_difference'
-print common.apply_mask(out_folder + '/openness_difference_' + tile_id + '.tif ',
-                        sea_mask=True, inland_water_mask=True
-                        )
+print points.odm_import_single_tile(tile_id)
+print points.odm_validate_crs(tile_id)
+print points.odm_add_normalized_z(tile_id)
+print points.odm_generate_footprint(tile_id)
+print points.odm_export_canopy_height(tile_id)
+#points.odm_export_point_counts(tile_id)
+#points.odm_export_proportions(tile_id)
 #--------------
 print '#' * 80
 print log_output

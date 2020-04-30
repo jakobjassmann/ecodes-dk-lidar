@@ -737,7 +737,7 @@ def odm_export_proportions(tile_id):
                                                   'vegetation_point_count_00m-50m'))
 
     # 2-9 m at 1 m intervals
-    for lower in range(2, 8, 1):
+    for lower in range(2, 9, 1):
         veg_height_bin = 'vegetation_point_count_0' + str(lower) + 'm-0' + str(lower + 1) + 'm'
         prop_variable_bin = 'vegetation_proportion_0' + str(lower) + 'm-0' + str(lower + 1) + 'm'
         return_values.append(odm_calc_proportions(tile_id, prop_variable_bin, veg_height_bin,
