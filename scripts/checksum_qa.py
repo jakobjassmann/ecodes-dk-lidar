@@ -7,6 +7,7 @@ import os
 import glob
 import numpy as np
 import pandas
+import re
 from dklidar import settings
 
 # Read in filenames using unix filename extensions from glob
@@ -49,4 +50,43 @@ damaged_files = df[df['md5_check'] == False]
 print(damaged_files)
 
 # Export csv
-damaged_files.to_csv('data/damaged_files.csv', index=False)
+damaged_files.to_csv(settings.laz_folder + '../damaged_files.csv', index=False)
+
+# Check for completeness
+# Load file names
+dtm_files = glob.glob(settings.dtm_folder + '/*.tif')
+laz_files = glob.glob(settings.laz_folder + '/*.laz')
+
+# initiate empty lists for tile_ids
+dtm_tile_ids = []
+laz_tile_ids = []
+
+# fill dictionaries with tile_id, as well as row number and column number for each file name:
+for file_name in dtm_files:
+    tile_id = re.sub('.*DTM_1km_(\d*_\d*).tif', '\g<1>', file_name)
+    dtm_tile_ids.append(tile_id)
+
+for file_name in laz_files:
+    tile_id = re.sub('.*PUNKTSKY_1km_(\d*_\d*).laz', '\g<1>', file_name)
+    laz_tile_ids.append(tile_id)
+
+missing_laz_tiles = set(dtm_tile_ids) - set(laz_tile_ids)
+missing_dtm_tiles = set(laz_tile_ids) - set(dtm_tile_ids)
+
+df_missing_dtm = pandas.DataFrame(zip(missing_dtm_tiles), columns=['tile_id'])
+df_missing_dtm.to_csv(settings.laz_folder + '../missing_dtm_tile_ids.csv', index=False)
+print(df_missing_dtm.head())
+df_missing_laz = pandas.DataFrame(zip(missing_laz_tiles), columns=['tile_id'])
+df_missing_laz.to_csv(settings.laz_folder + '../missing_laz_tile_ids.csv', index=False)
+print(df_missing_laz.head())
+
+out_file = open(settings.laz_folder + '../dtm_files_with_missing_laz.txt', 'a+')
+for tile_id in missing_laz_tiles:
+    out_file.write('D:/Jakob/dk_nationwide_lidar/data/dtm/DTM_1km_' + tile_id + '.tif\n')
+out_file.close()
+
+out_file = open(settings.laz_folder + '../laz_files_with_missing_dtm.txt', 'a+')
+for tile_id in missing_dtm_tiles:
+    out_file.write('D:/Jakob/dk_nationwide_lidar/data/laz/PUNKTSKY_1km_' + tile_id + '.laz\n')
+out_file.close()
+
