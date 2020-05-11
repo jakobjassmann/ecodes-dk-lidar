@@ -29,7 +29,7 @@ saga_openness_bin = 'C:/OSGeo4W64/apps/saga-ltr/saga_cmd.exe --cores=1 ta_lighti
 wd = 'D:/Jakob/dk_nationwide_lidar'
 
 # Point cloud folder
-laz_folder = wd + '/data/laz/'
+laz_folder = wd + '/data/sample/laz/'
 # DTM folder
 dtm_folder = wd + '/data/sample/dtm/'
 
