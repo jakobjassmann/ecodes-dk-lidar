@@ -1,5 +1,6 @@
 # Short script to confirm transferred file integrity using md5 checksums.
-# Prerequisite is that files were transferred using the create_envir.bat
+# Prerequisite is that checsum were generated using create_checksums.bat
+# A comparsions of the sets of laz tiles and dtm tiles is also carried out.
 # Jakob Assmann j.assmann@bios.au.dk 16 January 2020
 
 # Imports
@@ -52,7 +53,9 @@ print(damaged_files)
 # Export csv
 damaged_files.to_csv(settings.laz_folder + '../damaged_files.csv', index=False)
 
-# Check for completeness
+# ---------------------------------------------------
+# Check for completeness of datasets
+
 # Load file names
 dtm_files = glob.glob(settings.dtm_folder + '/*.tif')
 laz_files = glob.glob(settings.laz_folder + '/*.laz')
@@ -70,21 +73,30 @@ for file_name in laz_files:
     tile_id = re.sub('.*PUNKTSKY_1km_(\d*_\d*).laz', '\g<1>', file_name)
     laz_tile_ids.append(tile_id)
 
+# Determine differences between sets of tiles
 missing_laz_tiles = set(dtm_tile_ids) - set(laz_tile_ids)
 missing_dtm_tiles = set(laz_tile_ids) - set(dtm_tile_ids)
 
 df_missing_dtm = pandas.DataFrame(zip(missing_dtm_tiles), columns=['tile_id'])
 df_missing_dtm.to_csv(settings.laz_folder + '../missing_dtm_tile_ids.csv', index=False)
+
+# Print out a quick overview of data frame for control
 print(df_missing_dtm.head())
+
 df_missing_laz = pandas.DataFrame(zip(missing_laz_tiles), columns=['tile_id'])
 df_missing_laz.to_csv(settings.laz_folder + '../missing_laz_tile_ids.csv', index=False)
+
+# Print out a quick overview of data frame for control
 print(df_missing_laz.head())
 
+# Export lists to files
+# DTMs with mkssing LAZs
 out_file = open(settings.laz_folder + '../dtm_files_with_missing_laz.txt', 'a+')
 for tile_id in missing_laz_tiles:
     out_file.write('D:/Jakob/dk_nationwide_lidar/data/dtm/DTM_1km_' + tile_id + '.tif\n')
 out_file.close()
 
+# LAZs with missing DTMs
 out_file = open(settings.laz_folder + '../laz_files_with_missing_dtm.txt', 'a+')
 for tile_id in missing_dtm_tiles:
     out_file.write('D:/Jakob/dk_nationwide_lidar/data/laz/PUNKTSKY_1km_' + tile_id + '.laz\n')
