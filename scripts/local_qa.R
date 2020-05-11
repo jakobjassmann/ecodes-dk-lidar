@@ -213,3 +213,119 @@ test_points_df_converted_long_sub %>% group_by(region, class, variable) %>%
   summarise(mean(value))
 write.csv(test_points_df_converted_long_sub, 
           "D:/Jakob//dk_nationwide_lidar/qa_local/test_points.csv")
+
+
+# Gnereate 4k points in each of the three areas
+#             x       y
+# Aarhus Min: 550006  6210039 
+# Aarhus Max: 579969  6239996
+# Zealand Min: 680075  6180163
+# Zealand Max: 727700  6225883
+# Bornholm Min: 862523  6109819
+# Bornholm Max: 894749  6142680
+
+xmin <- c(550006, 680075, 862523)
+xmax <- c(579969, 727700, 894749)
+ymin <- c(6210039, 6180163, 6109819)
+ymax <- c(6239996, 6225883, 6142680)
+
+sampling_locations <- data.frame(
+  point_id = c(paste0(rep("Aaarhus_", 4000), seq(1,4000,1)),
+               paste0(rep("Zeqland_", 4000), seq(1,4000,1)),
+               paste0(rep("Bornholm_", 4000), seq(1,4000,1))),
+  x = c(runif(4000, xmin[1], xmax[1]),
+        runif(4000, xmin[2], xmax[2]),
+        runif(4000, xmin[3], xmax[3])),
+  y = c(runif(4000, ymin[1], ymax[1]),
+        runif(4000, ymin[2], ymax[2]),
+        runif(4000, ymin[3], ymax[3]))) %>%
+  st_as_sf(coords = c("x", "y"),
+           crs = crs(dtm_stack))
+
+# Extract data
+dtm_sample<- raster:::extract(dtm_stack, sampling_locations, df = T)[-1]
+colnames(dtm_sample) <- names(dtm_stack)
+lidar_sample <- raster:::extract(lidar_stack, sampling_locations, df = T)[-1]
+colnames(lidar_sample) <- gsub("_\\.", "_-", 
+                               gsub("m\\.", "m-", names(lidar_sample)))
+sample_df <- bind_cols(
+  data.frame(point_id = as.data.frame(sampling_locations)[,-2]),
+  dtm_sample,
+  lidar_sample)
+sample_df <- sample_df[sample_df$`ground_point_count_-01m-01m` != 0,]
+
+
+# Check min and  max
+min_vals <- apply(as.matrix(na.omit(sample_df[,c(-1, -9, -10, -70, -71, -73)])),
+                  2, function(x) min(x))
+max_vals <- apply(as.matrix(na.omit(sample_df[,c(-1, -9, -10, -70, -71, -73)])),
+                  2, function(x) max(x))
+min_max_df <- data.frame(variable = names(min_vals),
+                         min = min_vals,
+                         max = max_vals)
+
+# Apply confersion factors
+conv_fac <- read.csv("D:/Jakob/dk_nationwide_lidar/data/auxillary_files/conversion_factors.csv",
+                     stringsAsFactors = F)
+sample_df_converted <- sample_df %>% 
+  colnames %>%
+  map_dfc(function(col_name){
+    if(col_name %in% conv_fac$ï..var_name){
+      conv_factor <- filter(conv_fac, ï..var_name == !!col_name) %>% 
+        pull(conv_fac) %>%
+        pluck(1)
+      column_df <- sample_df %>% 
+        select(col_name) 
+      print(paste0("Factor ", conv_factor, " applied to ", col_name))
+      return(column_df * conv_factor)
+    } else  {
+      print(paste0("No conversion applied to ", col_name))
+      return(sample_df %>% select(!!col_name))
+    }
+  }) 
+
+# Convert into long form and calculate min and max
+sample_df_converted_long <- sample_df_converted %>% 
+  pivot_longer(cols = 2:73, 
+               names_to = "variable", 
+               values_to = "value") %>%
+  mutate(variable_fac = ordered(variable, 
+                                levels = unique(variable)))
+sample_df_min_max <- sample_df_converted_long %>%
+  group_by(variable) %>%
+  summarise(min = min(value, na.rm = T),
+            max = max(value, na.rm = T))
+# Historgram plot
+list_hist_plots <- lapply(
+  levels(sample_df_converted_long$variable_fac), 
+  function(x) {
+    data <- sample_df_converted_long %>% filter(variable == x)
+    if(x == "amplitude_mean") data <- data %>% filter(value <= 1000)
+    if(x == "amplitude_sd") data <- data %>% filter(value <= 1000)
+    hist_plot <- ggplot(data, 
+                        aes(x = value)) +
+      ggtitle(paste0(x,
+                     " \nmin: ",
+                     filter(sample_df_min_max, variable == x) %>%
+                       pull(min) %>% pluck(1) %>% round(3),
+                     " max: ",
+                     filter(sample_df_min_max, variable == x) %>%
+                       pull(max) %>% pluck(1) %>% round(3))
+              ) +
+      geom_histogram() +
+      theme_cowplot(15) +
+      theme(plot.title= element_text(size= 10))
+    return(hist_plot)
+  })
+hist_grid <- plot_grid(plotlist = list_hist_plots, nrow = 8, ncol = 9)
+save_plot("D:/Jakob/dk_nationwide_lidar/qa_local/hist_plot.png", hist_grid,
+          base_height = 20)
+
+# Correlation plot
+
+sample_corr <- cor(as.matrix(na.omit(sample_df[,c(-1, -9, -10, -70, -71,-73)])))
+corr_plot <- ggcorrplot(sample_corr, ggtheme = theme_cowplot(20))
+save_plot("D:/Jakob/dk_nationwide_lidar/qa_local/corr_plot.png", corr_plot,
+          base_height = 20)
+
+

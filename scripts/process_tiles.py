@@ -305,6 +305,10 @@ if __name__ == '__main__':
 
     ## Identify which tiles still require processing
     tiles_to_process = set(progress_df.index.values[progress_df['processing'] != 'complete'].tolist())
+    tiles_to_process = ["6211_579", "6212_579", "6213_579",
+                        "6214_579", "6215_579", "6216_578",
+                        "6217_578", "6218_555", "6218_578",
+                        "6219_577"]
     # Set up processing pool
     multiprocessing.set_executable(settings.python_exec_path)
     pool = multiprocessing.Pool(processes=n_processes)
