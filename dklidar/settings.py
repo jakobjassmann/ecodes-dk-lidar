@@ -29,23 +29,23 @@ saga_openness_bin = 'C:/OSGeo4W64/apps/saga-ltr/saga_cmd.exe --cores=1 ta_lighti
 wd = 'D:/Jakob/dk_nationwide_lidar'
 
 # Point cloud folder
-laz_folder = wd + '/data/sample/laz/'
+laz_folder = wd + '/data/laz/'
 # DTM folder
-dtm_folder = wd + '/data/sample/dtm/'
+dtm_folder = wd + '/data/dtm/'
 
 # DTM mosaics and footprints
-dtm_mosaics_folder = wd + '/data/sample/dtm_mosaics'
-dtm_footprint_folder = wd + '/data/sample/dtm_footprints'
+dtm_mosaics_folder = wd + '/data/dtm_mosaics'
+dtm_footprint_folder = wd + '/data/dtm_footprints'
 
 # ODM folder
-odm_folder = wd + '/data/sample/odm/'
+odm_folder = wd + '/data/odm/'
 
 # ODM Mosaics and footprint
-odm_mosaics_folder = wd +'/data/sample/odm_mosaics'
-odm_footprint_folder = wd + '/data/sample/odm_footprint/'
+odm_mosaics_folder = wd +'/data/odm_mosaics'
+odm_footprint_folder = wd + '/data/odm_footprint/'
 
 # Folder for ouptuts
-output_folder = wd + '/data/sample/outputs/'
+output_folder = wd + '/data/outputs/'
 
 # Scratch folder for temporary data storage
 scratch_folder =  wd + '/scratch'
