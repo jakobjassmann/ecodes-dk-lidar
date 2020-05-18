@@ -160,12 +160,12 @@ The "punktsky" point clouds were pre-classified by Geodatasyrelsen. The followin
 
 | name | height range | point classes |
 | ---- | ---- | ---- |
-| ground\_point\_count\_\-1m\-1m | \-1 m to 1 m | ground points (class 2) | 
-| water\_point\_count\_\-1m\-1m | \-1 m to 1 m | water points (class 9) | 
-| ground\_and\_water\_point\_count\_\-1m\-1m | \-1 m to 1 m | ground and water points (classes 2,9) | 
+| ground\_point\_count\_\-01m\-01m | \-1 m to 1 m | ground points (class 2) | 
+| water\_point\_count\_\-01m\-01m | \-1 m to 1 m | water points (class 9) | 
+| ground\_and\_water\_point\_count\_\-01m\-01m | \-1 m to 1 m | ground and water points (classes 2,9) | 
 | vegetation\_point\_count\_00m\-50m | 0 m to 50 m | vegetation points (classes 3,4,5) | 
-| building\_point\_count\_\-1m\-50m | \-1 m to 50 m | building points (class 6) | 
-| total\_point\_count\_\-1m\-50m | \-1 m to 50 m | ground, water, vegetation and building points (classes 2,3,4,5,6,9) | 
+| building\_point\_count\_\-01m\-50m | \-1 m to 50 m | building points (class 6) | 
+| total\_point\_count\_\-01m\-50m | \-1 m to 50 m | ground, water, vegetation and building points (classes 2,3,4,5,6,9) | 
 
 **Vegetation point counts for height bins:**
 | name | height range | point classes |
