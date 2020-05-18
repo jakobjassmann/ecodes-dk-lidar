@@ -112,7 +112,7 @@ Calculated with [OPALS Cell](https://opals.geo.tuwien.ac.at/html/stable/ModuleCe
 
 **Issues:**
 - If a cell contains no points the value is set to zero, not NA.
-- In rare cases where vegeation is found on artifical structures such as buildings this variable might lead to erroneous canopy-height readings. The nature of the alogrithm means that canopy height is calculated even if there is a very small amount of vegeation returns in a cell. For example, a tall communications tower can be found just south of Aarhus. On top of this tower some small patches of vegeation resulted in a small number of vegeation point returns. The canopy height for that cell is > 100 m, even though it carries little biological meaning. The building proportion variable may be used to account / identify such cases.
+- In rare cases, this variable might lead to erroneous canopy-height readings if vegeation is found on artifical structures. The canopy height is calculated even if there is only a small amount of vegeation returns in a cell. For example: A tall communications tower can be found just south of Aarhus. On top of this tower small patches of vegeation resulted in vegeation point returns. The canopy height for this cell is > 100 m. The building proportion variable may helpf in identifing such cases.
 
 **References:**
 No specific references available.
@@ -347,27 +347,28 @@ No relevant references.
 
 **Description:**
 
-Heat load index calculated following McCune and Keon (2002). Index purely based on the aspect of a cell, ranging from zero (North slopes) to 1 (South slopes).
+Heat load index calculated following McCune and Keon (2002). Index purely based on the aspect of a cell, ranging from zero (North slopes) to 1 (South slopes). 
+
+**Note:** The index is not the most meaningful measure of terain-derived energy influx from the sun, please use the `solar_radiation` variable as an indicator for this (Figure below). Instead this variable seems to be a good indicator for soil moisture conditions (see Moeslund et al. 2019). The name of the variable is simply kept for legacy reasons.  
 
 Calculated from the 10 m [aspect](#aspect) rasters following the equation specified in McCune and Keon (2002): 
 
 ```heat_load_index = (1 - cos((radians(A)-45)))/2```
 
-where `A is the aspect in degrees. The value is then stretched by a factor of 10000, rounded to the nearest integer and converted into a 16 bit integer. 
-
-**Additional Information:**
+where `A` is the aspect in degrees. The value is then stretched by a factor of 10000, rounded to the nearest integer and converted into a 16 bit integer. 
 
 ![Figure of correlation between solar rad and heat index](figures/solar_rad_vs_heat_index.png)
 
-**Figure:** Illustrating the correlation between solar radiation and heat load index, both variables are moderately correlated (r = 0.49), but the solar radiation value seems to contain more information and is deemed better by the authors. 
-
-**[Jakob: I think it would make sense to only include one of these two variables, and following the authors we should keep the solar radiation variable.]**
+**Figure:** Illustrating the correlation between solar radiation and heat load index, both variables are moderately correlated (r = 0.49), but the solar radiation value seems to contain more information and is deemed better by the McCUne and Keoon. 
 
 **Issues:**
-- Small edge effects for tiles with incomplete neighbourhoods, propagated from the aspect calculations.
+- The index is not the best indicator for terrain-derived energy influx from the sun, please use the `solar_radiation` variable for this instead.
+- Small edge effects for tiles with incomplete neighbourhoods, propagated from the aspect calculations. See `aspect` for more detail.
 
 **References:**
 - McCune, B., Keon, D., 2002. Equations for potential annual direct incident radiation and heat load. Journal of Vegetation Science 13, 603–606. https://doi.org/10.1111/j.1654-1103.2002.tb02087.x
+- Moeslund, J.E., Zlinszky, A., Ejrnæs, R., Brunbjerg, A.K., Bøcher, P.K., Svenning, J.-C., Normand, S., 2019. Light detection and ranging explains diversity of plants, fungi, lichens, and bryophytes across multiple habitats and large geographic extent. Ecological Applications 29, e01907. https://doi.org/10.1002/eap.1907
+
 
 [Back to content.](#content)
 
