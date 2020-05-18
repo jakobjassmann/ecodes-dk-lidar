@@ -112,6 +112,7 @@ Calculated with [OPALS Cell](https://opals.geo.tuwien.ac.at/html/stable/ModuleCe
 
 **Issues:**
 - If a cell contains no points the value is set to zero, not NA.
+- In rare cases where vegeation is found on artifical structures such as buildings this variable might lead to erroneous canopy-height readings. The nature of the alogrithm means that canopy height is calculated even if there is a very small amount of vegeation returns in a cell. For example, a tall communications tower can be found just south of Aarhus. On top of this tower some small patches of vegeation resulted in a small number of vegeation point returns. The canopy height for that cell is > 100 m, even though it carries little biological meaning. The building proportion variable may be used to account / identify such cases.
 
 **References:**
 No specific references available.
