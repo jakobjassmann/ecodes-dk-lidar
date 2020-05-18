@@ -19,6 +19,8 @@ Once all those steps are completed...
 8. Run `process_tiles.py` to start the processing.
 9. Open a second OPALS shell and start `progress_monitor.py` to keep taps on the progress.
 
+The `process_tiles.py` scripts uses a CSV-based database created in the `log/process_tiles` folder to keep track of which tiles have been process and document errors in the processsing steps. For each processed tile and all processing steps all OPALs and GDAL logs are kept in the relevant subfolders named with the tile id. The progress data base allows the script to resume processing should the processing be interrupted for some un-expected reason. In this case all partially processed tiles will be re-processed again.
+
 \* *Alternatively, Kortforsyningen could be contacted to request access to the  dataset via a different route.* 
 
 ----
