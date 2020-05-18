@@ -12,7 +12,7 @@ Carry out the following steps to prepare the processing:
 5. Modify the `set_environment.bat` script with your local paths and run the script to add the *dklidar package* to the OPALS python environment.
 5. Run `donwload_files.py`. 
 6. Run `create_checksums.bat` to create the checksums for the downloaded files.
-7. Verify checksums and establish any missing tiles using `checksum_qa.py`. Follow up by running `remove_missing_tiles.py` if you want to. 
+7. Verify checksums and establish any missing tiles using `checksum_qa.py`. Follow up by running `remove_missing_tiles.py` if you want. 
 
 Once all those steps are completed...
 
