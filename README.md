@@ -14,7 +14,7 @@ This project has been developed with OPALS 2.3.2.0, Python 2.7 (as distributed w
 |- data/          empty, place-holder for the data (needs to be imported from external sources).
 |- dklidar/       contains the Python package with modules for processing.
 |- log/           empty, place-holder for log file storage.
-|- qa_local/      quallity assurance outputs and processing report.
+|- qa_local/      quallity assurance outputs and processing reports.
 |- scratch/       empty, place-holder for temporary data handling.
 |- scripts/       contains all Batch and Python scritps for carrying out the processsing.
 ```
