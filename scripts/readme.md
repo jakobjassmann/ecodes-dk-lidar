@@ -1,24 +1,24 @@
 # Scripts for processing and setting up the environment
-The scripts in this folder are used to set up the environment and process the dataset, using the functions defined in the dklidar pacakage. 
+The scripts in this folder are used to set up the environment and process the dataset, using the functions defined in the *dklidar* pacakage. 
 
 ## Getting started
 Carry out the following steps to prepare the processing:
 
 1. Make a local clone of the repository.
-2. Set absolute paths to local folders in `dklidar/settings.py`.
-3. Check out all [pointcloud](https://download.kortforsyningen.dk/content/dhmpunktsky) and [DTM](https://download.kortforsyningen.dk/content/dhmterr%C3%A6n-04-m-grid) tile bundles on the Kortforsyningen website, but don't download via the browsers\*.
-4. Retrieve a cookie using Google Chrome and insert into the `download_files.py` script as described in the comments and adjust the number of parallel downloads fitting your needs. The tile bundle file names are specified in the respective files in the `data/kortforsyningen_file_lists/`folder.
+2. Set the absolute paths to your local folders in `dklidar/settings.py`.
+3. Check out all [pointcloud](https://download.kortforsyningen.dk/content/dhmpunktsky) and [DTM](https://download.kortforsyningen.dk/content/dhmterr%C3%A6n-04-m-grid) tile bundles on the Kortforsyningen website, but don't download via your browser\*.
+4. Follow instructions in the comments of the `download_files.py` script to retrieve a cookie for the Kortforsyningen website using *Google Chrome*. Adjust the number of parallel downloads in the script to fit your needs. Not: Tile bundle file names are specified in the text files in the `data/kortforsyningen_file_lists/`folder.
 5. Open an OPALS shell.
-5. Modify and run the `set_environment.bat` script to add the dklidar package path to the OPALS shell environment.
-5. Run the `donwload_files.py` script. 
-6. Create checksums for the downloaded files by updating the folder paths in `create_checksums.bat` and running the script.
-7. Verify checksums and establish missing tiles using `checksum_qa.py`.
+5. Modify the `set_environment.bat` script with your local paths and run the script to add the *dklidar package* to the OPALS python environment.
+5. Run `donwload_files.py`. 
+6. Run `create_checksums.bat` to create the checksums for the downloaded files.
+7. Verify checksums and establish any missing tiles using `checksum_qa.py`. Follow up by running `remove_missing_tiles.py` if you want to. 
 
 Once all those steps are completed...
 
-8. The processing can be run using `process_tiles.py`.
+8. Run `process_tiles.py` to start the processing.
 
-\* Alternatively, Kortforsyningen could be contacted to request access to the whole dataset via a different route. 
+\* *Alternatively, Kortforsyningen could be contacted to request access to the  dataset via a different route.* 
 
 ----
 
@@ -39,5 +39,4 @@ remove_missing_tiles.py | Helper script that removes incomplete tiles from the D
 **stop.bat** | Stops processing chain by providing a shortcut to killing all pyhton.exe processes currently run by the user. Can be used to interrupt the processing using the process_tiles.py script.
 test.py | Playground script to test processing steps etc. 
 
-
-*Note: Other scripts may appear here that are version controlled for temporary purposes.8
+*Note: Other scripts may appear here that are version controlled for temporary purposes.*
