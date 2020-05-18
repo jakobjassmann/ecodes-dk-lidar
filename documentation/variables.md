@@ -19,7 +19,7 @@ This dataset contains ecological and landscape descriptors extracted from the po
 
 The purpose of this dataset is to provide a light-weight version of the nationwide data containing easy to interpretable descriptors that summarise the structure of the point cloud data for ecological and biological studies. 
 
-The extent of the dataset comprises the majority of the Danish land surface (including many of the small islands and Bornholm) split into 49 598 tiles. The data is provided as GeoTIFF rasters projected in ETRS 96 UTM32 (EPSGS:7019). NoData values are globally set to -9999, but please see the description on how to interpet the NoData cells for the individual variables. Sea and small in-land water bodies have been masked out using a specifically generated masks \[**UPDATE ACCORDINGLY**\]. 
+The extent of the dataset comprises the majority of the Danish land surface (including many of the small islands and Bornholm) split into 49 598 tiles. The data is provided as GeoTIFF rasters projected in ETRS 96 UTM32 (EPSGS:7019). NoData values are globally set to -9999, but please see the description on how to interpet the NoData cells for the individual variables. Masks for sea and small in-land water bodies are provided, but have to be applied manually where appropiate. 
 
 This document describes the **\[INSERT TOTAL NUMBER\]** ecological and landscape variables extracted by us and how they were derived mathematically. We also highlight any known issues relevant to the interpretation of these variables.
 
@@ -66,7 +66,8 @@ Files to support data access and handling.
 
 | file name | description |
 | ---- | ---- |
-| [tile\_footprints](#tile_footprints) | Shapefile with all tile footprints to allow for targeted subsetting of dataset. |
+| [water masks](#water-masks) | Sea and inland water masks for each tile |
+| [tile footprints](#tile-footprints) | Tile footprints, allows for targeted subsetting of dataset |
 
 [Back to content.](#content)
 
@@ -162,25 +163,25 @@ The "punktsky" point clouds were pre-classified by Geodatasyrelsen. The followin
 | ground\_point\_count\_\-1m\-1m | \-1 m to 1 m | ground points (class 2) | 
 | water\_point\_count\_\-1m\-1m | \-1 m to 1 m | water points (class 9) | 
 | ground\_and\_water\_point\_count\_\-1m\-1m | \-1 m to 1 m | ground and water points (classes 2,9) | 
-| vegetation\_point\_count\_0m\-50m | 0 m to 50 m | vegetation points (classes 3,4,5) | 
+| vegetation\_point\_count\_00m\-50m | 0 m to 50 m | vegetation points (classes 3,4,5) | 
 | building\_point\_count\_\-1m\-50m | \-1 m to 50 m | building points (class 6) | 
 | total\_point\_count\_\-1m\-50m | \-1 m to 50 m | ground, water, vegetation and building points (classes 2,3,4,5,6,9) | 
 
 **Vegetation point counts for height bins:**
 | name | height range | point classes |
 | ---- | ---- | ----|
-| vegetation\_point\_count\_0.0m\-0.5m | 0.0 m to 0.5 m | vegetation points (classes 3,4,5) |
-| vegetation\_point\_count\_0.5m\-1.0m | 0.5 m to 1.0 m | vegetation points (classes 3,4,5) | 
-| vegetation\_point\_count\_1.0m\-1.5m | 1.0 m to 1.5 m | vegetation points (classes 3,4,5) | 
-| vegetation\_point\_count\_1.5m\-2.0m | 1.5 m to 2.0 m | vegetation points (classes 3,4,5) | 
-| vegetation\_point\_count\_2m\-3m | 2 m to 3 m | vegetation points (classes 3,4,5) | 
-| vegetation\_point\_count\_3m\-4m | 3 m to 4 m | vegetation points (classes 3,4,5) | 
-| vegetation\_point\_count\_4m\-5m | 4 m to 5 m | vegetation points (classes 3,4,5) |  
-| vegetation\_point\_count\_5m\-6m | 5 m to 6 m | vegetation points (classes 3,4,5) | 
-| vegetation\_point\_count\_6m\-7m | 6 m to 7 m | vegetation points (classes 3,4,5) | 
-| vegetation\_point\_count\_7m\-8m | 7 m to 8 m | vegetation points (classes 3,4,5) |
-| vegetation\_point\_count\_8m\-9m | 8 m to 9 m | vegetation points (classes 3,4,5) | 
-| vegetation\_point\_count\_9m\-10m | 9 m to 10 m | vegetation points (classes 3,4,5) | 
+| vegetation\_point\_count\_00.0m\-00.5m | 0.0 m to 0.5 m | vegetation points (classes 3,4,5) |
+| vegetation\_point\_count\_00.5m\-01.0m | 0.5 m to 1.0 m | vegetation points (classes 3,4,5) | 
+| vegetation\_point\_count\_01.0m\-01.5m | 1.0 m to 1.5 m | vegetation points (classes 3,4,5) | 
+| vegetation\_point\_count\_01.5m\-02.0m | 1.5 m to 2.0 m | vegetation points (classes 3,4,5) | 
+| vegetation\_point\_count\_02m\-03m | 2 m to 3 m | vegetation points (classes 3,4,5) | 
+| vegetation\_point\_count\_03m\-04m | 3 m to 4 m | vegetation points (classes 3,4,5) | 
+| vegetation\_point\_count\_04m\-05m | 4 m to 5 m | vegetation points (classes 3,4,5) |  
+| vegetation\_point\_count\_05m\-06m | 5 m to 6 m | vegetation points (classes 3,4,5) | 
+| vegetation\_point\_count\_06m\-07m | 6 m to 7 m | vegetation points (classes 3,4,5) | 
+| vegetation\_point\_count\_07m\-08m | 7 m to 8 m | vegetation points (classes 3,4,5) |
+| vegetation\_point\_count\_08m\-09m | 8 m to 9 m | vegetation points (classes 3,4,5) | 
+| vegetation\_point\_count\_09m\-10m | 9 m to 10 m | vegetation points (classes 3,4,5) |
 | vegetation\_point\_count\_10m\-11m | 10 m to 11 m | vegetation points (classes 3,4,5) |  
 | vegetation\_point\_count\_11m\-12m | 11 m to 12 m | vegetation points (classes 3,4,5) | 
 | vegetation\_point\_count\_12m\-13m | 12 m to 13 m | vegetation points (classes 3,4,5) | 
@@ -274,18 +275,18 @@ These proportions were calculated between the vegetation point count in the resp
 
 | name | height range |
 | ---- | ---- |
-| vegetation\_proportion\_0.0m-0.5m | 0.0 m to 0.5 m |
-| vegetation\_proportion\_0.5m-1.0m | 0.5 m to 1.0 m | 
-| vegetation\_proportion\_1.0m-1.5m | 1.0 m to 1.5 m | 
-| vegetation\_proportion\_1.5m-2.0m | 1.5 m to 2.0 m | 
-| vegetation\_proportion\_2m-3m | 2 m to 3 m | 
-| vegetation\_proportion\_3m-4m | 3 m to 4 m | 
-| vegetation\_proportion\_4m-5m | 4 m to 5 m | 
-| vegetation\_proportion\_5m-6m | 5 m to 6 m |  
-| vegetation\_proportion\_6m-7m | 6 m to 7 m |  
-| vegetation\_proportion\_7m-8m | 7 m to 8 m | 
-| vegetation\_proportion\_8m-9m | 8 m to 9 m | 
-| vegetation\_proportion\_9m-10m | 9 m to 10 m | 
+| vegetation\_proportion\_00.0m-00.5m | 0.0 m to 0.5 m |
+| vegetation\_proportion\_00.5m-01.0m | 0.5 m to 1.0 m | 
+| vegetation\_proportion\_01.0m-01.5m | 1.0 m to 1.5 m | 
+| vegetation\_proportion\_01.5m-02.0m | 1.5 m to 2.0 m | 
+| vegetation\_proportion\_02m-03m | 2 m to 3 m | 
+| vegetation\_proportion\_03m-04m | 3 m to 4 m | 
+| vegetation\_proportion\_04m-05m | 4 m to 5 m | 
+| vegetation\_proportion\_05m-06m | 5 m to 6 m |  
+| vegetation\_proportion\_06m-07m | 6 m to 7 m |  
+| vegetation\_proportion\_07m-08m | 7 m to 8 m | 
+| vegetation\_proportion\_08m-09m | 8 m to 9 m | 
+| vegetation\_proportion\_09m-10m | 9 m to 10 m | 
 | vegetation\_proportion\_10m-11m | 10 m to 11 m |
 | vegetation\_proportion\_11m-12m | 11 m to 12 m |
 | vegetation\_proportion\_12m-13m | 12 m to 13 m | 
@@ -533,6 +534,33 @@ No known issues with this variable.
 
 ## Auxillary files
 
-### tile\_footprints
+----
+
+### water masks
+
+**Folder locations:** `/outputs/masks/inland_water_mask` and `/outputs/masks/sea_mask` 
+
+**File names:** `inland_water_mask_xxxx_xxx.tif` and `sea_mask_xxxx_xxx.tif`
+
+**File type and units:** `16-bit integer, binary (1 = water and no data)`
+
+**Description:**
+
+Sea and inland water masks for each tile.
+
+Generated from polygon shapefiles assembled by Jesper Moeslund (AU Department of Bioscience - Biodiversity and Conservation). Fore each tile the polygon geometries were burned into the 10 m x 10 m grid using gdal_rasterize. 
+
+**Issues:**
+- Shape, outline, presence and absence of small water bodies and coastlines may fulctuate over time. The masks were chosen to present a snapshot of the water bodies as close to the timepoint of the LiDAR data aquistion as possible (winter 2014/2015), but inaccuracies may still arise.
+- The inland water masks was produced to be as comprehensive as possible, but some small ponds and water bodies might have been missed.
+
+**References:**
+No relevant references.
+
+[Back to content](#content).
+
+----
+
+### tile footprints
 
 To be filled. 
