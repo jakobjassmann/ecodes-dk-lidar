@@ -1,4 +1,4 @@
-# DK Nationwide LiDAR Documentation
+# DK Nationwide LiDAR Variable Description
 
 *Version 0.4*
 
@@ -19,7 +19,7 @@ This dataset contains ecological and landscape descriptors extracted from the po
 
 The purpose of this dataset is to provide a light-weight version of the nationwide data containing easy to interpretable descriptors that summarise the structure of the point cloud data for ecological and biological studies. As the data was collected in winter 2014/15 the data provides a snapshot of Denmark at that time, since then changes are likely to have occured. 
 
-The extent of the dataset comprises the majority of the Danish land surface (including many of the small islands and Bornholm) split into 49 598 tiles. The data is provided as GeoTIFF rasters projected in ETRS 96 UTM32 (EPSGS:7019). NoData values are globally set to -9999, but please see the description on how to interpet the NoData cells for the individual variables. Masks for sea and small in-land water bodies are provided, but have to be applied manually where appropiate. 
+The extent of the dataset comprises the majority of the Danish land surface (including many of the small islands and Bornholm) split into 49 598 tiles **\[Confirm!\]**. The data is provided as GeoTIFF rasters projected in ETRS 96 UTM32 (EPSGS:7019). NoData values are globally set to -9999, but please see the description on how to interpet the NoData cells for the individual variables. Masks for sea and small in-land water bodies are provided, but have to be applied manually where appropiate. 
 
 This document describes the **\[INSERT TOTAL NUMBER\]** ecological and landscape variables extracted by us and how they were derived. We also highlight any known issues relevant to the interpretation of these variables.
 
