@@ -7,7 +7,7 @@ Carry out the following steps to prepare the processing:
 1. Make a local clone of the repository.
 2. Set the absolute paths to your local folders in `dklidar/settings.py`.
 3. Check out all [pointcloud](https://download.kortforsyningen.dk/content/dhmpunktsky) and [DTM](https://download.kortforsyningen.dk/content/dhmterr%C3%A6n-04-m-grid) tile bundles on the Kortforsyningen website, but don't download via your browser\*.
-4. Follow instructions in the comments of the `download_files.py` script to retrieve a cookie for the Kortforsyningen website using *Google Chrome*. Adjust the number of parallel downloads in the script to fit your needs. Not: Tile bundle file names are specified in the text files in the `data/kortforsyningen_file_lists/`folder.
+4. Follow instructions in the comments of the `download_files.py` script to retrieve a cookie for the Kortforsyningen website using *Google Chrome*. Adjust the number of parallel downloads in the script to fit your needs. Note: Tile bundle file names are specified in the `.txt` files in the `data/kortforsyningen_file_lists/` folder.
 5. Open an OPALS shell.
 5. Modify the `set_environment.bat` script with your local paths and run the script to add the *dklidar package* to the OPALS python environment.
 5. Run `donwload_files.py`. 
@@ -17,6 +17,7 @@ Carry out the following steps to prepare the processing:
 Once all those steps are completed...
 
 8. Run `process_tiles.py` to start the processing.
+9. Open a second OPALS shell and start `progress_monitor.py` to keep taps on the progress.
 
 \* *Alternatively, Kortforsyningen could be contacted to request access to the  dataset via a different route.* 
 
