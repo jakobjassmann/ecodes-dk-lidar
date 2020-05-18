@@ -33,7 +33,7 @@ generate_dems.py | Generates low-quality DTMs from the pointclouds for tiles mis
 local_qa.R | Quality control for quick post-processing QA (written in shorthand).
 make_vrt.bat | Creates a vrt from all .tif files in the current folder, 1st argument names the vrt file.
 make_vrt_subfolders.bat | Recursively creates vrt files for all subfolders naming the file with the subfolder name.
-**process_tiles.py** | Main script for processing. Controls process managment and defines which steps are carried out. Usese the functions defined in the *dklidar package*.
+**process_tiles.py** | **Main script for processing**. Controls process managment and defines which steps are carried out. Uses the functions defined in the *dklidar package*.
 **progress_monitor.py** | Progress monitor to be launched after starting process_tiles. Run in a separate OPALS shell to keep track of the processing. 
 remove_missing_tiles.py | Removes incomplete tiles from the DTM and laz folders. Run after `checksum_qa.py` has been executed.
 **set_environment.bat** | Adds the *dklidar package* to the OPALS shell python path.
