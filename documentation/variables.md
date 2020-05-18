@@ -88,7 +88,7 @@ Arithmetic mean and standard deviation of the return amplitude for all points wi
 In the context of LiDAR, the amplitude represents the strenght of the signal received by the sensor for each return. For this variable the arithmetic mean and standard deviation of the amplitude are calculated for all points within a 10 m x 10 m cell. Calculations are carried out for a single tile using the [OPALS Cell module](https://opals.geo.tuwien.ac.at/html/stable/ModuleCell.html). Here, all points referes exactly to the following set of classes: ground, water, building, as well as low\-, medium\- and high\-vegetation.  
 
 **Issues:**
-- The amplitude variable is very difficult to interpret biologically.
+- The intepretation of the amplitude variable is not straightforward and its biological meaning can be complex. Nonetheless, the amplitude is senstive to moisture and captures texture, it can threfore be highly useful for segmenting vegetated and non-vegetated surfaces.
 - Amplitude is not directly comparable across flight strips due to differences in sensor etc. As some cells may contain returns from up to four different flight strips, we recommend using the amplitude variable in conjunction with information on the flight strip ids within each cell contained in the point\_source\_info variables.
 
 **References:**
@@ -359,7 +359,7 @@ where `A` is the aspect in degrees. The value is then stretched by a factor of 1
 
 ![Figure of correlation between solar rad and heat index](figures/solar_rad_vs_heat_index.png)
 
-**Figure:** Illustrating the correlation between solar radiation and heat load index, both variables are moderately correlated (r = 0.49), but the solar radiation value seems to contain more information and is deemed better by the McCUne and Keoon. 
+**Figure:** Illustrating the correlation between solar radiation and heat load index, both variables are moderately correlated (r = 0.49), but the solar radiation value seems to contain more information and is deemed better by the McCune and Keon (2002). 
 
 **Issues:**
 - The index is not the best indicator for terrain-derived energy influx from the sun, please use the `solar_radiation` variable for this instead.
