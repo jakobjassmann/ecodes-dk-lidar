@@ -17,11 +17,11 @@
 
 This dataset contains ecological and landscape descriptors extracted from the pointclouds of Denmark's nationwide LiDAR dataset *'Punktsky'* collected in winter 2014/15. The raw point clouds can be accessed on the website of [Kortforsyningen](#https://download.kortforsyningen.dk/content/dhmpunktsky) and documentation for the raw data is available [here](#https://kortforsyningen.dk/sites/default/files/old_gst/DOKUMENTATION/Data/dk_dhm_punktsky_v2_jan_2015.pdf) and [here](#https://sdfe.dk/hent-data/danmarks-hoejdemodel/). 
 
-The purpose of this dataset is to provide a light-weight version of the nationwide data containing easy to interpretable descriptors that summarise the structure of the point cloud data for ecological and biological studies. 
+The purpose of this dataset is to provide a light-weight version of the nationwide data containing easy to interpretable descriptors that summarise the structure of the point cloud data for ecological and biological studies. As the data was collected in winter 2014/15 the data provides a snapshot of Denmark at that time, since then changes are likely to have occured. 
 
 The extent of the dataset comprises the majority of the Danish land surface (including many of the small islands and Bornholm) split into 49 598 tiles. The data is provided as GeoTIFF rasters projected in ETRS 96 UTM32 (EPSGS:7019). NoData values are globally set to -9999, but please see the description on how to interpet the NoData cells for the individual variables. Masks for sea and small in-land water bodies are provided, but have to be applied manually where appropiate. 
 
-This document describes the **\[INSERT TOTAL NUMBER\]** ecological and landscape variables extracted by us and how they were derived mathematically. We also highlight any known issues relevant to the interpretation of these variables.
+This document describes the **\[INSERT TOTAL NUMBER\]** ecological and landscape variables extracted by us and how they were derived. We also highlight any known issues relevant to the interpretation of these variables.
 
 ## Overview
 The section provides a quick overview of all outputs and auxillary files.
