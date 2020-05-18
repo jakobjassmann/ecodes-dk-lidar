@@ -552,6 +552,7 @@ Generated from polygon shapefiles assembled by Jesper Moeslund (AU Department of
 
 **Issues:**
 - Shape, outline, presence and absence of small water bodies and coastlines may fulctuate over time. The masks were chosen to present a snapshot of the water bodies as close to the timepoint of the LiDAR data aquistion as possible (winter 2014/2015), but inaccuracies may still arise.
+- Location of inland water bodies and coastlines might have change since then.
 - The inland water masks was produced to be as comprehensive as possible, but some small ponds and water bodies might have been missed.
 
 **References:**
