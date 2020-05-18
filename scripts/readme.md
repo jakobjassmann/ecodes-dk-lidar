@@ -28,16 +28,16 @@ Script | Description
 --- | ---
 checksum_qa.py | Validates checksums for downloads, and checks dtm and pointcloud datasets for completnness.
 create_checksums.bat | Generates checksums for downloaded files. 
-download_files.py | Downloads laz pointclouds and dtm rasters.
-generate_dems.py | Helper script to generate low-quality DEMs from the pointclouds for tiles missing a DTM file (*currently not needed*).
-local_qa.R | Quality control script for quick post-processing QA (written in shorthand).
-make_vrt.bat | Creates a vrt from all .tif files in the current folder, requires one argument to name the output vrt file.
+download_files.py | Downloads pointclouds and dtm rasters.
+generate_dems.py | Generates low-quality DTMs from the pointclouds for tiles missing a DTM file (*currently not used*).
+local_qa.R | Quality control for quick post-processing QA (written in shorthand).
+make_vrt.bat | Creates a vrt from all .tif files in the current folder, 1st argument names the vrt file.
 make_vrt_subfolders.bat | Recursively creates vrt files for all subfolders naming the file with the subfolder name.
-**process_tiles.py** | Main script for processing, controls process managment and steps carried out for the processing of each tile. 
-**progress_monitor.py** | Progress monitor to be launched after starting process_tiles. Running in a separate shell this helper script provides key stats for the process of the processing.
-remove_missing_tiles.py | Helper script that removes incomplete tiles from the DTM and laz folders (can be run after checksum_qa.py has been executed).
-**set_environment.bat** | Launched from the OPALS shell, adds the dklidar python package folder to OPALS python path.
-**stop.bat** | Stops processing chain by providing a shortcut to killing all pyhton.exe processes currently run by the user. Can be used to interrupt the processing using the process_tiles.py script.
+**process_tiles.py** | Main script for processing. Controls process managment and defines which steps are carried out. Usese the functions defined in the *dklidar package*.
+**progress_monitor.py** | Progress monitor to be launched after starting process_tiles. Run in a separate OPALS shell to keep track of the processing. 
+remove_missing_tiles.py | Removes incomplete tiles from the DTM and laz folders. Run after `checksum_qa.py` has been executed.
+**set_environment.bat** | Adds the *dklidar package* to the OPALS shell python path.
+**stop.bat** | Stops processing chain by killing all pyhton.exe processes currently running. Can be used to interrupt `process_tiles.py`.
 test.py | Playground script to test processing steps etc. 
 
 *Note: Other scripts may appear here that are version controlled for temporary purposes.*
