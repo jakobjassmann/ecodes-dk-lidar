@@ -11,3 +11,4 @@ data/damaged_filse.txt
 .idea/
 .spyproject/
 auxillary_files
+*.pyc

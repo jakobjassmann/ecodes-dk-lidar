@@ -220,6 +220,68 @@ def dtm_aggregate_tile(tile_id):
 
     return return_value
 
+## Aggregate dem mosaic to 10 m
+def dtm_aggregate_mosaic(tile_id):
+    """
+    Aggregates the 0.4 m DTM mosaic to 10 m size for final output and other calculations.
+    :param tile_id: tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+    :return: execution status
+    """
+
+    # Initiate return valule and open log file
+    return_value = ''
+    log_file = open('log.txt', 'a+')
+
+    # get temporary work directory
+    wd = os.getcwd()
+
+    # Prepare output folder
+    out_folder = settings.dtm_mosaics_10m_folder
+    if not os.path.exists(out_folder): os.mkdir(out_folder)
+
+    try:
+        ## Aggregate dtm to temporary file:
+        # Specify gdal command
+        cmd = settings.gdalwarp_bin + \
+              '-tr 10 10 -r average ' + \
+              settings.dtm_mosaics_folder + '/dtm_' + tile_id + '_mosaic.tif ' + \
+              wd + '/dtm_10m_' + tile_id + '_float_mosaic.tif '
+
+        # Execute gdal command
+        log_file.write(subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
+                     '\n' + tile_id + ' aggregating dtm_10m successful.\n\n')
+
+        out_file = out_folder + '/dtm_10m_' + tile_id + '_mosaic.tif'
+
+        # Stretch by 100, round and store as int16
+        # Specify gdal command
+        cmd = settings.gdal_calc_bin + \
+              '-A ' + wd + '/dtm_10m_' + tile_id + '_float_mosaic.tif ' + \
+              ' --outfile=' + out_file + \
+              ' --calc=rint(100*A)' + ' --type=Int16' + ' --NoDataValue=-9999'
+
+        # Execute gdal command
+        log_file.write('\n' + tile_id + ' converting dtm_10m to int16... \n' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT))
+
+        # Apply mask(s)
+        common.apply_mask(out_file)
+
+        return_value = 'success'
+    except:
+        log_file.write('\n' + tile_id + ' dtm_10m aggregation failed.\n\n')
+        return_value = 'gdalError'
+
+    # Close log file
+    log_file.close()
+
+    # Remove temporary files
+    try:
+        os.remove(wd + '/dtm_10m_' + tile_id + '_float_mosaic.tif')
+    except:
+        pass
+
+    return return_value
 
 ## Calculate slope for file
 def dtm_calc_slope(tile_id):

@@ -35,6 +35,7 @@ dtm_folder = wd + '/data/dtm/'
 
 # DTM mosaics and footprints
 dtm_mosaics_folder = wd + '/data/dtm_mosaics'
+dtm_mosaics_10m_folder = wd + '/data/dtm_mosaics_10m'
 dtm_footprint_folder = wd + '/data/dtm_footprints'
 
 # ODM folder

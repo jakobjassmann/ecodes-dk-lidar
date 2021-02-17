@@ -23,6 +23,9 @@ update_interval = 60 # 60 s
 laz_files = glob.glob(settings.laz_folder + '/*.laz')
 n_total = len(laz_files)
 
+# Check nubmer of files already processed
+n_processed_at_start = len(glob.glob(settings.log_folder + '/process_tiles/*_*'))
+
 # set start date and time:
 start_time = datetime.datetime.fromtimestamp(os.path.getmtime(settings.log_folder + '/process_tiles/overall_progress.csv'))
 # Initate progress variables
@@ -38,7 +41,11 @@ while progress < 1:
 
     # Calculate time differences
     time_passed = datetime.datetime.now() - start_time
-    time_estimated = (time_passed / n_processed) * (n_total - n_processed)
+    if (n_processed - n_processed_at_start) <= 54:
+        time_estimated = 'estimating'
+    else:
+        time_estimated = (time_passed / (n_processed - n_processed_at_start)) * (n_total - n_processed)
+
 
     # Check whether the overall_progress.csv has been updated, if so
     # assume the processing of the last 54 files is done

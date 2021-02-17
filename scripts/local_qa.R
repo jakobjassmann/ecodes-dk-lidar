@@ -1,16 +1,23 @@
+# Local quality control script for DK Nationwide LiDAR outputs
+# Jakob Assmann j.assmann@bio.au.dk
+
+# Dependencies
 library(raster)
 library(cowplot)
 library(tidyverse)
 library(ggcorrplot)
 library(sf)
-list_of_vrts <- read.csv("D:/Jakob/dk_nationwide_lidar/data/sample_large/list_of_vrts.csv", 
+
+list_of_vrts <- read.csv("D:/Jakob/dk_nationwide_lidar/data/outputs/list_of_vrts.txt",
                          header = F,
                          stringsAsFactors = F)
+# Load stack of VRT files
+big_stack <- raster::stack(as.list(list_of_vrts))
 
-big_stack <- raster::stack(as.list(list_of_vrts$V1))
+# Conpare extent
 lapply(list_of_vrts$V1, function(x) {
   print(x)
-  extent(raster(x))
+  extent(raster(paste0("D:/Jakob/dk_nationwide_lidar/data/outputs/", x)))
   }
   )
 
