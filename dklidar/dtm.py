@@ -220,7 +220,7 @@ def dtm_aggregate_tile(tile_id):
 
     return return_value
 
-## Aggregate dem mosaic to 10 m
+## Aggregate dem mosaic to 10 m, but don't stretch and mask
 def dtm_aggregate_mosaic(tile_id):
     """
     Aggregates the 0.4 m DTM mosaic to 10 m size for final output and other calculations.
@@ -240,46 +240,23 @@ def dtm_aggregate_mosaic(tile_id):
     if not os.path.exists(out_folder): os.mkdir(out_folder)
 
     try:
-        ## Aggregate dtm to temporary file:
         # Specify gdal command
         cmd = settings.gdalwarp_bin + \
-              '-tr 10 10 -r average ' + \
+              '-tr 10 10 -r average -overwrite ' + \
               settings.dtm_mosaics_folder + '/dtm_' + tile_id + '_mosaic.tif ' + \
-              wd + '/dtm_10m_' + tile_id + '_float_mosaic.tif '
+              settings.dtm_mosaics_10m_folder + '/dtm_' + tile_id + '_float_mosaic_10m.tif '
 
         # Execute gdal command
         log_file.write(subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
-                     '\n' + tile_id + ' aggregating dtm_10m successful.\n\n')
-
-        out_file = out_folder + '/dtm_10m_' + tile_id + '_mosaic.tif'
-
-        # Stretch by 100, round and store as int16
-        # Specify gdal command
-        cmd = settings.gdal_calc_bin + \
-              '-A ' + wd + '/dtm_10m_' + tile_id + '_float_mosaic.tif ' + \
-              ' --outfile=' + out_file + \
-              ' --calc=rint(100*A)' + ' --type=Int16' + ' --NoDataValue=-9999'
-
-        # Execute gdal command
-        log_file.write('\n' + tile_id + ' converting dtm_10m to int16... \n' + \
-                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT))
-
-        # Apply mask(s)
-        common.apply_mask(out_file)
+                     '\n' + tile_id + ' aggregating dtm_10m mosaic successful.\n\n')
 
         return_value = 'success'
     except:
-        log_file.write('\n' + tile_id + ' dtm_10m aggregation failed.\n\n')
+        log_file.write('\n' + tile_id + ' dtm_10m mosaic aggregation failed.\n\n')
         return_value = 'gdalError'
 
     # Close log file
     log_file.close()
-
-    # Remove temporary files
-    try:
-        os.remove(wd + '/dtm_10m_' + tile_id + '_float_mosaic.tif')
-    except:
-        pass
 
     return return_value
 
@@ -306,15 +283,15 @@ def dtm_calc_slope(tile_id):
     try:
         # Calculate slope parameter
         cmd = settings.gdaldem_bin + ' slope ' + \
-            settings.dtm_mosaics_folder + '/dtm_' + tile_id + '_mosaic.tif ' + \
-            wd + '/slope_' + tile_id + '_mosaic.tif '
+              settings.dtm_mosaics_10m_folder + '/dtm_' + tile_id + '_float_mosaic_10m.tif ' + \
+              wd + '/slope_' + tile_id + '_mosaic.tif '
         log_file.write(tile_id + ' slope calculation... \n ' + \
                      subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT))
 
-        # Crop slope mosaic output to original tile size and aggregate to 10 m scale by median
+        # Crop slope mosaic output to original tile size 
         cmd = settings.gdalwarp_bin + \
               ' -cutline ' + settings.dtm_footprint_folder + '/DTM_1km_' + tile_id + '_footprint.shp ' + \
-               '-tr 10 10 -r med -crop_to_cutline -overwrite ' + \
+               '-crop_to_cutline -overwrite ' + \
               wd + '/slope_' + tile_id + '_mosaic.tif ' + \
               wd + '/slope_' + tile_id + '_mosaic_cropped.tif '
         log_file.write(subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
@@ -373,15 +350,15 @@ def dtm_calc_aspect(tile_id):
     try:
         # Calculate aspect
         cmd = settings.gdaldem_bin + ' aspect -zero_for_flat ' + \
-              settings.dtm_mosaics_folder + '/dtm_' + tile_id + '_mosaic.tif ' + \
+              settings.dtm_mosaics_10m_folder + '/dtm_' + tile_id + '_float_mosaic_10m.tif ' + \
               wd + '/aspect_' + tile_id + '_mosaic.tif '
         log_file.write(tile_id + ' aspect calculation... \n ' + \
                      subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT))
 
-        # Crop aspect output to original tile size and aggregate to 10 m:
+        # Crop aspect output to original tile size 
         cmd = settings.gdalwarp_bin + \
               ' -cutline ' + settings.dtm_footprint_folder + '/DTM_1km_' + tile_id + '_footprint.shp ' + \
-              '-tr 10 10 -r med -crop_to_cutline -overwrite ' + \
+              '-crop_to_cutline -overwrite ' + \
               wd + '/aspect_' + tile_id + '_mosaic.tif ' + \
               wd + '/aspect_' + tile_id + '_mosaic_cropped.tif '
         log_file.write(subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
@@ -669,23 +646,12 @@ def dtm_openness_mean(tile_id):
 
     # Attempt calculation of mean openness
     try:
-
-        ## Aggregate dtm mosaic to 10 m in a temporary file:
-        # Specify gdal command
-        cmd = settings.gdalwarp_bin + \
-              '-tr 10 10 -r average ' + \
-              settings.dtm_mosaics_folder + '/dtm_' + tile_id + '_mosaic.tif ' + \
-              wd + '/dtm_10m_' + tile_id + '_mosaic_float.tif ' + ' -overwrite'
-
-        # Execute gdal command
-        log_file.write(subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
-                     '\n' + tile_id + ' aggregated dtm_10m mosaic.\n\n')
-
+  
         # Initialise Opals Openness Module
         export_openness = opals.Openness.Openness()
 
         # Export positive openness for a given cell cell with a search radius of 150 m (15 cells)
-        export_openness.inFile = wd + '/dtm_10m_' + tile_id + '_mosaic_float.tif '
+        export_openness.inFile = settings.dtm_mosaics_10m_folder + '/dtm_' + tile_id + '_float_mosaic_10m.tif '
         export_openness.outFile = wd + '/openness_150m_' + tile_id + '_mosaic.tif '
         export_openness.feature = opals.Types.OpennessFeature.positive
         export_openness.kernelSize = 15  # 15 x 10 m = 150 m
@@ -746,7 +712,6 @@ def dtm_openness_mean(tile_id):
 
     # Remove temporary files
     try:
-        os.remove(wd + '/dtm_10m_' + tile_id + '_mosaic_float.tif ')
         os.remove(wd + '/openness_150m_' + tile_id + '_mosaic.tif ')
         os.remove(wd + '/landscape_openness_' + tile_id + '_mosaic.tif ')
         os.remove(wd + '/landscape_openness_' + tile_id + '_mosaic_cropped.tif ')
@@ -784,22 +749,12 @@ def dtm_openness_difference(tile_id):
 
     # Attempt openness difference calculation
     try:
-        ## Aggregate dtm mosaic to 10 m in a temporary file:
-        # Specify gdal command
-        cmd = settings.gdalwarp_bin + \
-              '-tr 10 10 -r average -overwrite ' + \
-              settings.dtm_mosaics_folder + '/dtm_' + tile_id + '_mosaic.tif ' + \
-              wd + '/dtm_10m_' + tile_id + '_mosaic_float.tif '
-
-        # Execute gdal command
-        log_file.write(subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
-                     '\n' + tile_id + ' aggregated dtm_10m mosaic.\n\n')
 
         # Initialise Opals Openness Module
         export_openness = opals.Openness.Openness()
 
         # Export minimum positive openness for a given cell cell with a kernel size of 50 m x 50 m
-        export_openness.inFile = wd + '/dtm_10m_' + tile_id + '_mosaic_float.tif '
+        export_openness.inFile = settings.dtm_mosaics_10m_folder + '/dtm_' + tile_id + '_float_mosaic_10m.tif '
         export_openness.outFile = wd + '/openness_50m_min_' + tile_id + '_mosaic.tif '
         export_openness.feature = opals.Types.OpennessFeature.positive
         export_openness.kernelSize = 5  # 5 x 10 m = 50 m
@@ -874,7 +829,6 @@ def dtm_openness_difference(tile_id):
 
     # Remove temporary files
     try:
-        os.remove(wd + '/dtm_10m_' + tile_id + '_mosaic_float.tif ')
         os.remove(wd + '/openness_50m_min_' + tile_id + '_mosaic.tif ')
         os.remove(wd + '/openness_50m_max_' + tile_id + '_mosaic.tif ')
         os.remove(wd + '/diff_openness_' + tile_id + '_mosaic.tif ')
