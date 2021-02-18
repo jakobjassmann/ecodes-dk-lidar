@@ -767,7 +767,7 @@ def dtm_openness_difference(tile_id):
         export_openness.reset()
 
         # Export maximum positive openness for a given cell with a kernel size of 50 m x 50 m
-        export_openness.inFile = wd + '/dtm_10m_' + tile_id + '_mosaic_float.tif '
+        export_openness.inFile = settings.dtm_mosaics_10m_folder + '/dtm_' + tile_id + '_float_mosaic_10m.tif '
         export_openness.outFile = wd + '/openness_50m_max_' + tile_id + '_mosaic.tif '
         export_openness.feature = opals.Types.OpennessFeature.positive
         export_openness.kernelSize = 5  # 5 x 10 m = 50 m
@@ -845,7 +845,122 @@ def dtm_openness_difference(tile_id):
     # Return exist status
     return return_value
 
+## Calculate TWI following Kopecky et al. 2020
+def dtm_kopecky_twi(tile_id):
+    """
+    Calculates the topographic wetness indec (TWI) following Kopecky et al. 2020.
+    Requires SAGA GIS 7.8.2 or later to be specified in settings.py.
+    Calculations are done on the aggregated 10 m tile neighbourhood mosaic.
+    :param tile_id: tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+    :return: execution status
+    """
 
+    # Initiate return valule and log output
+    return_value = ''
+    log_file = open('log.txt', 'a+')
+
+    # get temporary work directory
+    wd = os.getcwd()
+    # Replace backslash with forward slash for SAGA GIS
+    wd = re.sub('\\\\', '/', wd)
+
+    # Prepare output folder
+    out_folder = settings.output_folder + '/twi'
+    if not os.path.exists(out_folder): os.mkdir(out_folder)
+
+    try:
+
+        # Fill in sinks on mosaic
+        cmd = settings.saga_bin + 'ta_preprocessor 5 ' + \
+              '-ELEV ' + settings.dtm_mosaics_10m_folder + '/dtm_' + tile_id + '_float_mosaic_10m.tif ' + \
+              '-FILLED ' + wd + '/' + tile_id + '_mosaic_10m_filled.sdat ' + \
+              '-MINSLOPE 0.01'
+        log_file.write(tile_id + ' finished filling sinks. \n ' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT))
+
+        # Calculate Flow Accumulation on filled mosaic
+        cmd = settings.saga_bin + 'ta_hydrology 0 ' + \
+              '-ELEVATION ' + wd + '/' + tile_id + '_mosaic_10m_filled.sdat ' + \
+              '-METHOD 4 -CONVERGENCE 1.0 ' + \
+              '-FLOW ' + wd + '/' + tile_id + '_mosaic_10m_filled_flow_mfd.sdat ' 
+        log_file.write(tile_id + ' finished flow claculation. \n ' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT))
+
+        # Calculate Flow Width and Catchment Area
+        cmd = settings.saga_bin + 'ta_hydrology 19 ' + \
+              '-DEM ' + wd + '/' + tile_id + '_mosaic_10m_filled.sdat ' + \
+              '-TCA ' + wd + '/' + tile_id + '_mosaic_10m_filled_flow_mfd.sdat ' + \
+              '-WIDTH ' + wd + '/' + tile_id + '_mosaic_10m_filled_flow_mfd_width.sdat ' + \
+              '-SCA ' + wd + '/' + tile_id + '_mosaic_10m_filled_flow_mfd_sca.sdat '
+        log_file.write(tile_id + ' finished flow width and catchment area calculation. \n ' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT))
+
+        # Calculate slope on mosaic
+        cmd = settings.saga_bin + 'ta_morphometry 0 ' + \
+              '-ELEVATION ' + wd + '/' + tile_id + '_mosaic_10m_filled.sdat ' + \
+              '-METHOD 7 ' + \
+              '-SLOPE ' + wd + '/' + tile_id + '_mosaic_10m_filled_slope.sdat ' 
+        log_file.write(tile_id + ' finished slope claculation. \n ' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT))
+
+        # Calculate TWI on mosaic
+        cmd = settings.saga_bin + 'ta_hydrology 20 ' + \
+              '-SLOPE ' + wd + '/' + tile_id + '_mosaic_10m_filled_slope.sdat ' + \
+              '-AREA ' +wd + '/' + tile_id + '_mosaic_10m_filled_flow_mfd_sca.sdat ' + \
+              '-TWI  '+ wd + '/' + tile_id + '_mosaic_10m_filled_twi.sdat ' 
+        log_file.write(tile_id + ' finished twi claculation. \n ' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT))
+
+        # Crop output to original tile size and convert to tif:
+        cmd = settings.gdalwarp_bin + \
+              ' -cutline ' + settings.dtm_footprint_folder + '/DTM_1km_' + tile_id + '_footprint.shp ' + \
+              ' -crop_to_cutline -overwrite ' + \
+              wd + '/' + tile_id + '_mosaic_10m_filled_twi.sdat ' + \
+              wd + '/twi_' + tile_id + '_float.tif '
+
+        log_file.write(subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
+                     '\n' + tile_id + ' cropping wetness index mosaic successful.\n\n')
+        return_value = 'success'
+
+        # Stretch to by 1000, round and convert to int 16
+        # Construct gdal command:
+        cmd = settings.gdal_calc_bin + \
+              '-A ' + wd + '/twi_' + tile_id + '_float.tif ' + \
+              '--outfile=' + out_folder + '/twi_' + tile_id + '.tif ' + \
+              ' --calc=rint(1000*A) --type=Int16 --NoDataValue=-9999 --overwrite'
+
+        # Execute gdal command
+        log_file.write('\n' + tile_id + ' rounding and conversion finished. ' \
+                                                   'TWI calculation successful. \n' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT))
+
+    except:
+        log_file.write('\n' + tile_id + ' wetness index calculation failed.\n\n')
+        return_value = 'SAGA/GDAL Error'
+
+    # Close log file
+    log_file.close()
+
+    # Remove temporary file
+    try:
+        for temp_file in glob.glob(wd + '/' + tile_id + '_mosaic_10m_filled.*'):
+            os.remove(temp_file)
+        for temp_file in glob.glob(wd + '/' + tile_id + '_mosaic_10m_filled_flow_mfd.*'):
+            os.remove(temp_file)
+        for temp_file in glob.glob(wd + '/' + tile_id + '_mosaic_10m_filled_flow_mfd_width.*'):
+            os.remove(temp_file)
+        for temp_file in glob.glob(wd + '/' + tile_id + '_mosaic_10m_filled_flow_mfd_sca.*'):
+            os.remove(temp_file)
+        for temp_file in glob.glob(wd + '/' + tile_id + '_mosaic_10m_filled_slope.*'):
+            os.remove(temp_file)
+        for temp_file in glob.glob(wd + '/' + tile_id + '_mosaic_10m_filled_twi.*'):
+            os.remove(temp_file)
+        os.remove(wd + '/twi_' + tile_id + '_float.tif ')
+    except:
+        pass
+
+    return return_value
+    
 ## Calculate SAGA Wetness Index for a tile
 def dtm_saga_wetness(tile_id):
     """
@@ -862,7 +977,7 @@ def dtm_saga_wetness(tile_id):
     wd = os.getcwd()
 
     # Prepare output folder
-    out_folder = settings.output_folder + '/wetness_index'
+    out_folder = settings.output_folder + '/saga_wetness_index'
     if not os.path.exists(out_folder): os.mkdir(out_folder)
 
     try:
@@ -1036,6 +1151,7 @@ def dtm_remove_temp_files(tile_id):
     return_value = ''
 
     dtm_mosaic = settings.dtm_mosaics_folder + '/dtm_' + tile_id + '_mosaic.tif'
+    dtm_mosaic_10m = settings.dtm_mosaics_10m_folder + '/dtm_' + tile_id + '_float_mosaic_10m.tif'
     dtm_footprint_files = glob.glob(settings.dtm_footprint_folder + '/DTM_1km_' + tile_id + '_footprint.*')
 
     try:
@@ -1043,6 +1159,12 @@ def dtm_remove_temp_files(tile_id):
         return_value = 'success'
     except:
         return_value = 'unable to delete dtm mosaic file'
+
+    try:
+        os.remove(dtm_mosaic_10m)
+        return_value = 'success'
+    except:
+        return_value = 'unable to delete dtm mosaic 10 m file'
 
     try:
         for file in dtm_footprint_files: os.remove(file)

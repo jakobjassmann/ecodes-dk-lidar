@@ -23,6 +23,7 @@ gdalsrsinfo_bin = 'C:/OSGeo4W64/OSGeo4W.bat gdalsrsinfo '
 # Saga binary commands
 saga_wetness_bin = 'C:/OSGeo4W64/apps/saga-ltr/saga_cmd.exe --cores=1 ta_hydrology 15 '
 saga_openness_bin = 'C:/OSGeo4W64/apps/saga-ltr/saga_cmd.exe --cores=1 ta_lighting 5 '
+saga_bin = 'D:/Jakob/saga-7.8.2_x64/saga_cmd.exe --cores=1 '
 
 ### Set folder locations
 # Main working directory
