@@ -1,0 +1,99 @@
+---
+title: "DK LiDAR Debug Visualisation"
+output: html_notebook
+---
+
+Run `scripts/debug.py` piror knitting this notebook.
+
+Visualisations of outputs form the dk lidar debug script.
+
+```{r echo = FALSE, warning = FALSE, message = FALSE}
+# Dependencies
+library(raster)
+library(tidyverse)
+library(cowplot)
+library(ggplot2)
+library(raster)
+library(rasterVis)
+library(knitr)
+library(kableExtra)
+
+# Set debug folder 
+debug_folder <- "D:/Jakob/dk_nationwide_lidar/scratch/debug"
+
+# load tiff files
+raster_files <- list.files(debug_folder, 
+                           pattern = ".tif", 
+                           recursive = T,
+                           full.names = T)
+raster_list <- lapply(raster_files, raster)
+
+
+
+```
+
+```{r echo = FALSE, results = "asis"}
+# Define function to generate markdown section
+analyse_raster <- function(index){
+  # Load raster and set variables
+  variable_name <- gsub(".*/([A-Za-z0-9_]*).*_[0-9]{4}_[0-9]{3}.tif", 
+                        "\\1",
+                        raster_files[index])
+  tile_id <- gsub(".*([0-9]{4}_[0-9]{3}).tif", 
+                        "\\1",
+                        raster_files[index])
+  target_raster <- raster_list[[index]]
+  target_raster[target_raster == -9999] <- NA
+  # Get summary stats
+  summary_stats <- data.frame(
+    dataType = dataType(target_raster),
+    mean = cellStats(target_raster, mean),
+    min = cellStats(target_raster, min),
+    max = cellStats(target_raster, max),
+    isNA = sum(is.na(target_raster[]))
+  )
+  # Raster Plot
+  raster_plot <- levelplot(target_raster,
+             margin = F)
+  # Histogram Plot
+  hist_plot <- ggplot(as.data.frame(target_raster), 
+                      aes(x = get(paste0(variable_name, "_", tile_id)))) +
+    geom_histogram(bins = 100) +
+    labs(x = "", y = "n cells") +
+    theme_cowplot()
+  # Export plot
+  save_plot(paste0(debug_folder, "/", variable_name, "_", tile_id, ".png"),
+            plot_grid(as_grob(raster_plot), hist_plot, ncol = 2))
+  # Generate Markdown section
+  cat("\n---\n")
+  cat(paste0("\n## ", variable_name, " ", tile_id, "\n"))
+  print(kable(summary_stats)  %>% kable_styling(full_width = F, position = "left"))
+  cat(paste0("![](", debug_folder, "/", variable_name, "_", tile_id, ".png)\n"))
+  return(NULL)
+}
+
+# Add Hillshade if both aspect and slope are present and if it is only one tile
+variables <- gsub(".*/([A-Za-z0-9_]*).*_[0-9]{4}_[0-9]{3}.tif", 
+                        "\\1",
+                        raster_files)
+tile_ids <- unique(gsub(".*([0-9]{4}_[0-9]{3}).tif", 
+                        "\\1",
+                        raster_files))
+if("aspect" %in% variables & "slope" %in% variables & length(tile_ids) == 1){
+  
+  hill_shade <- hillShade(raster_list[[which(variables == "aspect")]] * pi / 180, 
+                          raster_list[[which(variables == "slope")]] * pi / 180)
+  cat(paste0("\n## Hillshade ", tile_ids, "\n"))
+  hill_shade_plot <- levelplot(hill_shade,
+             margin = F,
+             col.regions = gray(0:100/100))
+  save_plot(paste0(debug_folder, "/", "hillshade_", tile_ids, ".png"),
+            as_grob(hill_shade_plot), ncol = 2)
+   cat(paste0("![](", debug_folder, "/", "hillshade_", tile_ids, ".png)\n"))
+}
+
+# Plot all other rasters
+for(i in seq_along(raster_files)) analyse_raster(i)
+```
+
+
