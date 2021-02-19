@@ -301,7 +301,7 @@ def dtm_calc_slope(tile_id):
         cmd = settings.gdal_calc_bin + \
               '-A ' + wd + '/slope_' + tile_id + '_mosaic_cropped.tif ' + \
               ' --outfile=' + out_folder + '/slope_' + tile_id + '.tif ' + \
-              ' --calc=rint(A) --type=Int16 --NoDataValue=-9999'
+              ' --calc=rint(10*A) --type=Int16 --NoDataValue=-9999'
         log_file.write('\n' + tile_id + ' rounding slope and calculation successful. \n' + \
                      subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT))
 
@@ -368,7 +368,7 @@ def dtm_calc_aspect(tile_id):
         cmd = settings.gdal_calc_bin + \
               '-A ' + wd + '/aspect_' + tile_id + '_mosaic_cropped.tif ' + \
               ' --outfile=' + out_folder + '/aspect_' + tile_id + '.tif ' + \
-              ' --calc=rint(A) --type=Int16 --NoDataValue=-9999'
+              ' --calc=rint(10*A) --type=Int16 --NoDataValue=-9999'
         log_file.write('\n' + tile_id + ' rounding aspect to int16 and calculation success. \n' + \
                      subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT))
 
@@ -417,7 +417,7 @@ def dtm_calc_heat_index(tile_id):
         aspect_file = '-A ' + settings.output_folder + '/aspect/aspect_' + tile_id + '.tif '
 
         # Construct numpy equation, stretch by 10k and round
-        heat_index = 'rint(10000*((1-cos(radians(A-45)))/2))'
+        heat_index = 'rint(10000*((1-cos(radians((A/10)-45)))/2))'
 
         # Specify output path
         out_file = out_folder + '/heat_load_index_' + tile_id + '.tif '
@@ -585,7 +585,7 @@ def dtm_calc_solar_radiation(tile_id):
         aspect_file = '-A ' + settings.output_folder + '/aspect/aspect_' + tile_id + '.tif '
 
         # Construct numpy equation (based on McCune and Keon 2002) and stretch by 1000 and round to nearest int.
-        solar_rad_eq = 'rint(1000*(0.339+0.808*cos(radians(L))*cos(radians(S))-0.196*sin(radians(L))*sin(radians(S))-0.482*cos(radians(180-absolute(180-A)))*sin(radians(S))))'
+        solar_rad_eq = 'rint(1000*(0.339+0.808*cos(radians(L))*cos(radians((S/10)))-0.196*sin(radians(L))*sin(radians((S/10)))-0.482*cos(radians(180-absolute(180-(A/10))))*sin(radians((S/10)))))'
 
         # Specify output path
         out_file = out_folder + '/solar_rad_' + tile_id + '.tif '

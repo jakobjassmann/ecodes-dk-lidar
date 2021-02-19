@@ -81,8 +81,8 @@ tile_ids <- unique(gsub(".*([0-9]{4}_[0-9]{3}).tif",
                         raster_files))
 if("aspect" %in% variables & "slope" %in% variables & length(tile_ids) == 1){
   
-  hill_shade <- hillShade(raster_list[[which(variables == "aspect")]] * pi / 180, 
-                          raster_list[[which(variables == "slope")]] * pi / 180)
+  hill_shade <- hillShade(raster_list[[which(variables == "aspect")]] / 10 * pi / 180, 
+                          raster_list[[which(variables == "slope")]] / 10 * pi / 180)
   cat(paste0("\n## Hillshade ", tile_ids, "\n"))
   hill_shade_plot <- levelplot(hill_shade,
              margin = F,
