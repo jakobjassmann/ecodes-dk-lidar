@@ -68,6 +68,7 @@ Files to support data access and handling.
 | ---- | ---- |
 | [water masks](#water-masks) | Sea and inland water masks for each tile |
 | [tile footprints](#tile-footprints) | Tile footprints, allows for targeted subsetting of dataset |
+| [vrt files](#vrt-files) | VRT files (virtual mosaic file) for each variable |
 
 [Back to content.](#content)
 
@@ -552,7 +553,7 @@ No relevant references.
 
 ----
 
-### tile_footprints
+### tile footprints
 
 Folder location: `/outpus/tile_footprints`
 
@@ -577,3 +578,31 @@ No relevant references.
 [Back to content](#content).
 
 ---
+
+### vrt files
+
+**Folder locations:** `/outputs/*`
+
+**File names:** `*.vrt`
+
+**File type:** `VRT file`
+
+**Description:**
+
+Each variable folder contains a *.vrt file, where * is the variable name (same as the variable folder). These [VRT files](https://gdal.org/drivers/raster/vrt.html) allows the user to access all tiles for any one variable in a single virtual mosaic without the need of carrying out actual mosaicing of the rasters. 
+
+The files were generated using the `make_vrt_subfolders.bat` script.
+
+**Issues:**
+
+- On some platforms RStudio R session are unable to open these files, likely due to memory / file number limitations placed on the R session by RStudio. Should you encounter this problem we recommend starting an R session in a console or using an alternative IDE. 
+- The files can be slow to handle in interactive GIS applications due to the size. We recommend generating pyramids in ArcMap or QGIS upon opening the VRTs in these applications. 
+
+**References:**
+
+No relevant references.
+
+[Back to content](#content).
+
+---
+
