@@ -7,7 +7,7 @@ __*NOTE: This repository is currently under development.*__
 
 ## Variable Descriptions
 
-A description of the output variables can be found [here](/documentation/variables.md).
+A description of the output variables can be found [here](/documentation/variables.md) or download the [pdf](/documentation/variables.pdf).
 
 ## Repository Structure
 ```
@@ -33,9 +33,9 @@ To get started with the processing check out the [workflow overview](/documentat
 This project has been developed with OPALS 2.3.2.0, Python 2.7 (as distributed with OPALS), pandas (0.24.2), GDAL 2.2.4 (from OSgeo4W64) and SAGA GIS 7.8.2 executed on Windows 2012 Server 64 bit. 
 
 ## Contributors
-PI leading the research for this project: Signe Normand (signe.normand@bios.au.dk)
+PI leading the research for this project: Signe Normand (signe.normand@bio.au.dk)
 
-Repository maintanance and code development: Jakob Assmann (j.assmann@bios.au.dk)
+Repository maintanance and code development: Jakob Assmann (j.assmann@bio.au.dk)
 
 Selection and computation of output variables: Urs Treier, Andràs Zlinszky and Jesper Moeslund.
 
