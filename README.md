@@ -13,12 +13,12 @@ A description of the output variables can be found [here](/documentation/variabl
 ```
 /                 root folder
 |- data/          empty, place-holder for the data (needs to be imported from external sources).
-|- dklidar/       contains the Python package with modules for processing.
+|- dklidar/       contains the Python modules with processing function.
 |- documentation/ variable descriptions and further documentation. 
 |- log/           empty, place-holder for log file storage.
 |- qa_local/      quallity assurance outputs and processing reports.
 |- scratch/       empty, place-holder for temporary data handling.
-|- scripts/       contains all Batch and Python scritps for carrying out the processsing.
+|- scripts/       contains all batch, Python and R scripts for process managment and QA.
 ```
 ## Getting Started
 
