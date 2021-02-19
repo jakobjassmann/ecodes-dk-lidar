@@ -7,3 +7,4 @@ scratch/*
 auxillary_files
 *.pyc
 *Rproj*
+.Rhistory
