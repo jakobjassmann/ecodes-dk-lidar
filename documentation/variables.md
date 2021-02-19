@@ -320,7 +320,7 @@ These proportions were calculated between the vegetation point count in the resp
 
 **File name:** `aspect_xxxx_xxx.tif`
 
-**File type and units:** `16-bit integer, degrees`
+**File type and units:** `16-bit integer, degrees x 10`
 
 **Description:**
 
@@ -426,7 +426,7 @@ First, the 0.4 m DTM is aggregated to a grain size of 10 m. To reduce edge effec
 
 **File name:** `slope_xxxx_xxx.tif`
 
-**File type and units:** `16-bit integer, degrees`
+**File type and units:** `16-bit integer, degrees x 10`
 
 **Description:**
 
