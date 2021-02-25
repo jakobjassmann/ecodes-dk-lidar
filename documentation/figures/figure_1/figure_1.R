@@ -185,22 +185,22 @@ pallete_variables <- data.frame(
                     "canopy_height",
                     "normalized_z_sd",
                     "amplitude_mean"),
-  variable_name_pretty = c("Ground\nPts.",
-                           "Water\nPts.",
-                           "Veg.\nPts.",
+  variable_name_pretty = c("Ground Pts.",
+                           "Water Pts.",
+                           "Veg. Pts.",
                            "",
-                           "Canopy\nHt. (m)",
-                           "Norm. z\nSD (m)",
-                           "Ampl.\nMean"),
+                           "Canopy H.",
+                           "Norm. z sd",
+                           "Ampl. Mean"),
   scale_factor = c(1,1,1,1,0.01,0.01,1),
   decimals = c(0,0,0,0,1,1,1),
-  unit = c("","","","","", "", ""),
+  unit = c("","","",""," m", " m", ""),
   colours = c(
     palette["ground2"],
     palette["water9"],
     palette["vegetation3"],
     palette["vegetation3"],
-    palette["vegetation3"],
+    "#505050",
     "#505050",
     "#505050"),
   range_min = c(0, 0, 0, 0, 0, NA, NA),
@@ -292,7 +292,7 @@ draw_poly <- function(pixel, variable){
             axis.text = element_text(colour = "#505050"),
             axis.line = element_line(colour = "#505050"),
             axis.ticks = element_line(colour = "#505050"),
-            plot.margin=unit(c(1.5,9,1.5,13.5), "mm"))
+            plot.margin=unit(c(1.5,9,4.5,13.5), "mm"))
   
   } else {
     # get pixel value
@@ -314,7 +314,7 @@ draw_poly <- function(pixel, variable){
     
     # Set pixel text colour
     if(ramp_position <= 50) { 
-      pixel_text_colour <- "black"
+      pixel_text_colour <- "#505050"
     } else pixel_text_colour <- "white"
     
     # Scale and round variable
@@ -342,8 +342,8 @@ draw_poly <- function(pixel, variable){
       labs(x = "", y = "") +
       # annotate("text", x = 0, y = 165, hjust = 0, vjust = 1,
       #          label = variable_name_pretty, size = 2) +
-      annotate("text", x = 430, y = 165, hjust = 1, vjust = 1,
-               label = pixel_text, size = 6, colour = "#505050") +
+      annotate("text", x = 190, y = 90, hjust = 0.5, vjust = 0.5,
+               label = pixel_text, size = 6, colour = pixel_text_colour) +
       coord_cartesian() + 
       theme_nothing() +
       theme(axis.line = element_blank(),
@@ -352,7 +352,7 @@ draw_poly <- function(pixel, variable){
             axis.ticks = element_blank(),
             axis.text = element_blank(),
             legend.margin=unit(0, "mm"),
-            plot.margin=unit(c(1.5,3.5,1.5,24), "mm"),
+            plot.margin=unit(c(1.5,9.5,1.5,24), "mm"),
             axis.ticks.length = unit(0, "mm"))
     # poly_plot <- ggplot_gtable(ggplot_build(poly_plot))
     # poly_plot$layout$clip[poly_plot$layout$name == "panel"] <- "off"
@@ -373,8 +373,8 @@ variable_plot <- plot_grid(
   label_fontface = "bold",
   label_size = 18,
   label_colour = "#505050",
-  label_y = 0.95,
-  label_x = 0.04,
+  label_y = 1.1,
+  label_x = 0.03,
   hjust = 0,
   vjust = 1)
 
