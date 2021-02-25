@@ -200,7 +200,7 @@ pallete_variables <- data.frame(
     palette["water9"],
     palette["vegetation3"],
     palette["vegetation3"],
-    "#505050",
+    "#8D00BF",
     "#505050",
     "#505050"),
   range_min = c(0, 0, 0, 0, 0, NA, NA),
