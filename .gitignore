@@ -6,3 +6,6 @@ scratch/*
 .spyproject/
 auxillary_files
 *.pyc
+*Rproj*
+.Rhistory
+*.DS_Store
