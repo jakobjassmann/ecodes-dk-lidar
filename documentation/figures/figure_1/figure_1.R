@@ -1,4 +1,5 @@
 # Visualisation of pointclouds for publication
+# Jakob Assmann j.assmann@bio.au.dk Feb 2021
 
 # Dependencies
 library(lidR)
