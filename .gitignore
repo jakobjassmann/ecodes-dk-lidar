@@ -9,3 +9,4 @@ auxillary_files
 *Rproj*
 .Rhistory
 *.DS_Store
+documentation/figures/figure_2/*.tif
