@@ -10,3 +10,4 @@ auxillary_files
 .Rhistory
 *.DS_Store
 documentation/figures/figure_2/*.tif
+documentation/figures/figure_3/*.tif

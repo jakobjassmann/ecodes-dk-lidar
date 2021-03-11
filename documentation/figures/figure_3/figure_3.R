@@ -18,7 +18,7 @@ library(rnaturalearthdata)
 eval(parse("../plot_raster_3d/plot_raster_3d.R", encoding = "UTF-8"))
 
 # Set target tile id (Mol's Bjerge)
-tile_id <- "6210_570"
+tile_id <- "6171_541" #"6210_570"
 
 # Set folder paths
 dtm_10m <- "D:/Jakob/dk_nationwide_lidar/data/outputs/dtm_10m"
@@ -54,13 +54,27 @@ canopy_openness_raster <- raster(paste0(canopy_openness, "/canopy_openness_", ti
 vegetation_density_raster <- raster(paste0(vegetation_density, "/vegetation_density_", tile_id, ".tif")) / 10000
 building_proportion_raster <- raster(paste0(building_proportion, "/building_proportion_", tile_id, ".tif")) / 10000
 
-# Load orthomosaic 
-# Reduce size for easier handling (commmented out as this takes time)
-# ortho <- stack("6210_570_ortho_2014.tif")
+# Load orthomosaic
+
+# Determine ortho tile number (2014 ortho tiles are 2 km x 2 km)
+tile_row <- as.numeric(gsub("([0-9]{4})_.*", "\\1", tile_id))
+tile_col <- as.numeric(gsub(".*_([0-9]{3})", "\\1", tile_id))
+if(tile_row %% 2 == 1) tile_row <- tile_row - 1  
+if(tile_col %% 2 == 1) tile_col <- tile_col - 1 
+
+# # Convert ESRI world file to tif
+# system(paste0("C:/OSGeo4W64/OSGeo4W.bat gdal_translate ",
+#        "O:/Nat_Ecoinformatics/B_Read/Denmark/Orthophotos/SOF2014/UTM32N/",
+#        "2km_", tile_row, "_", tile_col, "_2014.ecw ",
+#        getwd(), "/ortho_", tile_row, "_", tile_col, "_2014.tif"))
+# 
+# # Reduce size for easier handling (commmented out as this takes time)
+# ortho <- stack(paste0("ortho_", tile_row, "_", tile_col, "_2014.tif"))
 # ortho <- crop(ortho, dtm_10m_raster)
 # ortho <- aggregate(ortho, 12)
 # writeRaster(ortho, paste0("ortho_", tile_id, "_aggregated.tif"), overwrite = T)
-# Shortcut to cropped and aggregated ortho raster
+
+# Shortcut to load cropped and aggregated ortho raster
 ortho <- stack(paste0("ortho_", tile_id, "_aggregated.tif"))
 
 
@@ -81,15 +95,15 @@ parameters <- tibble(
                     "vegetation_density",
                     "building_proportion"),
   variable_name = c("Return Amplitude (undefined)",
-                    "Return Amplitude σ (undefined)",
+                    "Return Amplitude sd (undefined)",
                     "Canopy Height (m)",
                     "Normalized z mean (m)",
-                    "Normalized z σ (m)",
-                    "Ground Point Count",
-                    "Water Point Count",
-                    "Vegetation Point Count",
-                    "Building Point Count",
-                    "Total Point Count",
+                    "Normalized z sd (m)",
+                    "Ground Point Count (x1k)",
+                    "Water Point Count (x1k)",
+                    "Vegetation Point Count (x1k)",
+                    "Building Point Count (x1k)",
+                    "Total Point Count (x1k)",
                     "Point Source IDs Count",
                     "Canopy Openness",
                     "Vegetation Density",
@@ -101,11 +115,11 @@ parameters <- tibble(
     canopy_height_raster,
     normalized_z_mean_raster,
     normalized_z_sd_raster,
-    ground_point_count_raster,
-    water_point_count_raster,
-    vegetation_point_count_raster,
-    building_point_count_raster,
-    total_point_count_raster,
+    ground_point_count_raster / 1000,
+    water_point_count_raster / 1000,
+    vegetation_point_count_raster / 1000,
+    building_point_count_raster / 1000,
+    total_point_count_raster / 1000,
     point_source_nids_raster,
     canopy_openness_raster,
     vegetation_density_raster,
@@ -124,25 +138,35 @@ parameters <- tibble(
                     dtm_10m_raster,
                     dtm_10m_raster,
                     dtm_10m_raster),
-  colour_ramp = list(sequential_hcl(99, palette = "Plasma", rev = T),
-                     sequential_hcl(99, palette = "Viridis", rev = T),
+  colour_ramp = list(sequential_hcl(99, palette = "Plasma", rev = F),
+                     sequential_hcl(99, palette = "Viridis", rev = F),
                      sequential_hcl(10, palette = "Greens 3", rev = T),
                      sequential_hcl(10, palette = "Heat", rev = T),
                      sequential_hcl(10, palette = "OrRd", rev = T),
                      sequential_hcl(99, palette = "BrwnYl", rev = T),
-                     sequential_hcl(5, palette = "Blues 3", rev = T),
+                     sequential_hcl(5, palette = "Blue-Yellow", rev = T),
+                     sequential_hcl(5, palette = "Greens 3", rev = T),
+                     sequential_hcl(5, palette = "Reds 3", rev = T),
+                     sequential_hcl(5, palette = "Grays", rev = T),
+                     sequential_hcl(3, palette = "Viridis", rev = F),
+                     sequential_hcl(10, palette = "Sunset", rev = F),
                      sequential_hcl(10, palette = "Greens 3", rev = T),
-                     sequential_hcl(10, palette = "Reds 3", rev = T),
-                     sequential_hcl(99, palette = "Grays", rev = T),
-                     sequential_hcl(3, palette = "Inferno", rev = T),
-                     sequential_hcl(10, palette = "Sunset", rev = T),
-                     sequential_hcl(10, palette = "Greens 3", rev = T),
-                     sequential_hcl(10, palette = "Reds 3", rev = T)),
-  # min_value = c(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-  # max_value = c(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-  # y_max = c(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+                     sequential_hcl(4, palette = "Reds 3", rev = T)),
+  min_value = c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+  max_value = c(350, 150, 50, 40, 15, 3, 1.5, 10, 3, 12, 3, 1, 1, 0.5),
+  # y_max = c(600, 300, 4000, 5000, 4000, 1500, 10000, 6000, 10000, 3000, 7000, 3000, 3000, 10000),
   z_scale = 5
   )
+
+# # Print min max values for all rasters for manual adjiustment of histograms
+# parameters %>% dplyr::select(variable_code, raster_object) %>%
+#   pmap(function(variable_code, raster_object){
+#     cat(variable_code, "\n")
+#     print(cellStats(raster_object, min, na.rm = T))
+#     print(cellStats(raster_object, max, na.rm = T))
+#     print(quantile(raster_object, c(0.05, 0.95)))
+#     return(NULL)
+#   })
 
 # Generate combined plots
 plot_list <- parameters %>% 
