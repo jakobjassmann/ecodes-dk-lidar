@@ -17,7 +17,7 @@ library(rnaturalearthdata)
 # Use eval and parse instead.
 eval(parse("../plot_raster_3d/plot_raster_3d.R", encoding = "UTF-8"))
 
-# Set target tile id (Mol's Bjerge)
+# Set target tile id (Vejle Fjord)
 tile_id <- "6171_541" #"6210_570"
 
 # Set folder paths
