@@ -1,7 +1,7 @@
 data/*
 qa_local/*
 log/*
-scratch/*
+scratch/*/
 .idea/
 .spyproject/
 auxillary_files
@@ -11,3 +11,4 @@ auxillary_files
 *.DS_Store
 documentation/figures/figure_2/*.tif
 documentation/figures/figure_3/*.tif
+.Rproj.user
