@@ -1,6 +1,6 @@
 # DK Nation-wide LiDAR Variable Descriptions
 
-*Version 0.5*
+*Version 0.6*
 
 *Work in progress...*
 
@@ -340,7 +340,31 @@ No relevant references.
 
 ----
 
+### dtm_10m
+
+**Folder location:** `/outputs/dtm_10m`
+
+**File name:** `dtm_10m_xxxx_xxx.tif`
+
+**File type and units:** `16-bit integer, metres x 100`
+
+**Description:**
+
+Digital Terrain Model (DTM) tiles of Denmark with a grain size of 10 m x 10 m. The 10 m rasters are mean aggregates of the 0.4 m DTM provided by Kortforsyningen.  The outputs were streched by a factor of 100 and stored as a 16-bit integer. The output values are therefore in cm. To backconvert to metres, simply devide by 100. 
+
+**Issues:**
+
+- No known issues.
+
+**References:**
+No relevant references.
+
+[Back to content.](#content)
+
+----
+
 ### heat\_load\_index
+
 **Folder location:** `/outputs/heat_load_index`
 
 **File name:** `heat_load_index_xxxx_xxx.tif`
