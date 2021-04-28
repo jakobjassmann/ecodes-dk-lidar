@@ -350,7 +350,9 @@ No relevant references.
 
 **Description:**
 
-Digital Terrain Model (DTM) tiles of Denmark with a grain size of 10 m x 10 m. The 10 m rasters are mean aggregates of the 0.4 m DTM provided by Kortforsyningen.  The outputs were streched by a factor of 100 and stored as a 16-bit integer. The output values are therefore in cm. To backconvert to metres, simply devide by 100. 
+Digital Terrain Model (DTM) tiles of Denmark with a grain size of 10 m x 10 m. The 10 m rasters are mean aggregates of the 0.4 m DTM provided by Kortforsyningen.  
+
+The outputs were streched by a factor of 100 and stored as a 16-bit integer. The output values are therefore in cm - divide by 100 to convert back to metres. 
 
 **Issues:**
 
