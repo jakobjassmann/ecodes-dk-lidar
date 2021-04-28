@@ -5,23 +5,43 @@ The scripts in this folder are used to set up the environment and process the da
 Carry out the following steps to prepare the processing:
 
 1. Make a local clone of the repository.
-2. Set the absolute paths to your local folders in `dklidar/settings.py`.
+2. Set the relevant absolute paths to your local folders in `dklidar/settings.py`.
 3. Check out all [pointcloud](https://download.kortforsyningen.dk/content/dhmpunktsky) and [DTM](https://download.kortforsyningen.dk/content/dhmterr%C3%A6n-04-m-grid) tile bundles on the Kortforsyningen website, but don't download via your browser\*.
 4. Follow instructions in the comments of the `download_files.py` script to retrieve a cookie for the Kortforsyningen website using *Google Chrome*. Adjust the number of parallel downloads in the script to fit your needs. Note: Tile bundle file names are specified in the `.txt` files in the `data/kortforsyningen_file_lists/` folder.
 5. Open an OPALS shell.
-5. Modify the `set_environment.bat` script with your local paths and run the script to add the *dklidar package* to the OPALS python environment.
-5. Run `donwload_files.py`. 
-6. Run `create_checksums.bat` to create the checksums for the downloaded files.
-7. Verify checksums and establish any missing tiles using `checksum_qa.py`. Follow up by running `remove_missing_tiles.py` if you want. 
+6. Navigate to the `script` folder of your local clone of this repository. 
+7. Modify the `set_environment.bat` script with your local paths and run the script to add the *dklidar package* to the OPALS python environment. __Note: You will have to run this batch script every time you open a new OPALS shell for processing using this workflow__
+8. Run `python donwload_files.py`. 
+9. Run `create_checksums.bat` to create the checksums for the downloaded files.
+10. Verify checksums and establish any missing tiles using `python checksum_qa.py`. Follow up by running `python remove_missing_tiles.py` if you want. 
+11. If you have not already installed `pandas` in your OPALS python environment do this now by running: `python -m pip install pandas --user`
 
-Once all those steps are completed...
+\* *Alternatively, Kortforsyningen could be contacted to request access to the dataset via a different route, e.g. their ftp file server access.* 
 
-8. Run `process_tiles.py` to start the processing.
-9. Open a second OPALS shell and start `progress_monitor.py` to keep taps on the progress.
+Optional test run:
 
-The `process_tiles.py` scripts uses a CSV-based database created in the `log/process_tiles` folder to keep track of which tiles have been processed. The progress database allows the script to resume without dataloss, should the processing be interrupted for some unexpected reason. In this case all partially processed tiles will be re-processed again. The database also contains information on the exit status of each processing step for each tile. Furthermore, the OPALs and GDAL logs are kept for all processed tiles in the subfolders of this folder named with the tile id. 
+- Open `debug.py` and adjust the file paths in line 22 and 25 to match your local file paths. Also specify a tile_id (line 36) that you have certainly downloaded both the dtm as well as the laz files for.
+- Run the debug script in the OPALS shell using `python debug.py`.
 
-\* *Alternatively, Kortforsyningen could be contacted to request access to the  dataset via a different route.* 
+## Running the processing
+
+Once the above steps are completed...
+
+12. Adjust the number of parallel processes to be run in `process_tiles.py`
+
+13. Run `python process_tiles.py` to start the processing.
+
+14. Open a second OPALS shell, set the environment using `set_environment.bat` and start `python progress_monitor.py` to keep taps on the progress.
+
+Note: The `process_tiles.py` scripts uses a CSV-based database created in the `log/process_tiles` folder to keep track of which tiles have been processed. The progress database allows the script to resume without data loss, should the processing be interrupted for some unexpected reason. In this case, all partially processed tiles will be re-processed again. If you want to start a fresh process you will have to delete the log folder `log/process_tiles`.  
+
+
+
+## Quality control and logging outputs
+
+We have provided a couple of scripts that allow for quality control. These will be described here.
+
+The logging database used for processe management in `log also contains information on the exit status of each processing step for each tile. In addition, the OPALs and GDAL logs are kept for all processed tiles in the subfolders of this folder named with the tile id.
 
 ----
 
@@ -41,5 +61,7 @@ remove_missing_tiles.py | Removes incomplete tiles from the DTM and laz folders.
 **set_environment.bat** | Adds the *dklidar package* to the OPALS shell python path.
 **stop.bat** | Stops processing chain by killing all pyhton.exe processes currently running. Can be used to interrupt `process_tiles.py`.
 test.py | Playground script to test processing steps etc. 
+debug.py | Script to test run all data extraction functions in the dk_lidar module. Requires the dtm and laz to be downloaded for at least one tile. 
+debug.Rmd | R Markdown file to visualise the outputs from a debug.py run. 
 
 *Note: Other scripts may appear here that are version controlled for temporary purposes.*
