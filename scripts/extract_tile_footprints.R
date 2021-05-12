@@ -18,7 +18,7 @@ system2(osgeos_path,
                  paste0(data_outputs_path, 
                         "tile_footprints/tile_footprints.shp"),
                  paste0(data_outputs_path, 
-                        "aspect/*.tif")))
+                        "dtm_10m/*.tif")))
 
 # Load file as sf object
 tile_footprints <- read_sf(paste0(data_outputs_path, 
