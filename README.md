@@ -37,7 +37,7 @@ To replicate the processing, revisit the [workflow overview](/documentation/dk_l
 |- dklidar/       Python module providing the processing functions.
 |- documentation/ documentation for python module and output variables. 
 |- log/           empty, place-holder for log file output.
-|- manuscript/    scripts and additional information accompanying the manuscript.
+|- manuscript/    scripts accompanying the manuscript.
 |- qa_local/      quallity assurance outputs and processing reports.
 |- scratch/       empty, place-holder for temporary data storage.
 |- scripts/       contains Python and R scripts for process management and QA.
