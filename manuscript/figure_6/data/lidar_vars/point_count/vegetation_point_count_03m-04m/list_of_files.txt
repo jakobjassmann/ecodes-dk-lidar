@@ -1,0 +1,9 @@
+D:/Jakob/scratch/husby/lidar_vars//point_count/vegetation_point_count_03m-04m/vegetation_point_count_03m-04m_6238_445.tif
+D:/Jakob/scratch/husby/lidar_vars//point_count/vegetation_point_count_03m-04m/vegetation_point_count_03m-04m_6238_446.tif
+D:/Jakob/scratch/husby/lidar_vars//point_count/vegetation_point_count_03m-04m/vegetation_point_count_03m-04m_6238_447.tif
+D:/Jakob/scratch/husby/lidar_vars//point_count/vegetation_point_count_03m-04m/vegetation_point_count_03m-04m_6239_445.tif
+D:/Jakob/scratch/husby/lidar_vars//point_count/vegetation_point_count_03m-04m/vegetation_point_count_03m-04m_6239_446.tif
+D:/Jakob/scratch/husby/lidar_vars//point_count/vegetation_point_count_03m-04m/vegetation_point_count_03m-04m_6239_447.tif
+D:/Jakob/scratch/husby/lidar_vars//point_count/vegetation_point_count_03m-04m/vegetation_point_count_03m-04m_6240_445.tif
+D:/Jakob/scratch/husby/lidar_vars//point_count/vegetation_point_count_03m-04m/vegetation_point_count_03m-04m_6240_446.tif
+D:/Jakob/scratch/husby/lidar_vars//point_count/vegetation_point_count_03m-04m/vegetation_point_count_03m-04m_6240_447.tif
