@@ -1,5 +1,7 @@
 # dk_nationwide_lidar
-Raster outputs for ecological and environmental variables derived from DK nation-wide LiDAR data "Punktsky" and the nation-wide DTM at 0.4 m resolution.
+Software to generate high-resolution ecological descriptors of vegetation and terrain from Denmark’s national airborne laser scanning dataset. 
+
+Code repository accompanying Assmann *et al.* 2021 - EcoDes-DK15: High-resolution ecological descriptors of vegetation and terrain derived from Denmark’s national airborne laser scanning dataset.
 
 ---
 
@@ -39,7 +41,12 @@ Repository maintanance and code development: Jakob Assmann (j.assmann@bio.au.dk)
 
 Selection and computation of output variables: Urs Treier, Andràs Zlinszky and Jesper Moeslund.
 
-## License
-Content in this repository is currently not avialalbe under any license. Please contact Jakob (j.assmann@bios.au.dk) if you would like to re-use or share any of the code in this repostiory. 
+## Citation
 
+When using the code or data please cite:
+
+Assmann, Jakob J., Jesper E. Moeslund, Urs A. Treier and Signe Normand. *In prep*. EcoDes-DK15: High-resolution ecological descriptors of vegetation and terrain derived from Denmark’s national airborne laser scanning dataset.
+
+## License
+The code in this repository is freely available via a simplified BSD license. See [LICENSE.txt](license.txt) for the exact conditions. We highly encourage use and further development of the code provided.  
 
