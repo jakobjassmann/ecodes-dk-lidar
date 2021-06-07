@@ -85,7 +85,7 @@ Assmann, Jakob J., Jesper E. Moeslund, Urs A. Treier and Signe Normand. *in prep
 
 ## License
 
-The code in this repository is openly available via a simplified BSD license. See [LICENSE.txt](license.txt) for details. We highly encourage use and further development of the code provided.  
+The code in this repository is openly available via a simplified BSD license. See [LICENSE](license.txt) for details. We highly encourage use and further development of the code provided.  
 
 [\[to top\]](#content)
 
