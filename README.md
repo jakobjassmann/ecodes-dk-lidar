@@ -1,7 +1,10 @@
 # EcoDes-DK Software and Documentation
 Jakob J. Assmann, Jesper E. Moselund, Urs A. Treier and Signe Normand
 
-Code repository accompanying the **EcoDes-DK15** dataset [INSERT BADGE](https://doi.org/10.5281/zenodo.4756557) and *Assmann* et al. in prep. - *EcoDes-DK15:* *High-resolution ecological descriptors of vegetation and terrain derived from Denmark’s national airborne laser scanning dataset.* [LINK TO DOI]().
+Code repository accompanying:
+
+- The **EcoDes-DK15** dataset [!INSERT BADGE!](https://doi.org/10.5281/zenodo.4756557).
+- Assmann et al. in prep. - *EcoDes-DK15:* *High-resolution ecological descriptors of vegetation and terrain derived from Denmark’s national airborne laser scanning dataset.* [!LINK TO DOI!]().
 
 ## Content
 
@@ -16,15 +19,16 @@ Code repository accompanying the **EcoDes-DK15** dataset [INSERT BADGE](https://
 
 ## Getting Started
 
-This repository contains the code needed to generate the EcoDes-DK15 dataset and the figures in accompanying manscuript, it also provides additional documentation for the dataset and the processing software.
+This repository contains the code to generate the EcoDes-DK15 dataset, as well as the figures in the accompanying manscuript. It also provides additional documentation for the dataset and the processing software.
 
-We recommend the manuscript as a first starting point for information on both the dataset as well as the overall processing method. Further documentation for code and dataset, as well as example scripts on how to access the data are provided as outlined [below](#documentation). 
+We recommend the manuscript as a first starting point for information on the dataset and the processing method. Here, we provide a) more detailed documentation on the code and processing, b) scripts to generate the figures in the manuscript, and c) example scripts on how to access the data. For an overview of these, see the [documentation section below](#documentation). 
 
-To get started with replicating the processing, please revisit the [workflow overview](/documentation/dk_lidar_processing_flow.pdf). Then carry out the following steps:
+To replicate the processing, revisit the [workflow overview](/documentation/dk_lidar_processing_flow.pdf), then carry out the following steps:
 
-1. Set up your local environment and download the source data following the pre-processing steps in [*scripts/readme.md*](scripts/readme.md).
-2. Process the tiles using [*scripts/process_tiles.py*](scripts/process_tiles.py).
-3. Carry out the post-processing steps in [*scripts/readme.md*](scripts/readme.md).
+1. Obtain a local clone of this repository. 
+2. Set up your local environment and download the source data following the pre-processing steps in [*scripts/readme.md*](scripts/readme.md).
+3. Process the tiles using [*scripts/process_tiles.py*](scripts/process_tiles.py).
+4. Carry out the post-processing steps in [*scripts/readme.md*](scripts/readme.md).
 
 [\[to top\]](#content)
 
@@ -57,9 +61,9 @@ Code development and processing were carried out on Windows 2012 Server 64 bit, 
 [\[to top\]](#content)
 
 ## Contact
-Repository maintanance and code development: Jakob Assmann (j.assmann@bio.au.dk)
+Code development and maintenance: Jakob J. Assmann (j.assmann@bio.au.dk)
 
-PI leading the research for this project: Signe Normand (signe.normand@bio.au.dk)
+PI overseeing this project: Signe Normand (signe.normand@bio.au.dk)
 
 [\[to top\]](#content)
 
