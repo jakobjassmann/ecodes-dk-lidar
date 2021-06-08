@@ -19,7 +19,7 @@ Code repository accompanying:
 
 ## Getting Started
 
-This repository contains the code needed to generate the EcoDes-DK15 dataset and the figures in the accompanying manscuript. It also provides additional documentation for both code and dataset, see [below](#documentation). 
+This repository contains the code required for generating the EcoDes-DK15 dataset and the associated figures in the accompanying manscuript. The repository also provides additional documentation for both code and dataset, for details on those see [below](#documentation). 
 
 To replicate the processing, revisit the [workflow overview](/documentation/dk_lidar_processing_flow.pdf), then carry out the following steps:
 
@@ -46,11 +46,11 @@ To replicate the processing, revisit the [workflow overview](/documentation/dk_l
 
 ## Documentation
 
-This repository contains the following documentation supplementary to the manuscript:
+This repository contains the following documentation:
 
 - A summary description of the output variables. See [/documentation/variables.md](/documentation/variables.md) (or as [pdf](/documentation/variables.pdf)).
-- Documentation for the pre- / post- processing and processing scripts. See [/scripts/readme.md](/scripts/readme.md).
-- Documentation for the *dklidar* Python module. See [/documentation/dklidar.md](/documentation/dklidar.md).
+- Documentation for the pre- / post- processing and processing steps and scripts. See [/scripts/readme.md](/scripts/readme.md).
+- Documentation for the *dklidar* Python processing module. See [/documentation/dklidar.md](/documentation/dklidar.md).
 - Example scripts for subsetting and working with the dataset. See [/manuscript/figure_6/subset_dataset.R](/manuscript/figure_6/subset_dataset.R) (subsetting) and [/manuscript/figure_6/figure_6.R](****) (ecological stratification).
 
 [\[to top\]](#content)
@@ -58,6 +58,8 @@ This repository contains the following documentation supplementary to the manusc
 ## Software Requirements
 
 The processing workdflow was developed with OPALS 2.3.2.0, Python 2.7 (as distributed with OPALS), pandas (0.24.2), GDAL 2.2.4 and SAGA GIS 7.8.2. Newer versions of these software packages will likely work, but have not been tested. 
+
+The R example scripts require R and the raster package. 
 
 Code development and processing were carried out on Windows 2012 Server 64 bit, but execution should (in theory) be platform independent. 
 
