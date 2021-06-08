@@ -19,7 +19,7 @@ Code repository accompanying:
 
 ## Getting Started
 
-This repository contains the code for generating the EcoDes-DK15 dataset and the associated figures in the accompanying manscuript. The repository also provides additional documentation for both code and dataset, for details on those see [below](#documentation). 
+This repository contains the code for generating the EcoDes-DK15 dataset and the accompanying figures in the manscuript. The repository also provides additional documentation for the code and dataset, for details see ["Documentation"](#documentation) below. 
 
 To replicate the processing, revisit the [workflow overview](/documentation/dk_lidar_processing_flow.pdf), then carry out the following steps:
 
