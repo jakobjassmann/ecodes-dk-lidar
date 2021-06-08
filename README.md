@@ -51,13 +51,13 @@ This repository contains the following documentation:
 - A summary description of the output variables. See [/documentation/variables.md](/documentation/variables.md) (or as [pdf](/documentation/variables.pdf)).
 - Documentation for the pre- / post- processing and processing steps and scripts. See [/scripts/readme.md](/scripts/readme.md).
 - Documentation for the *dklidar* Python processing module. See [/documentation/dklidar.md](/documentation/dklidar.md).
-- Example scripts for subsetting and working with the dataset. See [/manuscript/figure_6/subset_dataset.R](/manuscript/figure_6/subset_dataset.R) (subsetting) and [/manuscript/figure_6/figure_6.R](****) (ecological stratification).
+- Example scripts for subsetting and working with the dataset. See [/manuscript/figure_6/subset_dataset.R](/manuscript/figure_6/subset_dataset.R) (subsetting) and [/manuscript/figure_6/figure_6.R](/manuscript/figure_6/figure_6.R) (ecological stratification).
 
 [\[to top\]](#content)
 
 ## Software Requirements
 
-The processing workdflow was developed with OPALS 2.3.2.0, Python 2.7 (as distributed with OPALS), pandas (0.24.2), GDAL 2.2.4 and SAGA GIS 7.8.2. Newer versions of these software packages will likely work, but have not been tested. 
+The processing workflow was developed with OPALS 2.3.2.0, Python 2.7 (as distributed with OPALS), pandas (0.24.2), GDAL 2.2.4 and SAGA GIS 7.8.2. Newer versions of these software packages will likely work, but have not been tested. 
 
 The R example scripts require R and the raster package. 
 
@@ -92,7 +92,7 @@ Assmann, Jakob J., Jesper E. Moeslund, Urs A. Treier and Signe Normand. *in prep
 
 ## License
 
-The code in this repository is openly available via a simplified BSD license. See [LICENSE](license.txt) for details. We highly encourage use and further development of the code provided.  
+The code in this repository is openly available via a simplified BSD license. See [LICENSE](/LICENSE.txt) for details. We highly encourage use and further development of the code provided.  
 
 [\[to top\]](#content)
 
