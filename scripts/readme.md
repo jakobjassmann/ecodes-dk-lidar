@@ -1,67 +1,106 @@
 # Scripts for processing and setting up the environment
-The scripts in this folder are used to set up the environment and process the dataset, using the functions defined in the *dklidar* pacakage. 
+The scripts in this folder are used to prepare the processing environment, process the dataset, and carry out any post-processing steps neccessary. 
 
-## Getting started
-Carry out the following steps to prepare the processing:
+## Setting up the environment and downloading the data
+Carry out the following steps to prepare the processing. **Unless explicitly stated, all scripts need to be executed from within an OPALS shell.** 
 
 1. Make a local clone of the repository.
-2. Set the relevant absolute paths to your local folders in `dklidar/settings.py`.
-3. Check out all [pointcloud](https://download.kortforsyningen.dk/content/dhmpunktsky) and [DTM](https://download.kortforsyningen.dk/content/dhmterr%C3%A6n-04-m-grid) tile bundles on the Kortforsyningen website, but don't download via your browser\*.
-4. Follow instructions in the comments of the `download_files.py` script to retrieve a cookie for the Kortforsyningen website using *Google Chrome*. Adjust the number of parallel downloads in the script to fit your needs. Note: Tile bundle file names are specified in the `.txt` files in the `data/kortforsyningen_file_lists/` folder.
-5. Open an OPALS shell.
-6. Navigate to the `script` folder of your local clone of this repository. 
-7. Modify the `set_environment.bat` script with your local paths and run the script to add the *dklidar package* to the OPALS python environment. __Note: You will have to run this batch script every time you open a new OPALS shell for processing using this workflow__
-8. Run `python donwload_files.py`. 
-9. Run `create_checksums.bat` to create the checksums for the downloaded files.
-10. Verify checksums and establish any missing tiles using `python checksum_qa.py`. Follow up by running `python remove_missing_tiles.py` if you want. 
-11. If you have not already installed `pandas` in your OPALS python environment do this now by running: `python -m pip install pandas --user`
+2. Update the relevant paths and parameters in `dklidar/settings.py` according to your local system.
+3. Modify the `set_environment.bat` script to set the absolute paths to your OPALS Python executable and the *dklidar* modules. **Note: You will have to run this batch script every time you open a new OPALS shell for processing using this workflow.**
+4. If you have not already installed `pandas` in your OPALS Python environment do this now, for example by running: `python -m pip install pandas --user`
+5. Download the source dtm and point clouds:
+   1. Order / check out all [pointcloud](https://download.kortforsyningen.dk/content/dhmpunktsky) and [DTM](https://download.kortforsyningen.dk/content/dhmterr%C3%A6n-04-m-grid) tile bundles on the Kortforsyningen website, but don't download these files via your browser yet. We will download them in step 3 using the `download_files.py` script\*.
+   2. Follow instructions in the comments of the `download_files.py` script to retrieve a cookie for the Kortforsyningen website using *Google Chrome* (you could also do that in a different browser, but we only provide instructions for *Chrome* here). 
+   3. Adjust the number of parallel downloads in the `download_files.py` script to fit your needs and bandwidth. Note: Tile bundle file names are specified in the `.txt` files in the `data/kortforsyningen_file_lists/` folder.
+   4. Open an OPALS shell.
+   5. Navigate to the `scripts` folder in your local clone of this repository. 
+   6. Run `set_environment.bat` to set up the environment .
+   7. Run `python donwload_files.py`. 
+6. Verify the integrity of the downloads and check for completness of the datasets:
+   1. Run `create_checksums.bat` to create the checksums for the downloaded files.
+   2. Verify checksums and establish any missing tiles by running `python checksum_qa.py`. 
+      - The script will flag up any corrputed files based on the checksums and export a list of those to a csv stored in the parent folder that contain the data (the file will be named damaged_files.csv).
+      - The script will cross-compare the completness of the dtm and point cloud files. Tiles present in one set, but not present in the other, are reported. The outcomes are exported both as a csv of tile ids and as alist of file names. Again these are saved in the parent folder containing each dataset. 
+7. Optional: fill in any gaps in the dtm dataset by generating missing dtms using `python generate_dems.py` . If you do so, don't forget to update the outputs for the completness check by re-running `python checksum_qa.py` afterwards.
+8. Finally, remove any remaining incomplete tiles in the datasets (e.g. dtm tiles without a corresponding point cloud) by running `python remove_missing_tiles.py` . 
+9. Consider confirming that the dataset is complete by re-running `python checksum_qa.py`.
 
 \* *Alternatively, Kortforsyningen could be contacted to request access to the dataset via a different route, e.g. their ftp file server access.* 
 
-Optional test run:
+## Test run for a single tile
 
-- Open `debug.py` and adjust the file paths in line 22 and 25 to match your local file paths. Also specify a tile_id (line 36) that you have certainly downloaded both the dtm as well as the laz files for.
-- Run the debug script in the OPALS shell using `python debug.py`.
+1. Open `debug.py` and adjust the file paths in line 22 and 25 to match your local file paths.
+
+2. Specify the tile_id (line 36) for which you would like to carry out the test run.
+
+3. Run the debug script in an OPALS shell using `python debug.py`.
+4. If needed, quality control debug run outputs using `debug.Rmd`.
 
 ## Running the processing
 
-Once the above steps are completed...
+Once the above steps are completed and the single tile test run was successful, we can then:
 
-12. Adjust the number of parallel processes to be run in `process_tiles.py`
+1. Adjust the number of parallel processes to be run in `process_tiles.py`
 
-13. Run `python process_tiles.py` to start the processing.
+2. Run `python process_tiles.py` to start the processing.
 
-14. Open a second OPALS shell, set the environment using `set_environment.bat` and start `python progress_monitor.py` to keep taps on the progress.
+3. Open a second OPALS shell, set the environment using `set_environment.bat` and start `python progress_monitor.py` to keep track of the progress.
 
-Note: The `process_tiles.py` scripts uses a CSV-based database created in the `log/process_tiles` folder to keep track of which tiles have been processed. The progress database allows the script to resume without data loss, should the processing be interrupted for some unexpected reason. In this case, all partially processed tiles will be re-processed again. If you want to start a fresh process you will have to delete the log folder `log/process_tiles`.  
+Note: 
 
+- If for some reason the processing needs to be interrupted, use `stop.bat` to kill all Python processs and sub-processes on the machine. **NB: This will also kill any Python processes not related to the processing of the LiDAR data.**
+- `process_tiles.py` uses a CSV-based database created in the `log/process_tiles`  to keep track of which tiles have been processed. The progress database allows the script to resume without data loss, should the processing be interrupted. Once the processing is resumed, all already processed tiles will be skipped and any partially processed tiles will be re-processed. If, for some reason, you would like to start a fresh processing attempt that overwrites any existing progress, then you will have to delete the script's log folder and its contents (`log/process_tiles`).  
+- To process only a subset of the variables, comment out any unwanted processing steps in `process_tiles.py`.
+- `progress_monitor.py` uses a linear estimate for the ETA, this should give a general idea for when the processing might finish, but becomes inaccurate once the first parallel processes are starting to be completed.
+- `progress_monitor.py` might fail to keep track of the progress once less tiles than the number of parallel processes are remaining. In that case, check the output from `process_tiles.py` to confirm the final completion. 
 
+## Post processing
 
-## Quality control and logging outputs
+Once the processing has finished, a few post-processing steps need to be carried out:
 
-We have provided a couple of scripts that allow for quality control. These will be described here.
+1. Generate a tile_footprints shapefile by running `extract_tile_footprints.R`. You might have to update the global parmeters with your local file paths at the beginning of the script.
+2. Generate VRT files for each variable using the `make_vrt_subfolders.bat` batch script. Execute this script in the parent folder containing all your output rasters (the one specified in the settings.output_folder variable of the settings.py module). **NB: Unlike the other scripts this batch script will have to be run in an ordinary (non-OPALS) Windows command prompt.** 
+   - The script will recursively loop through the folder tree and generate a vrt file in any folder that contains tif files. 
+   - The script will name the VRT file based on the folder that contains it and all file paths used will be relative.
+   - The VRT file will be generated for the  extent of the nationwide datset, consider adjusting the extent parameter in `make_vrs.bat` in case only a subset has been processed. 
+3. Fill in processing gaps using `fill_processing_gaps.py`.
+   - A small number of tiles (< 100), e.g. on the fringes of the dataset (including sand banks, spits etc.), may fail processing for some of the variables - especially the point cloud derived variables. This script fills these "processing gaps", by creating empty rasters containing onlly NA for the missing tiles and variables. The script also outputs a csv file summarising the number of tiles missing for each variable [/documentation/empty_tiles.csv](/documentation/empty_tiles.csv). The specific tile ids of the missing variable / tile combinations can be retrieved from the log files. 
+4. Optional: Bundle and compress outputs as tar.bz2 archives by running `archive_outputs.py`. Note: Adjust the destination folder for archives (line 14) prior execution. 
+5. Optional: Generate a list of all the VRT files with in the settings.output_folder folder structre using `generate_list_of_vrts.py`. This file can be handy for fast access to the data, especially in R as listing files in a folder tree with a large amount of files can be very slow. 
 
-The logging database used for processe management in `log also contains information on the exit status of each processing step for each tile. In addition, the OPALs and GDAL logs are kept for all processed tiles in the subfolders of this folder named with the tile id.
+## Quality control and log file processing
+
+We have provided a couple of scripts that allow for quality control and log file processing: 
+
+- `quality_assurance.R` - A simple quality assurance script that checks summary statistics, generates histograms and correlation plots for a set of random sample points from across Denmark. **(To be updated!)**
+- `processing_report.Rmd` - R Markdown file that gathers key processing information from the log files, such as error rates, messages and tile id, as well as variable - tile id combination for which the processing was not succesffull. **(Available locally - still to be added to repository!)**
+
+Note: The logging database used for processe management in also contains information on the exit status of each processing step for each tile. In addition, the OPALs and GDAL logs are kept for all processed tiles in the subfolders of this folder named with the tile id.
 
 ----
 
 ## Scripts
 Script | Description 
 --- | ---
-checksum_qa.py | Validates checksums for downloads, and checks dtm and pointcloud datasets for completnness.
+archive_outputs.py | Simple scripts to bundle and compress the output files by variable / group, based on the subfolders of the output folder defined in `settings.py`. 
+checksum_qa.py | Validates checksums for downloads, and cross-compares dtm and pointcloud datasets for completnness. Requires `checksum_qa.py` to be run previously. 
 create_checksums.bat | Generates checksums for downloaded files. 
-download_files.py | Downloads pointclouds and dtm rasters.
-generate_dems.py | Generates low-quality DTMs from the pointclouds for tiles missing a DTM file (*currently not used*).
-local_qa.R | Quality control for quick post-processing QA (written in shorthand).
-make_vrt.bat | Creates a vrt from all .tif files in the current folder, 1st argument names the vrt file.
-make_vrt_subfolders.bat | Recursively creates vrt files for all subfolders naming the file with the subfolder name.
-**process_tiles.py** | **Main script for processing**. Controls process managment and defines which steps are carried out. Uses the functions defined in the *dklidar package*.
-**progress_monitor.py** | Progress monitor to be launched after starting process_tiles. Run in a separate OPALS shell to keep track of the processing. 
-remove_missing_tiles.py | Removes incomplete tiles from the DTM and laz folders. Run after `checksum_qa.py` has been executed.
-**set_environment.bat** | Adds the *dklidar package* to the OPALS shell python path.
-**stop.bat** | Stops processing chain by killing all pyhton.exe processes currently running. Can be used to interrupt `process_tiles.py`.
-test.py | Playground script to test processing steps etc. 
-debug.py | Script to test run all data extraction functions in the dk_lidar module. Requires the dtm and laz to be downloaded for at least one tile. 
-debug.Rmd | R Markdown file to visualise the outputs from a debug.py run. 
+debug.py | Script for testing / debugging the processing workflow based on a single tile. Processing is done sequentially, one variable after the other. Timings are provided. 
+debug.Rmd | R Markdown document for visual quality assurance of the debug.py outputs. 
+download_files.py | Helper script to download DHM\Punktsky pointclouds and DHM dtm rasters from the Kortforsyningen website. 
+extract_tile_footprints.R | Collates and exports tile footprints shapefile based on the dtm_10m exports. 
+fill_processing_gaps.py | Fills incomplete variables with empty rasters (all NA) for the missing tiles. To be executed after processing. 
+generate_dems.py | Generates DTMs from the pointclouds that are missing a corresponding DTM file. 
+generate_list_of_vrts.py | Generates a text file containing a list of all vrt files in each subfolder of a given directory. 
+make_vrt.bat | Creates a vrt from all .tif files in the folder from which it is executed, 1st argument specifies the name of the output vrt file. 
+make_vrt_subfolders.bat | Recursively creates vrt files within all subfolders of the current directory that contain tif images. Each VRT file is named with the subfolder name. 
+plot_raster_3d.R | Set of helper functions to generate publication ready 3D plots of rasters in R using the *rayshader* package. (Used to generate the figures for the manuscript). 
+**process_tiles.py** | **Main script for processing**. Controls process managment and defines which processing steps are carried out. Uses the functions defined in the *dklidar* modules. 
+**progress_monitor.py** | **Progress monitor**. Run this script in a separate OPALS shell to keep track of the processing. Launch after initating processing using `process_tiles.py`. 
+quality_assurance.R | Simple quality assurance script that checks summary statistics, generates histograms and correlation plots for a set of random sample points from across Denmark. 
+remove_missing_tiles.py | Removes incomplete sets of tiles from the DTM and laz folders. Run after `checksum_qa.py` has been executed. 
+**set_environment.bat** | Adds the *dklidar package* to the OPALS shell python path. **Execute each time after launching an new OPALS shell.** 
+**stop.bat** | **Stops process_tiles.py** by killing all pyhton.exe processes currently running. Can be used to interrupt `process_tiles.py`. **NB: Kills ALL Python processes!** 
 
 *Note: Other scripts may appear here that are version controlled for temporary purposes.*
+
