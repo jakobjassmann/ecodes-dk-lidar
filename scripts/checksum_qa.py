@@ -78,7 +78,7 @@ missing_laz_tiles = set(dtm_tile_ids) - set(laz_tile_ids)
 missing_dtm_tiles = set(laz_tile_ids) - set(dtm_tile_ids)
 
 df_missing_dtm = pandas.DataFrame(zip(missing_dtm_tiles), columns=['tile_id'])
-df_missing_dtm.to_csv(settings.laz_folder + '../missing_dtm_tile_ids.csv', index=False)
+df_missing_dtm.to_csv(settings.dtm_folder + '../missing_dtm_tile_ids.csv', index=False)
 
 # Print out a quick overview of data frame for control
 print(df_missing_dtm.head())
@@ -90,15 +90,15 @@ df_missing_laz.to_csv(settings.laz_folder + '../missing_laz_tile_ids.csv', index
 print(df_missing_laz.head())
 
 # Export lists to files
-# DTMs with mkssing LAZs
-out_file = open(settings.laz_folder + '../dtm_files_with_missing_laz.txt', 'a+')
+# DTMs with missing LAZs
+out_file = open(settings.dtm_folder + '../dtm_files_with_missing_laz.txt', 'a+')
 for tile_id in missing_laz_tiles:
-    out_file.write('D:/Jakob/dk_nationwide_lidar/data/dtm/DTM_1km_' + tile_id + '.tif\n')
+    out_file.write(settings.dtm_folder + 'DTM_1km_' + tile_id + '.tif\n')
 out_file.close()
 
 # LAZs with missing DTMs
 out_file = open(settings.laz_folder + '../laz_files_with_missing_dtm.txt', 'a+')
 for tile_id in missing_dtm_tiles:
-    out_file.write('D:/Jakob/dk_nationwide_lidar/data/laz/PUNKTSKY_1km_' + tile_id + '.laz\n')
+    out_file.write(settings.laz_folder  +'PUNKTSKY_1km_' + tile_id + '.laz\n')
 out_file.close()
 
