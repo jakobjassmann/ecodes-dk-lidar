@@ -18,7 +18,7 @@ from dklidar import common
 def dtm_generate_footprint(tile_id):
     """
     Generates a footprint file using gdal.
-    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number
     :return execution status
     """
 
@@ -48,9 +48,9 @@ def dtm_generate_footprint(tile_id):
 ## Create neighbourhood mosaic
 def dtm_neighbourhood_mosaic(tile_id):
     """
-    Generates a tif mosaic with all existing 8 neighbouring cells
-    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
-    input_folder: folder location for input dtm files. ouput_folder ouput location for dtm mosaics.
+    Generates a mosaic of the dem for a given tile and it's 8 neighbourings. Incoplete mosaics are generated should
+    a given neighbour be missing. 
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number
     :return: execution status
     """
 
@@ -113,8 +113,8 @@ def dtm_neighbourhood_mosaic(tile_id):
 def dtm_validate_crs(tile_id, mosaic = True):
     """
     Function to validate the crs for dtm files (single tile and mosaic)
-    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
-    :param mosaic: if Ture validates crs for mosaic also, default: True.
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number
+    :param mosaic: if Ture validates crs for mosaic also, default: True
     :return: execution status
     """
 
@@ -160,8 +160,8 @@ def dtm_validate_crs(tile_id, mosaic = True):
 ## Aggregate dem to 10 m
 def dtm_aggregate_tile(tile_id):
     """
-    Aggregates the 0.4 m DTM to 10 m size for final output and other calculations.
-    :param tile_id: tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+    Aggregates the 0.4 m DTM to 10 m size for final output and further calculations.
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number
     :return: execution status
     """
 
@@ -220,11 +220,11 @@ def dtm_aggregate_tile(tile_id):
 
     return return_value
 
-## Aggregate dem mosaic to 10 m, but don't stretch and mask
+## Aggregate dem mosaic to 10 m
 def dtm_aggregate_mosaic(tile_id):
     """
     Aggregates the 0.4 m DTM mosaic to 10 m size for final output and other calculations.
-    :param tile_id: tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number
     :return: execution status
     """
 
@@ -260,12 +260,12 @@ def dtm_aggregate_mosaic(tile_id):
 
     return return_value
 
-## Calculate slope for file
+## Calculate slope for tile
 def dtm_calc_slope(tile_id):
     """
-    Calculates the slope parameter for a DTM neighbourhood mosaic and crops to original tile_size
-    Requires dtm_generate_mosaic to be executed.
-    :param tile_id: tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+    Calculates the slope parameter for a DTM neighbourhood mosaic and crops to original tile_size.
+    Requires dtm_generate_mosaic() to be executed.
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number
     :return: stdout and stderr command line output of gdal command execution.
     """
 
@@ -331,8 +331,8 @@ def dtm_calc_slope(tile_id):
 ## Calculate aspect for a tile
 def dtm_calc_aspect(tile_id):
     """
-    Calculates the aspect for all 10 m cells in a DTM neighbourhood mosaic and crops to original tile_size
-    :param tile_id: tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+    Calculates the aspect for all 10 m cells in a DTM neighbourhood mosaic and crops to original tile_size.
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number
     :return: execution status
     """
 
@@ -398,7 +398,7 @@ def dtm_calc_heat_index(tile_id):
     """
     Calculates the heat index from McCune and Keon (2002) based on the aspect only. Aspect must have been
     calculated using dtm_calc_aspect().
-    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number
     :return: execution status
     """
     # Intialise return value and log
@@ -451,8 +451,8 @@ def dtm_calc_heat_index(tile_id):
 def dtm_calc_solar_radiation(tile_id):
     """
     Returns cell by cell solar radiation following McCune and Keon 2002. Slope and aspect must have been calculated
-    beforehand using dtm_calc_slope and dtm_calc_aspect.
-    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+    beforehand using dtm_calc_slope() and dtm_calc_aspect().
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number
     :return: execution status
     """
 
@@ -630,7 +630,7 @@ def dtm_openness_mean(tile_id):
     """
     Exports the mean landscape openness for all eight cardinal directions with a 150 m search radius
     using the OPALS Openness module.
-    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number
     :return: execution status
     """
     # Initiate return value
@@ -732,7 +732,7 @@ def dtm_openness_difference(tile_id):
     """
     Exports the difference between the minimum and maximum positive openness within a 50 m search radius
     using the Opals Openness module.
-    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number
     :return: execution status
     """
     # Initiate return value
@@ -851,7 +851,7 @@ def dtm_kopecky_twi(tile_id):
     Calculates the topographic wetness indec (TWI) following Kopecky et al. 2020.
     Requires SAGA GIS 7.8.2 or later to be specified in settings.py.
     Calculations are done on the aggregated 10 m tile neighbourhood mosaic.
-    :param tile_id: tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number
     :return: execution status
     """
 
@@ -965,7 +965,7 @@ def dtm_kopecky_twi(tile_id):
 def dtm_saga_wetness(tile_id):
     """
     Calculates the saga wetness index for a tile mosaic then crops to the original tile.
-    :param tile_id: tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number
     :return: execution status
     """
 
@@ -1041,7 +1041,7 @@ def dtm_saga_wetness(tile_id):
 def dtm_saga_landscape_openness(tile_id):
     """
     Calculates landscape opennes following Yokoyama et al. 2002 based on an aggregated 10 m dtm and a 150 m search radius.
-    :param tile_id: tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number
     :return: execution status
     """
 
@@ -1143,7 +1143,7 @@ def dtm_saga_landscape_openness(tile_id):
 def dtm_remove_temp_files(tile_id):
     """
     Removes footprint and mosaic files for the dtm to clear up space for subsequent processing.
-    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number
     :return: execution status
     """
 
