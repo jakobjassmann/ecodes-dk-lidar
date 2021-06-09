@@ -4,8 +4,8 @@ The scripts in this folder are used to prepare the processing environment, proce
 ## Content
 
 1. [Setting up the environment and downloading the data](#setting-up-the-environment-and-downloading-the-data)
-2. [Test run fo a single tile](#test-run-for-a-single-tile)
-3. [Execute the processing of all tiles](#execute-the-processing-of-all-tiles)
+2. [Test run for a single tile](#test-run-for-a-single-tile)
+3. [Execute the processing for all tiles](#execute-the-processing-for-all-tiles)
 4. [Post-processing steps](#post-processing-steps)
 5. [Quality control and log file processing](#quality-control-and-log-file-processing)
 6. [Overview of scripts in this folder](#scripts-overview)
@@ -51,7 +51,7 @@ Carry out the following steps to prepare the processing. **Unless explicitly sta
 
 [\[to top\]](#content)
 
-## Execute the processing of all tiles
+## Execute the processing for all tiles
 
 Once the above steps are completed and the single tile test run was successful, we can then:
 
