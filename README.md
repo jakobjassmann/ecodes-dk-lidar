@@ -34,8 +34,8 @@ To replicate the processing, revisit the [workflow overview](/documentation/dk_l
 ```
 /                 root folder.
 |- data/          empty, place-holder for input (imported) and output (generated) data.
-|- dklidar/       Python module providing the processing functions.
-|- documentation/ documentation for python module and output variables. 
+|- dklidar/       Python modules providing the processing functions.
+|- documentation/ documentation for python modules and output variables. 
 |- log/           empty, place-holder for log file output.
 |- manuscript/    scripts accompanying the manuscript.
 |- qa_local/      quallity assurance outputs and processing reports.
@@ -50,7 +50,7 @@ This repository contains the following documentation:
 
 - A summary description of the output variables. See [/documentation/variables.md](/documentation/variables.md) (or as [pdf](/documentation/variables.pdf)).
 - Documentation for the pre- / post- processing and processing steps and scripts. See [/scripts/readme.md](/scripts/readme.md).
-- Documentation for the *dklidar* Python processing module. See [/documentation/dklidar.md](/documentation/dklidar.md).
+- Documentation for the *dklidar* Python processing modules. See [/documentation/dklidar_modules.md](/documentation/dklidar_modules.md).
 - Example scripts for subsetting and working with the dataset. See [/manuscript/figure_6/subset_dataset.R](/manuscript/figure_6/subset_dataset.R) (subsetting) and [/manuscript/figure_6/figure_6.R](/manuscript/figure_6/figure_6.R) (ecological stratification).
 
 [\[to top\]](#content)
