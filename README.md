@@ -35,7 +35,7 @@ To replicate the processing, revisit the [workflow overview](/documentation/dk_l
 /                 root folder.
 |- data/          empty, place-holder for input (imported) and output (generated) data.
 |- dklidar/       Python modules providing the processing functions.
-|- documentation/ documentation for python modules and output variables. 
+|- documentation/ documentation for Python modules and output variables. 
 |- log/           empty, place-holder for log file output.
 |- manuscript/    scripts accompanying the manuscript.
 |- qa_local/      quallity assurance outputs and processing reports.
