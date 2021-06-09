@@ -1,4 +1,4 @@
-# Handy wrapper functions to quickly generate oublishable 3D rasterplots 
+# Handy wrapper functions to quickly generate publishable 3D rasterplots 
 # using the rayshader package
 # Jakob Assmann j.assmann@bio.au.dk 9 March 2021
 
