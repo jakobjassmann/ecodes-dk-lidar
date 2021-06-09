@@ -15,7 +15,7 @@ os.mkdir('temp_odms')
 os.chdir('temp_odms')
 
 # load missing tiles
-missing_dtms = pandas.read_csv('D:/Jakob/dk_nationwide_lidar/data/missing_dtm_tile_ids.csv')['tile_id'].tolist()
+missing_dtms = pandas.read_csv(settings.dtm_folder + '../missing_dtm_tile_ids.csv')['tile_id'].tolist()
 
 print('Generating dems for ' + str(len(missing_dtms)) + ' tiles...')
 
