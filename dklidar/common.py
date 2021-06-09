@@ -18,8 +18,9 @@ from dklidar import settings
 def init_log_folder(script_name, tile_ids):
     """
     Initiates a log folder for storing the processing output and progress management
-    :param tile_ids: tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
-    :return: pandas DataFrame with progress data.
+    :param script_name: name of the processing script for which to initialise the logging database / folder
+    :param tile_ids: tile ids in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number
+    :return: pandas DataFrame with progress data
     """
 
     # Check and create root folder for script
@@ -75,10 +76,11 @@ def init_log_folder(script_name, tile_ids):
 ## Function to gather progress update, key to progress management and logging.
 def update_progress_df(script_name, progress_df):
     """
-    Searches a script's log folder for subfolders matching the tile_id_pattern(rrrr_ccc), then crawls these folders for
-    status.csv files, compiling them into one pandas datafram and retutning it.
-    :param script_name: name of the script (for folder matching), progress_df: progress dataframe to be updated
-    :return: returns updated progress_df
+    Searches a script's log folder for subfolders matching the tile_id pattern (rrrr_ccc), then crawls these folders for
+    status.csv files, compiling them into a single pandas dataframe and returning it.
+    :param script_name: name of the script (for folder matching)
+    :param progress_df: progress dataframe to be updated
+    :return: returns an updated progress_df
     """
     # Status update
     print(datetime.datetime.now().strftime('%X') + ' Updating progress management...'),
@@ -133,13 +135,14 @@ def update_progress_df(script_name, progress_df):
 ## Define function to gather logs
 def gather_logs(script_name, step_name, tile_id):
     """
-    This wee function needs to be run out of a temporary working directory by a pool process from the multiprocessing
-    module. It then copies all log files in the temporary working directory to the log folder, where it stores them
-    in a sub-subfolder according to the step_name and tile_id parameters
-    :param script_name: name of the script that is calling the function.
+    Gather logs from temporary work dir. 
+    This wee function is to be run out of a temporary working directory by a pool process from a multiprocessing
+    workflow. It then copies all log files in the temporary working directory to the main log folder for the processing script, 
+    where it stores them in a sub-subfolder according to the step_name and tile_id parameters.
+    :param script_name: name of the script that is calling the function
     :param step_name: name of the step that should be logged for
-    :param tile_id: tile id in the usual format (rrrr_ccc).
-    :return: nothing.
+    :param tile_id: tile id in the usual format (rrrr_ccc)
+    :return: nothing
     """
     # Generate string for log folder for the tile and create the directory if it does not exist
     log_folder_tile = settings.log_folder + '/' + script_name + '/' + tile_id
@@ -184,9 +187,9 @@ def gather_logs(script_name, step_name, tile_id):
 ## Function to generate sea and inland water masks for a tile
 def generate_water_masks(tile_id):
     """
-    Generates both sea and inland water mask rasters based on the dtm as a template using the nationwide
-    sea and inland water masks vector files specified in the settings file.
-    :param tile_id: ide of the tile
+    Generates both sea and inland water mask rasters with 10 m grain size, based on the dtm as a template and the
+    the nationwide sea and inland water masks vector files specified in the settings file.
+    :param tile_id: id of the tile
     :return: execution status
     """
 
@@ -293,10 +296,11 @@ def generate_water_masks(tile_id):
 ## Function to apply water masks, sea or inland water.
 def apply_mask(target_raster = '', sea_mask = False, inland_water_mask = False):
     """
-    For a given target raster, this function masks all sea off the coastline of Denmark (sea_mask = True) or all inland water
-    bodies such as lakes or ponds (inland_water_mask = True) or both.
-    :param sea_mask: Boolean switch for applying sea mask
-    :param inland_water_mask: Boolean switch for applying the inland water mask
+    For a given target raster, this function masks all sea off the coastline of Denmark (sea_mask = True),
+    or all inland water bodies such as lakes or ponds (inland_water_mask = True) or both. 
+    Requires raster masks to be generated using generate_water_masks().
+    :param sea_mask: boolean switch for applying sea mask
+    :param inland_water_mask: boolean switch for applying the inland water mask
     :param target_raster: target raster file path
     :return: execution status
     """
