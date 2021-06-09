@@ -1,4 +1,4 @@
-# fix_missing_tiles.py
+# fix_processing_gaps.py
 # short script to fix missing tiles for each variable
 # to be run post completion of processing with process_tiles.py
 # Jakob Assmann j.assmann@bios.au.dk 11 May 2021
