@@ -1,6 +1,17 @@
 # Scripts for processing and setting up the environment
 The scripts in this folder are used to prepare the processing environment, process the dataset, and carry out any post-processing steps neccessary. 
 
+## Content
+
+1. [Setting up the environment and downloading the data](#setting-up-the-environment-and-downloading-the-data)
+2. [Test run fo a single tile](#test-run-for-a-single-tile)
+3. [Execute the processing of all tiles](#execute-the-processing-of-all-tiles)
+4. [Post-processing steps](#post-processing-steps)
+5. [Quality control and log file processing](#quality-control-and-log-file-processing)
+6. [Overview of scripts in this folder](#scripts-overview)
+
+[\[to top\]](#content)
+
 ## Setting up the environment and downloading the data
 Carry out the following steps to prepare the processing. **Unless explicitly stated, all scripts need to be executed from within an OPALS shell.** 
 
@@ -27,6 +38,8 @@ Carry out the following steps to prepare the processing. **Unless explicitly sta
 
 \* *Alternatively, Kortforsyningen could be contacted to request access to the dataset via a different route, e.g. their ftp file server access.* 
 
+[\[to top\]](#content)
+
 ## Test run for a single tile
 
 1. Open `debug.py` and adjust the file paths in line 22 and 25 to match your local file paths.
@@ -36,7 +49,9 @@ Carry out the following steps to prepare the processing. **Unless explicitly sta
 3. Run the debug script in an OPALS shell using `python debug.py`.
 4. If needed, quality control debug run outputs using `debug.Rmd`.
 
-## Running the processing
+[\[to top\]](#content)
+
+## Execute the processing of all tiles
 
 Once the above steps are completed and the single tile test run was successful, we can then:
 
@@ -54,7 +69,9 @@ Note:
 - `progress_monitor.py` uses a linear estimate for the ETA, this should give a general idea for when the processing might finish, but becomes inaccurate once the first parallel processes are starting to be completed.
 - `progress_monitor.py` might fail to keep track of the progress once less tiles than the number of parallel processes are remaining. In that case, check the output from `process_tiles.py` to confirm the final completion. 
 
-## Post processing
+[\[to top\]](#content)
+
+## Post processing steps
 
 Once the processing has finished, a few post-processing steps need to be carried out:
 
@@ -68,6 +85,8 @@ Once the processing has finished, a few post-processing steps need to be carried
 4. Optional: Bundle and compress outputs as tar.bz2 archives by running `archive_outputs.py`. Note: Adjust the destination folder for archives (line 14) prior execution. 
 5. Optional: Generate a list of all the VRT files with in the settings.output_folder folder structre using `generate_list_of_vrts.py`. This file can be handy for fast access to the data, especially in R as listing files in a folder tree with a large amount of files can be very slow. 
 
+[\[to top\]](#content)
+
 ## Quality control and log file processing
 
 We have provided a couple of scripts that allow for quality control and log file processing: 
@@ -77,9 +96,9 @@ We have provided a couple of scripts that allow for quality control and log file
 
 Note: The logging database used for processe management in also contains information on the exit status of each processing step for each tile. In addition, the OPALs and GDAL logs are kept for all processed tiles in the subfolders of this folder named with the tile id.
 
-----
+[\[to top\]](#content)
 
-## Scripts
+## Scripts overview
 Script | Description 
 --- | ---
 archive_outputs.py | Simple scripts to bundle and compress the output files by variable / group, based on the subfolders of the output folder defined in `settings.py`. 
@@ -104,3 +123,4 @@ remove_missing_tiles.py | Removes incomplete sets of tiles from the DTM and laz 
 
 *Note: Other scripts may appear here that are version controlled for temporary purposes.*
 
+[\[to top\]](#content)
