@@ -18,9 +18,9 @@ from dklidar import settings
 ## Import a single tile into ODM
 def odm_import_single_tile(tile_id):
     """
-        Imports a single tile (specified by tile_id) into an ODM for subsequent processing
-    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
-    :return: returns execution status.
+        Imports a single tile (specified by tile_id) into an ODM for subsequent processing.
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number
+    :return: returns execution status
     """
     # Initiate return value
     return_value = ''
@@ -50,8 +50,8 @@ def odm_import_mosaic(tile_id):
     """
         Imports a tile (specified by tile_id) and it's 3 x 3 neighbourhood into a mosaiced ODM file for subsequent
         processing.
-    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
-    :return: returns execution status.
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number
+    :return: returns execution status
     """
     # Initiate return value, open log file
     return_value = ''
@@ -118,8 +118,8 @@ def odm_import_mosaic(tile_id):
 def odm_generate_footprint(tile_id):
     """
     Exports footprint from an odm file based on the tile_id in the DK nationwide dataset
-    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
-    :return: returns execution status.
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number
+    :return: returns execution status
     """
 
     # Initiate return value
@@ -180,8 +180,8 @@ def odm_generate_footprint(tile_id):
 def odm_validate_crs(tile_id, mosaic = False):
     """
     Function to validate the crs for odm files (single tile and mosaic)
-    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
-    :param mosaic: if Ture validates crs for mosaic also, default: False.
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number
+    :param mosaic: if True validates crs for mosaic also, default: False
     :return: execution status
     """
 
@@ -231,11 +231,12 @@ def odm_validate_crs(tile_id, mosaic = False):
 ## Add height above ground (normalized z) to a tile odm
 def odm_add_normalized_z(tile_id, mosaic = False):
     """
-    Adds a "normalizedZ' variable to each point in and ODM file by normalising the height using the 0.4 m DTM.
-    Can deal with either single tile odms or neighbourhood mosaics (option mosaic).
-    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+    Adds a "normalizedZ' variable to each point in an ODM file by normalising the height using the 0.4 m DTM.
+    Can deal with either single tile odms or neighbourhood mosaics (option mosaic). If a mosaic is normalised, 
+    then the corresponding dtm mosaic will have to be generated first (use dtm_neighbourhood_mosaic()).
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number
     :param mosaic: boolean (true or false) specifies whether a single tile pointcloud or a neighbourhood mosaic
-    should be normalised.
+    should be normalised
     :return: execution status
     """
     # Initiate return value
@@ -270,8 +271,9 @@ def odm_add_normalized_z(tile_id, mosaic = False):
 ## Export mean and sd of height above ground for all 10 m cells in a tile
 def odm_export_normalized_z(tile_id):
     """
-    Exports mean and standard deviation of the normalisedZ variable for the 10 m x 10 m raster grid.
-    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+    Exports mean and standard deviation of the normalisedZ variable for the 10 m x 10 m raster grid. 
+    This function requires the normalizedZ to be added first (use odm_add_normalized_z()).
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number
     :return: execution status
     """
     # Initiate return value
@@ -385,8 +387,8 @@ def odm_export_normalized_z(tile_id):
 def odm_export_canopy_height(tile_id):
     """
     Exports the canopy height (95 percentile of normalised height only for points classified as vegetation)
-    for the 10 m x 10 m raster grid.
-    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+    for the 10 m x 10 m raster grid. This function requires the normalizedZ to be added first (use odm_add_normalized_z()).
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number
     :return: execution status
     """
     # Initiate return value
@@ -481,12 +483,13 @@ def odm_export_point_count(tile_id, name = 'vegetation_point_count',
                            lower_limit = -1, upper_limit = 50.0,
                            point_classes = None):
     """
-    Exports point count for a 10 m x 10 m cell in a given normalised height interval specified by
-    the lower and upper limit parameters and for a given set of point classes specified by the pint_classes parameter.
-    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
-    :param name: identifier name for point count used in file and folder naming during export.
-    :param lower_limit: lower limit for the height interval to count in (normalised height in m).
-    :param upper_limit: upper limit for the height interval to count in (normalised height in m).
+    Exports point counts for each 10 m x 10 m cell in an ODM and a given height interval specified by
+    the lower and upper limit parameters, as well as a given set of point classes specified by the pint_classes parameter.
+    Height parameters are given as normalised height above ground. 
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number
+    :param name: identifier name for the point count - used in file and folder naming during export
+    :param lower_limit: lower limit for the height interval (normalised height in m)
+    :param upper_limit: upper limit for the height interval (normalised height in m)
     :param point_classes: classes to subset from
     :return: execution status
     """
@@ -584,9 +587,9 @@ def odm_export_point_count(tile_id, name = 'vegetation_point_count',
 ## Export point counts for a pre-defined set of height ranges and classes
 def odm_export_point_counts(tile_id):
     """
-    Exports point counts for multiple classes and pre defined height intervals by calling the
-    odm_export_point_count function.
-    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+    Exports point counts for multiple pre-defined classes and height intervals by calling the
+    odm_export_point_count() function.
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number
     :return: execution status
     """
     # Initiate empty list for return values
@@ -643,7 +646,7 @@ def odm_export_point_counts(tile_id):
 def odm_calc_proportions(tile_id, prop_name, point_count_id1, point_count_id2):
     """
     Function to calculate point count proportions for two point counts.
-    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number
     :param prop_name: name to be assinged to the proportions output
     :param point_count_id1: name of point count to be rationed (numerator)
     :param point_count_id2: name of point count to be rationed to (denominator)
@@ -714,7 +717,7 @@ def odm_calc_proportions(tile_id, prop_name, point_count_id1, point_count_id2):
 def odm_export_proportions(tile_id):
     """
     Exports proportions for: canopy openness, canopy height profile, buildings point counts
-    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number
     :return: exit status
     """
     # Initiate return values
@@ -786,8 +789,8 @@ def odm_export_proportions(tile_id):
 ## Export mean and sd in the amplitude variable for all 10 m cells in a tile
 def odm_export_amplitude(tile_id):
     """
-    Exports mean and variance(sd) for the lidar amplitude for all 10 m x 10 m cells in a tile.
-    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+    Exports mean and sd for the lidar amplitude for all 10 m x 10 m cells in a tile.
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number
     :return: execution status
     """
     # Initiate return value
@@ -855,7 +858,7 @@ def odm_export_amplitude(tile_id):
 def odm_export_point_source_info(tile_id):
     """
     Extracts point source statistics for the 10 m x 10 m cells of the point cloud.
-    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number
     :return: execution status
     """
 
@@ -1080,7 +1083,7 @@ def odm_export_point_source_info(tile_id):
 def odm_remove_temp_files(tile_id):
     """
     Removes footprint and odm files to clear up space for subsequent processing.
-    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number.
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number
     :return: execution status
     """
 
