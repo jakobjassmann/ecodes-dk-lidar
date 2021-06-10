@@ -4,10 +4,10 @@ log/*
 scratch/*/
 .idea/
 .spyproject/
-auxillary_files
 *.pyc
 *Rproj*
 .Rhistory
+auxillary_files
 *.DS_Store
 documentation/figures/figure_2/*.tif
 documentation/figures/figure_3/*.tif
