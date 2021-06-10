@@ -82,7 +82,7 @@ Once the processing has finished, a few post-processing steps need to be carried
    - The VRT file will be generated for the  extent of the nationwide datset, consider adjusting the extent parameter in `make_vrs.bat` in case only a subset has been processed. 
 3. Fill in processing gaps using `fill_processing_gaps.py`.
    - A small number of tiles (< 100), e.g. on the fringes of the dataset (including sand banks, spits etc.), may fail processing for some of the variables - especially the point cloud derived variables. This script fills these "processing gaps", by creating empty rasters containing onlly NA for the missing tiles and variables. The script also outputs a csv file summarising the number of tiles missing for each variable [/documentation/empty_tiles.csv](/documentation/empty_tiles.csv). The specific tile ids of the missing variable / tile combinations can be retrieved from the log files. 
-4. Optional: Bundle and compress outputs as tar.bz2 archives by running `archive_outputs.py`. Note: Adjust the destination folder for archives (line 14) prior execution. 
+4. Optional: Bundle and compress outputs as tar.bz2 archives by running `archive_outputs.py`. Note: Adjust the destination folder for archives (line 14) prior execution. You can also generate md5 checksums for those archives using `create_checksums_archives.bat`, again update the folder path(s) in the script.
 5. Optional: Generate a list of all the VRT files with in the settings.output_folder folder structre using `generate_list_of_vrts.py`. This file can be handy for fast access to the data, especially in R as listing files in a folder tree with a large amount of files can be very slow. 
 
 [\[to top\]](#content)
@@ -104,6 +104,7 @@ Script | Description
 archive_outputs.py | Simple scripts to bundle and compress the output files by variable / group, based on the subfolders of the output folder defined in `settings.py`. 
 checksum_qa.py | Validates checksums for downloads, and cross-compares dtm and pointcloud datasets for completnness. Requires `checksum_qa.py` to be run previously. 
 create_checksums.bat | Generates checksums for downloaded files. 
+create_checksums_archives.bat | Generates checksums for outputs packed into archives using `archive_outputs.py`. 
 debug.py | Script for testing / debugging the processing workflow based on a single tile. Processing is done sequentially, one variable after the other. Timings are provided. 
 debug.Rmd | R Markdown document for visual quality assurance of the debug.py outputs. 
 download_files.py | Helper script to download DHM\Punktsky pointclouds and DHM dtm rasters from the Kortforsyningen website. 
