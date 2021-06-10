@@ -1,5 +1,5 @@
-## This folder is emtpy on prurpose!
-Upon initiation of the processing, log files will be stored here in the following folder structure:
+﻿## This folder is emtpy on prurpose!
+After starting the processing, log files will be stored here. The folder structure is as follows:
 ```
 /log/                                                     log folder
     |- process_tiles/                                     subfolder log outputs for process_tiles.py
@@ -7,7 +7,7 @@ Upon initiation of the processing, log files will be stored here in the followin
     |               |         |- step X/                  subfolder log outputs for step X
     |               |         |        |- log.txt         high-level log information for step X
     |               |         |        |- opalsLOG.xml    opalsLog.xml file for step X [optional]
-    |               |         |        |- opalsError.txt  opalsError.txt file for step X) [optional]
+    |               |         |        |- opalsError.txt  opalsError.txt file for step X [optional]
     |               |         |         
     |               |         |- step ...                 other steps
     |               |         |- status.csv               file with status summary
