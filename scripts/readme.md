@@ -92,7 +92,7 @@ Once the processing has finished, a few post-processing steps need to be carried
 We have provided a couple of scripts that allow for quality control and log file processing: 
 
 - `quality_assurance.R` - A simple quality assurance script that checks summary statistics, generates histograms and correlation plots for a set of random sample points from across Denmark. **(To be updated!)**
-- `processing_report.Rmd` - R Markdown file that gathers key processing information from the log files, such as error rates, messages and tile id, as well as variable - tile id combination for which the processing was not succesffull. **(Available locally - still to be added to repository!)**
+- `processing_report.Rmd` - R Markdown file that gathers key processing information from the log files, such as error rates, messages and tile id, as well as variable - tile id combination for which the processing was not succesffull. 
 
 Note: The logging database used for processe management in also contains information on the exit status of each processing step for each tile. In addition, the OPALs and GDAL logs are kept for all processed tiles in the subfolders of this folder named with the tile id.
 
@@ -117,6 +117,7 @@ make_vrt_subfolders.bat | Recursively creates vrt files within all subfolders of
 plot_raster_3d.R | Set of helper functions to generate publication ready 3D plots of rasters in R using the *rayshader* package. (Used to generate the figures for the manuscript). 
 **process_tiles.py** | **Main script for processing**. Controls process managment and defines which processing steps are carried out. Uses the functions defined in the *dklidar* modules. 
 **progress_monitor.py** | **Progress monitor**. Run this script in a separate OPALS shell to keep track of the processing. Launch after initating processing using `process_tiles.py`. 
+processing_report.Rmd | R Markdown document to generate an overview report based on the log outputs from `process_tiles.py`. 
 quality_assurance.R | Simple quality assurance script that checks summary statistics, generates histograms and correlation plots for a set of random sample points from across Denmark. 
 remove_missing_tiles.py | Removes incomplete sets of tiles from the DTM and laz folders. Run after `checksum_qa.py` has been executed. 
 **set_environment.bat** | Adds the *dklidar package* to the OPALS shell python path. **Execute each time after launching an new OPALS shell.** 
