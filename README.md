@@ -49,6 +49,7 @@ To replicate the processing, revisit the [workflow overview](/documentation/dk_l
 This repository contains the following documentation:
 
 - A summary description of the output variables. See [/documentation/variables.md](/documentation/variables.md) (or as [pdf](/documentation/variables.pdf)).
+- A lookup table for easy access to the variable conversion factors [/documentation/conversion_factors.csv](/documentation/conversion_factors.csv).
 - Documentation for the pre- / post- processing and processing steps and scripts. See [/scripts/readme.md](/scripts/readme.md).
 - Documentation for the *dklidar* Python processing modules. See [/documentation/dklidar_modules.md](/documentation/dklidar_modules.md).
 - Example scripts for subsetting and working with the dataset. See [/manuscript/figure_6/subset_dataset.R](/manuscript/figure_6/subset_dataset.R) (subsetting) and [/manuscript/figure_6/figure_6.R](/manuscript/figure_6/figure_6.R) (ecological stratification).
