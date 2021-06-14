@@ -1,0 +1,16 @@
+auxillary_files/lake_mask_jesper.shp filter=lfs diff=lfs merge=lfs -text
+auxillary_files/lake_mask_jesper.shp.xml filter=lfs diff=lfs merge=lfs -text
+auxillary_files/lake_mask_jesper.sbx filter=lfs diff=lfs merge=lfs -text
+auxillary_files/dk_bounds_jesper_poly.dbf filter=lfs diff=lfs merge=lfs -text
+auxillary_files/dk_bounds_jesper_poly.shp.xml filter=lfs diff=lfs merge=lfs -text
+auxillary_files/lake_mask_jesper.cpg filter=lfs diff=lfs merge=lfs -text
+auxillary_files/lake_mask_jesper.sbn filter=lfs diff=lfs merge=lfs -text
+auxillary_files/lake_mask_jesper.shx filter=lfs diff=lfs merge=lfs -text
+auxillary_files/dk_bounds_jesper_poly.sbn filter=lfs diff=lfs merge=lfs -text
+auxillary_files/dk_bounds_jesper_poly.shp filter=lfs diff=lfs merge=lfs -text
+auxillary_files/lake_mask_jesper.prj filter=lfs diff=lfs merge=lfs -text
+auxillary_files/dk_bounds_jesper_poly.shx filter=lfs diff=lfs merge=lfs -text
+auxillary_files/lake_mask_jesper.dbf filter=lfs diff=lfs merge=lfs -text
+auxillary_files/dk_bounds_jesper_poly.cpg filter=lfs diff=lfs merge=lfs -text
+auxillary_files/dk_bounds_jesper_poly.prj filter=lfs diff=lfs merge=lfs -text
+auxillary_files/dk_bounds_jesper_poly.sbx filter=lfs diff=lfs merge=lfs -text
