@@ -32,15 +32,16 @@ To replicate the processing, revisit the [workflow overview](/documentation/dk_l
 
 ## Repository Structure
 ```
-/                 root folder.
-|- data/          empty, place-holder for input (imported) and output (generated) data.
-|- dklidar/       Python modules providing the processing functions.
-|- documentation/ documentation for Python modules and output variables. 
-|- log/           empty, place-holder for log file output.
-|- manuscript/    scripts accompanying the manuscript.
-|- qa_local/      quallity assurance outputs and processing reports.
-|- scratch/       empty, place-holder for temporary data storage.
-|- scripts/       contains Python and R scripts for process management and QA.
+/                     root folder.
+|- auxillary_files/   shapefiles needed for generating the sea and water masks. 
+|- data/              empty, place-holder for input (imported) and output (generated) data.
+|- dklidar/           Python modules providing the processing functions.
+|- documentation/     documentation for Python modules and output variables. 
+|- log/               empty, place-holder for log file output.
+|- manuscript/        scripts accompanying the manuscript.
+|- qa_local/          quallity assurance outputs and processing reports.
+|- scratch/           empty, place-holder for temporary data storage.
+|- scripts/           contains Python and R scripts for process management and QA.
 ```
 [\[to top\]](#content)
 
