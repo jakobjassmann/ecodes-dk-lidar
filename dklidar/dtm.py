@@ -663,7 +663,7 @@ def dtm_calc_solar_radiation(tile_id):
         solar_rad_eq = 'rint(1000*(0.339+0.808*cos(radians(L))*cos(radians((S/10)))-0.196*sin(radians(L))*sin(radians((S/10)))-0.482*cos(radians(180-absolute(180-(A/10))))*sin(radians((S/10)))))'
 
         # Specify output path
-        out_file = out_folder + '/solar_rad_' + tile_id + '.tif '
+        out_file = out_folder + '/solar_radiation_' + tile_id + '.tif '
 
         # Construct gdal command:
         cmd = settings.gdal_calc_bin + \
