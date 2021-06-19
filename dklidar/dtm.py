@@ -8,6 +8,7 @@ import pandas
 import opals
 import glob
 import time
+import shutil
 
 from dklidar import settings
 from dklidar import common
@@ -329,10 +330,11 @@ def dtm_calc_slope(tile_id):
 
 
 ## Calculate aspect for a tile
-def dtm_calc_aspect(tile_id):
+def dtm_calc_aspect(tile_id, slope_zero = 'nodata'):
     """
     Calculates the aspect for all 10 m cells in a DTM neighbourhood mosaic and crops to original tile_size.
     :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number
+    :param slope_zero: integer value or 'nodata', sets the value for cells were slope = 0. 
     :return: execution status
     """
 
@@ -349,7 +351,7 @@ def dtm_calc_aspect(tile_id):
 
     try:
         # Calculate aspect
-        cmd = settings.gdaldem_bin + ' aspect -zero_for_flat ' + \
+        cmd = settings.gdaldem_bin + ' aspect ' + \
               settings.dtm_mosaics_10m_folder + '/dtm_' + tile_id + '_float_mosaic_10m.tif ' + \
               wd + '/aspect_' + tile_id + '_mosaic.tif '
         log_file.write(tile_id + ' aspect calculation... \n ' + \
@@ -364,11 +366,52 @@ def dtm_calc_aspect(tile_id):
         log_file.write(subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
                  '\n' + tile_id + ' aspect mosaic cropped.\n\n')
 
+        # Set aspect for cells slope = 0 if the value is not nodata
+        if slope_zero != 'nodata':
+
+            # Calculate slope
+            cmd = settings.gdaldem_bin + ' slope ' + \
+              settings.dtm_mosaics_10m_folder + '/dtm_' + tile_id + '_float_mosaic_10m.tif ' + \
+              wd + '/slope_' + tile_id + '_mosaic.tif '
+            log_file.write(tile_id + ' slope calculated. \n ' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT))
+        	
+            # Crop slope mosaic
+            cmd = settings.gdalwarp_bin + \
+                  ' -cutline ' + settings.dtm_footprint_folder + '/DTM_1km_' + tile_id + '_footprint.shp ' + \
+                  '-crop_to_cutline -overwrite ' + \
+                  wd + '/slope_' + tile_id + '_mosaic.tif ' + \
+                  wd + '/slope_' + tile_id + '_mosaic_cropped.tif '
+            log_file.write(subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT) + \
+                     '\n' + tile_id + ' slope mosaic cropped.\n\n')
+        
+            # Prepare mask from slope raster for slope = 0
+            cmd = settings.gdal_calc_bin + \
+              '-S ' + wd + '/slope_' + tile_id + '_mosaic_cropped.tif ' + \
+              ' --outfile=' + wd + '/slope_mask_' + tile_id + '.tif ' + \
+              ' --calc=' + str(slope_zero) + '*(S==0)-9999*(S!=0)'
+            log_file.write('\n' + tile_id + ' generated slope mask successfuly. \n' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT))
+
+            # Merge mask over aspect to set value for aspect where slope = 0
+            cmd = settings.gdal_merge_bin + \
+                  ' -o ' + wd + '/aspect_' + tile_id + '_mosaic_cropped_masked.tif '+ \
+                  ' -a_nodata -9999 -init -9999 -ot Float32 ' + \
+                  wd + '/slope_mask_' + tile_id + '.tif ' + \
+                  wd + '/aspect_' + tile_id + '_mosaic_cropped.tif '
+            log_file.write('\n' + tile_id + ' set aspect for slope = 0 successfuly. \n' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT))
+        else:
+            # Rename cropped mosaic
+            os.rename(wd + '/aspect_' + tile_id + '_mosaic_cropped.tif ',
+                      wd + '/aspect_' + tile_id + '_mosaic_cropped_masked.tif ')
+
         # Round and store as int16
         cmd = settings.gdal_calc_bin + \
-              '-A ' + wd + '/aspect_' + tile_id + '_mosaic_cropped.tif ' + \
+              '-A ' + wd + '/aspect_' + tile_id + '_mosaic_cropped_masked.tif ' + \
               ' --outfile=' + out_folder + '/aspect_' + tile_id + '.tif ' + \
               ' --calc=rint(10*A) --type=Int16 --NoDataValue=-9999'
+        
         log_file.write('\n' + tile_id + ' rounding aspect to int16 and calculation success. \n' + \
                      subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT))
 
@@ -383,10 +426,14 @@ def dtm_calc_aspect(tile_id):
     # Close log file
     log_file.close()
 
-    # Remove temporary file
+    # Remove temporary files
     try:
         os.remove(wd + '/aspect_' + tile_id + '_mosaic.tif ')
         os.remove(wd + '/aspect_' + tile_id + '_mosaic_cropped.tif ')
+        os.remove(wd + '/aspect_' + tile_id + '_mosaic_cropped_masked.tif ')
+        os.remove(wd + '/slope_' + tile_id + '_mosaic.tif ')
+        os.remove(wd + '/slope_' + tile_id + '_mosaic_cropped.tif ')
+        os.remove(wd + '/slope_mask_' + tile_id + '.tif ')
     except:
         pass
 
@@ -394,11 +441,12 @@ def dtm_calc_aspect(tile_id):
 
 
 ## Calculcate heat index
-def dtm_calc_heat_index(tile_id):
+def dtm_calc_heat_index(tile_id, slope_zero = 'nodata'):
     """
     Calculates the heat index from McCune and Keon (2002) based on the aspect only. Aspect must have been
     calculated using dtm_calc_aspect().
     :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number
+    :param zero_slope: zero_slope - inteeger value assigned to the aspect when slope = 0 or 'nodata'
     :return: execution status
     """
     # Intialise return value and log
@@ -419,13 +467,16 @@ def dtm_calc_heat_index(tile_id):
         # Construct numpy equation, stretch by 10k and round
         heat_index = 'rint(10000*((1-cos(radians((A/10)-45)))/2))'
 
+        # Specify temp_file path
+        temp_file = wd + '/heat_load_index_' + tile_id + '.tif '
+        
         # Specify output path
         out_file = out_folder + '/heat_load_index_' + tile_id + '.tif '
 
         # Construct gdal command, save file as Int16:
         cmd = settings.gdal_calc_bin + \
               aspect_file + \
-              '--outfile=' + out_file + \
+              '--outfile=' + temp_file + \
               ' --calc=' + heat_index + \
               ' --type=Int16 --NoDataValue=-9999 --overwrite'
 
@@ -433,9 +484,33 @@ def dtm_calc_heat_index(tile_id):
         log_file.write('\n' + tile_id + ' calculating heat index success. \n' + \
                      subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT))
 
+        # maks index for zero slope value if specified
+        if slope_zero != 'nodata':
+            cmd = settings.gdal_calc_bin + \
+                  aspect_file + \
+                  ' -B ' + temp_file + \
+                  ' --outfile=' + out_file + \
+                  ' --calc=-9999*(A==' + str(slope_zero) + ')+B*(A!=' + str(slope_zero) + ')' + \
+                  ' --type=Int16 --NoDataValue=-9999 --overwrite '
+            log_file.write('\n' + tile_id + ' applied aspect mask successfuly. \n' + \
+                     subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT))
+        else:
+            # Move file
+            try:
+                os.remove(out_file)
+            except:
+                pass
+            os.rename(temp_file, out_file)
+        
         # Apply mask(s)
         common.apply_mask(out_file)
 
+        # remove temp file
+        try:
+                  os.remove(temp_file)
+        except:
+                  pass
+        
         return_value = 'success'
     except:
         log_file.write(tile_id + ' calculating heat index failed. \n ')

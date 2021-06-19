@@ -226,7 +226,7 @@ def generate_water_masks(tile_id):
 
         # Set all cells with data in raster to 0 and set it as no data value
         cmd = settings.gdal_calc_bin + \
-              '--calc=0 --NoDataValue=0 --overwrite --type Int16 ' + \
+              '--calc=1 --NoDataValue=-9999 --overwrite --type Int16 ' + \
               '-A ' + temp_file + ' ' + \
               '--outfile=' + sea_mask_file
 
@@ -253,12 +253,11 @@ def generate_water_masks(tile_id):
         dk_sea_mask_temp_file = os.getcwd() + '/temp_' + dk_sea_mask_file_base + '.shp'
         dk_inland_mask_temp_file = os.getcwd() + '/temp_' + dk_inland_mask_file_base + '.shp'
 
-        # Apply sea mask
+        # Generate sea mask
         cmd = settings.gdal_rasterize_bin + \
-              '-b 1 ' + '-burn -9999 ' + '-at ' + '-i ' + \
+              '-b 1 ' + '-burn -9999 ' + '-i ' + '-at ' + \
               dk_sea_mask_temp_file + ' ' + \
               sea_mask_file
-
         log_file.write('\n' + \
                      subprocess.check_output(
                          cmd,
@@ -266,12 +265,12 @@ def generate_water_masks(tile_id):
                          stderr=subprocess.STDOUT) + \
                      '\n' + sea_mask_file + ' sea mask created. \n\n ')
 
-        # Apply inland water mask
+        # Generate inland water mask
         cmd = settings.gdal_rasterize_bin + \
               '-b 1 ' + '-burn -9999 ' + '-at ' + \
               dk_inland_mask_temp_file + ' ' + \
               inland_mask_file
-
+        
         log_file.write('\n' + \
                      subprocess.check_output(
                          cmd,
@@ -328,12 +327,12 @@ def apply_mask(target_raster = '', sea_mask = False, inland_water_mask = False):
     if (sea_mask == True):
         try:
             # Construct gdal command
-            cmd = settings.gdal_merge_bin + \
-                  '-a_nodata -9999 ' + \
-                  '-o ' + temp_file + ' ' + \
-                  ' ' + target_raster + ' ' + \
-                  ' ' + sea_mask_file + ' '
-
+            cmd = settings.gdal_calc_bin + \
+              '-A ' + sea_mask_file + ' ' + \
+              '-B ' + target_raster + ' ' + \
+              '--outfile=' + temp_file + ' ' + \
+              '--calc=B --NoDataValue=-9999 --overwrite --type Int16 '
+            
             log_file.write('\n' + \
                  subprocess.check_output(
                      cmd,
@@ -353,12 +352,12 @@ def apply_mask(target_raster = '', sea_mask = False, inland_water_mask = False):
     if (inland_water_mask == True):
         try:
             # Construct gdal command
-            cmd = settings.gdal_merge_bin + \
-                  '-a_nodata -9999 ' + \
-                  '-o ' + temp_file + ' ' + \
-                  ' ' + target_raster + ' ' + \
-                  ' ' + inland_mask_file + ' '
-
+            cmd = settings.gdal_calc_bin + \
+              '-A ' + inland_mask_file + ' ' + \
+              '-B ' + target_raster + ' ' + \
+              '--outfile=' + temp_file + ' ' + \
+              '--calc=B --NoDataValue=-9999 --overwrite --type Int16 '
+            
             log_file.write('\n' + \
                  subprocess.check_output(
                      cmd,

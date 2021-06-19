@@ -56,8 +56,8 @@ scratch_folder =  wd + '/scratch'
 log_folder = wd + '/log'
 
 # Mask files
-dk_coastline_poly = 'D:/Jakob/dk_nationwide_lidar/data/masks/dk_bounds_jesper_poly.shp'
-dk_lakes_poly = 'D:/Jakob/dk_nationwide_lidar/data/masks/lake_mask_jesper.shp'
+dk_coastline_poly = 'D:/Jakob/dk_nationwide_lidar/auxillary_files/dk_bounds_jesper_poly.shp'
+dk_lakes_poly = 'D:/Jakob/dk_nationwide_lidar/auxillary_files/lake_mask_jesper.shp'
 
 ## Spatial reference settings
 
