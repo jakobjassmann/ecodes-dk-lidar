@@ -44,31 +44,37 @@ analyse_raster <- function(index){
                         raster_files[index])
   target_raster <- raster_list[[index]]
   target_raster[target_raster == -9999] <- NA
-  # Get summary stats
-  summary_stats <- data.frame(
-    dataType = dataType(target_raster),
-    mean = cellStats(target_raster, mean),
-    min = cellStats(target_raster, min),
-    max = cellStats(target_raster, max),
-    isNA = sum(is.na(target_raster[]))
-  )
-  # Raster Plot
-  raster_plot <- levelplot(target_raster,
-             margin = F)
-  # Histogram Plot
-  hist_plot <- ggplot(as.data.frame(target_raster), 
-                      aes(x = get(paste0(variable_name, "_", tile_id)))) +
-    geom_histogram(bins = 100) +
-    labs(x = "", y = "n cells") +
-    theme_cowplot()
-  # Export plot
-  save_plot(paste0(debug_folder, "/", variable_name, "_", tile_id, ".png"),
-            plot_grid(as_grob(raster_plot), hist_plot, ncol = 2))
-  # Generate Markdown section
-  cat("\n---\n")
-  cat(paste0("\n## ", variable_name, " ", tile_id, "\n"))
-  print(kable(summary_stats)  %>% kable_styling(full_width = F, position = "left"))
-  cat(paste0("![](", debug_folder, "/", variable_name, "_", tile_id, ".png)\n"))
+  if(sum(!is.na(unique(target_raster[]))) != 0){
+    # Get summary stats
+    summary_stats <- data.frame(
+      dataType = dataType(target_raster),
+      mean = cellStats(target_raster, mean),
+      min = cellStats(target_raster, min),
+      max = cellStats(target_raster, max),
+      isNA = sum(is.na(target_raster[]))
+    )
+    # Raster Plot
+    raster_plot <- levelplot(target_raster,
+                             margin = F)
+    # Histogram Plot
+    hist_plot <- ggplot(as.data.frame(target_raster), 
+                        aes(x = get(paste0(variable_name, "_", tile_id)))) +
+      geom_histogram(bins = 100) +
+      labs(x = "", y = "n cells") +
+      theme_cowplot()
+    # Export plot
+    save_plot(paste0(debug_folder, "/", variable_name, "_", tile_id, ".png"),
+              plot_grid(as_grob(raster_plot), hist_plot, ncol = 2))
+    # Generate Markdown section
+    cat("\n---\n")
+    cat(paste0("\n## ", variable_name, " ", tile_id, "\n"))
+    print(kable(summary_stats)  %>% kable_styling(full_width = F, position = "left"))
+    cat(paste0("![](", debug_folder, "/", variable_name, "_", tile_id, ".png)\n"))
+  } else {
+    cat("\n---\n")
+    cat(paste0("\n## ", variable_name, " ", tile_id, "\n"))
+    cat(paste0("All raster values are NA.\n"))
+  }
   return(NULL)
 }
 
