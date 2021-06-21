@@ -1,4 +1,4 @@
-# Handy wrapper functions to quickly generate publishable 3D rasterplots 
+# Handy wrapper functions to quickly generate oublishable 3D rasterplots 
 # using the rayshader package
 # Jakob Assmann j.assmann@bio.au.dk 9 March 2021
 
@@ -20,7 +20,7 @@ library(magick)
 #' @param raster_object A single layer raster object
 #' @param dtm_raster A digital terrain model raster, defaults to a zero height raster generated from the raster_object. 
 #' @param output_file A PNG output file to write the plot to.
-#' @param colour_ramp A colour ramp vector or a single string specifing a sequential colour ramp name of the colorspace apackage. 
+#' @param 	 A colour ramp vector or a single string specifing a sequential colour ramp name of the colorspace apackage. 
 #' @param invert_ramp Logical. Invert colour ramp. 
 #' @param min_value Minimum value for the colour ramp.  
 #' @param max_value Maximum vale for the colour ramp. 
@@ -202,7 +202,8 @@ plot_raster_hist_bar <- function(raster_object,
                                  max_value = NULL, 
                                  n_steps = NULL,
                                  y_max = NULL,
-                                 colour_bar_only = F) {
+                                 colour_bar_only = F,
+                                 font_size = 18) {
   
   # Convert raster object to data frame
   raster_df <- as.data.frame(raster_object)
@@ -292,13 +293,13 @@ plot_raster_hist_bar <- function(raster_object,
                       ylim = c(raster_df$bar_lower[1],
                                y_max),
                       expand = F) +
-      theme_cowplot(18) +
+      theme_cowplot(font_size) +
       theme(legend.position = "none",
             plot.margin = margin(1, 1, 1, 0.25, "inch"),
             axis.title.y = element_text(hjust = 0.7))
   } else{
     hist_plot <- ggplot(raster_df, aes(x = x_centre, y = n_x, fill = col, colour = col)) +
-      geom_col(aes(xmin = x_in, xmax = x_max,
+      geom_rect(aes(xmin = x_min, xmax = x_max,
                    ymin = bar_lower, ymax = 0),
                size = 1) +
       scale_fill_manual(values = colour_ramp) +
@@ -322,9 +323,9 @@ plot_raster_hist_bar <- function(raster_object,
            y = "") +     
       coord_cartesian(xlim = c(min_value, max_value), 
                       ylim = c(raster_df$bar_lower[1],
-                               y_max),
+                               0),
                       expand = F) +
-      theme_cowplot(18) +
+      theme_cowplot(font_size) +
       theme(legend.position = "none",
             plot.margin = margin(1, 1, 1, 0.25, "inch"),
             axis.title.y = element_blank(),
@@ -380,6 +381,7 @@ plot_raster_3d_combined <- function(raster_object,
                                     plot_zoom = 0.75,
                                     variable_name = "Raster Value",
                                     y_max = NULL,
+                                    font_size = 18,
                                     colour_bar_only = F,
                                     colour_bar_y_pos = 0.5,
                                     colour_bar_height_factor = 0.6 # Only needed if colour_bar_only = T. This looks good if both plots are equal in width and are of sufficient height. 
@@ -413,6 +415,7 @@ plot_raster_3d_combined <- function(raster_object,
                                         max_value = max_value, 
                                         n_steps = n_steps,
                                         y_max = y_max,
+                                        font_size = font_size,
                                         colour_bar_only = colour_bar_only)
   # Colur scale bar only? -> reduce height to 20% of plot size
   if(colour_bar_only) {
