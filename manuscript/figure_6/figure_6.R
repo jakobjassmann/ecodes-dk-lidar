@@ -357,7 +357,6 @@ tile_location <- ggplot() + geom_sf(data = dk_boundary, fill = "white", size = 1
         axis.ticks = element_blank(),
         panel.grid.minor = element_line(colour = "white"),
         panel.grid.major = element_line(colour = "white")) 
-tile_location
 save_plot("manuscript/figure_6/area_location.png",
            tile_location,
            base_asp = 1)
