@@ -4,9 +4,11 @@
 ## 1) Housekeeping ----
 
 # Set wd
-setwd("D:/Jakob/dk_nationwide_lidar/documentation/figures/figure_3")
+setwd("D:/Jakob/dk_nationwide_lidar/manuscript//figure_3")
 
 # Dependencies
+library(raster)
+library(sf)
 library(cowplot)
 library(tidyverse)
 library(rnaturalearth)
@@ -15,27 +17,28 @@ library(rnaturalearthdata)
 # Source 3D plotting funcitions for rasters
 # Contains special characters and stored in UTF-8 does not work with "source"
 # Use eval and parse instead.
-eval(parse("../plot_raster_3d/plot_raster_3d.R", encoding = "UTF-8"))
+eval(parse("../../scripts/plot_raster_3d.R", encoding = "UTF-8"))
 
 # Set target tile id (Vejle Fjord)
 tile_id <- "6171_541" #"6210_570"
 
 # Set folder paths
-dtm_10m <- "D:/Jakob/dk_nationwide_lidar/data/outputs/dtm_10m"
-amplitude_mean <- "D:/Jakob/dk_nationwide_lidar/data/outputs/amplitude/amplitude_mean"
-amplitude_sd <- "D:/Jakob/dk_nationwide_lidar/data/outputs/amplitude/amplitude_sd"
-canopy_height <- "D:/Jakob/dk_nationwide_lidar/data/outputs/canopy_height"
-normalized_z_mean <- "D:/Jakob/dk_nationwide_lidar/data/outputs/normalized_z/normalized_z_mean"
-normalized_z_sd <- "D:/Jakob/dk_nationwide_lidar/data/outputs/normalized_z/normalized_z_sd"
-ground_point_count <- "D:/Jakob/dk_nationwide_lidar/data/outputs/point_count/ground_point_count_-01m-01m"
-water_point_count <- "D:/Jakob/dk_nationwide_lidar/data/outputs/point_count/water_point_count_-01m-01m"
-vegetation_point_count <- "D:/Jakob/dk_nationwide_lidar/data/outputs/point_count/vegetation_point_count_00m-50m"
-building_point_count <- "D:/Jakob/dk_nationwide_lidar/data/outputs/point_count/building_point_count_-01m-50m"
-total_point_count <- "D:/Jakob/dk_nationwide_lidar/data/outputs/point_count/total_point_count_-01m-50m"
-point_source_nids <- "D:/Jakob/dk_nationwide_lidar/data/outputs/point_source_info/point_source_nids"
-canopy_openness <- "D:/Jakob/dk_nationwide_lidar/data/outputs/proportions/canopy_openness"
-vegetation_density <- "D:/Jakob/dk_nationwide_lidar/data/outputs/proportions/vegetation_density"
-building_proportion <- "D:/Jakob/dk_nationwide_lidar/data/outputs/proportions/building_proportion"
+ecodes_path <- "O:/Nat_Ecoinformatics-tmp/au634851/dk_lidar_backup_2021-05-12/"
+dtm_10m <- paste0(ecodes_path, "dtm_10m")
+amplitude_mean <- paste0(ecodes_path, "amplitude_mean")
+amplitude_sd <- paste0(ecodes_path, "amplitude_sd")
+canopy_height <- paste0(ecodes_path, "canopy_height")
+normalized_z_mean <- paste0(ecodes_path, "normalized_z_mean")
+normalized_z_sd <- paste0(ecodes_path, "normalized_z_sd")
+ground_point_count <- paste0(ecodes_path, "point_count/ground_point_count_-01m-01m")
+water_point_count <- paste0(ecodes_path, "point_count/water_point_count_-01m-01m")
+vegetation_point_count <- paste0(ecodes_path, "point_count/vegetation_point_count_00m-50m")
+building_point_count <- paste0(ecodes_path, "point_count/building_point_count_-01m-50m")
+total_point_count <- paste0(ecodes_path, "point_count/total_point_count_-01m-50m")
+point_source_nids <- paste0(ecodes_path, "point_source_info/point_source_nids")
+canopy_openness <- paste0(ecodes_path, "canopy_openness")
+vegetation_density <- paste0(ecodes_path, "vegetation_density")
+building_proportion <- paste0(ecodes_path, "building_proportion")
 
 # Load rasters for the tile
 dtm_10m_raster <- raster(paste0(dtm_10m, "/dtm_10m_", tile_id, ".tif"))/ 100
@@ -56,11 +59,11 @@ building_proportion_raster <- raster(paste0(building_proportion, "/building_prop
 
 # Load orthomosaic
 
-# Determine ortho tile number (2014 ortho tiles are 2 km x 2 km)
-tile_row <- as.numeric(gsub("([0-9]{4})_.*", "\\1", tile_id))
-tile_col <- as.numeric(gsub(".*_([0-9]{3})", "\\1", tile_id))
-if(tile_row %% 2 == 1) tile_row <- tile_row - 1  
-if(tile_col %% 2 == 1) tile_col <- tile_col - 1 
+# # Determine ortho tile number (2014 ortho tiles are 2 km x 2 km)
+# tile_row <- as.numeric(gsub("([0-9]{4})_.*", "\\1", tile_id))
+# tile_col <- as.numeric(gsub(".*_([0-9]{3})", "\\1", tile_id))
+# if(tile_row %% 2 == 1) tile_row <- tile_row - 1  
+# if(tile_col %% 2 == 1) tile_col <- tile_col - 1 
 
 # # Convert ESRI world file to tif
 # system(paste0("C:/OSGeo4W64/OSGeo4W.bat gdal_translate ",
@@ -211,7 +214,7 @@ combined_plot <- plot_grid(
   plotlist = plot_list ,
   ncol = 3,
   labels = paste0(
-                  letters[1:9], ") " , 
+                  letters[1:15], ") " , 
                   c("orthophoto",
                     parameters$variable_code)),
   label_size = 24,
