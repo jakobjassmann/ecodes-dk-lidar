@@ -15,8 +15,8 @@ library(rasterVis)
 library(rnaturalearth)
 library(rnaturalearthdata)
 
-# Set working directory
-setwd("D:/Jakob/dk_nationwide_lidar/")
+# Set working directory (if needed)
+#setwd("D:/Jakob/dk_nationwide_lidar/")
 
 # Also source playground script for data visualisation
 source("scripts/plot_raster_3d.R")
@@ -214,8 +214,8 @@ veg_sample$proportion <- gsub("vegetation_point_count_","",veg_sample$proportion
 veg_sample$proportion <- gsub("m\\."," - ",veg_sample$proportion)
 veg_sample$proportion <- gsub("m"," m",veg_sample$proportion)
 veg_sample$veg_class[veg_sample$veg_class == 1] <- "Grass & Heath"
-veg_sample$veg_class[veg_sample$veg_class == 2] <- "Pinus mugo"
-veg_sample$veg_class[veg_sample$veg_class == 3] <- "Pinus sylvestris"
+veg_sample$veg_class[veg_sample$veg_class == 2] <- "Shrubs &\nSmall Trees"
+veg_sample$veg_class[veg_sample$veg_class == 3] <- "Trees"
 veg_sample$veg_class <- factor(veg_sample$veg_class)
 veg_sample$proportion <- factor(veg_sample$proportion, 
                                    levels = sort(unique((veg_sample$proportion))))
@@ -249,14 +249,14 @@ tpi_veg_combined_classes <- ratify(tpi_veg_combined_classes)
 classes <- levels(tpi_veg_combined_classes)[[1]]
 classes$legend <- c("Water", 
                     "Troughs + Grass & Heath",
-                    "Troughs + Pinus mugo",
-                    "Troughs + Pinus sylvestris",
+                    "Troughs + Shrubs & Small Trees",
+                    "Troughs + Trees",
                     "Mid-slopes + Grass & Heath",
-                    "Mid-slopes + Pinus mugo",
-                    "Mid-slopes + Pinus sylvestris",
+                    "Mid-slopes + Shrubs & Small Trees",
+                    "Mid-slopes + Trees",
                     "Ridges + Grass & Heath",
-                    "Ridges + Pinus mugo",
-                    "Ridges + Pinus sylvestris")
+                    "Ridges + Shrubs & Small Trees",
+                    "Ridges + Trees")
 levels(tpi_veg_combined_classes) <- classes
 names(tpi_veg_combined_classes) <- "class"
 classification_plot <- as_grob(levelplot(tpi_veg_combined_classes,
@@ -332,14 +332,24 @@ st_crs(tile_footprint) <- st_crs(dtm_10m)
 
 # Generate a map of Denmark
 dk_boundary <- ne_countries(scale = "medium", returnclass = "sf") %>%
-  filter(name == "Denmark")
+  filter(name == "Denmark") %>% st_transform(st_crs(dtm_10m))
+
+# Set boundaries
+map_bounds <- dk_boundary  %>% st_bbox()
 
 # Plot map of tile location in Denmark
 tile_location <- ggplot() + geom_sf(data = dk_boundary, fill = "white", size = 1) + 
   geom_sf(data = st_centroid(tile_footprint),
           colour = "#1E8AA8",
           size = 5, shape = 15) +  
-  coord_sf(ylim = c(54, 58.5), xlim = c(7.87307, 13.2433), expand = F) +
+  coord_sf(ylim = c(map_bounds["ymin"] - 50000, map_bounds["ymax"] + 50000), 
+           xlim = c(map_bounds["xmin"] - 50000, map_bounds["xmax"] - 100000), expand = F) +
+  annotation_scale(pad_x = unit(2.25, "in"), pad_y = unit(2.5, "in"),
+                   style = "ticks",
+                   width_hint = 0.15) +
+  annotation_north_arrow(pad_x = unit(2.175, "in"), 
+                         pad_y = unit(2.75, "in"),
+                         style = north_arrow_nautical) +
   theme_nothing() +
   theme(legend.title = element_blank(),
         axis.text = element_blank(),
@@ -347,7 +357,8 @@ tile_location <- ggplot() + geom_sf(data = dk_boundary, fill = "white", size = 1
         axis.ticks = element_blank(),
         panel.grid.minor = element_line(colour = "white"),
         panel.grid.major = element_line(colour = "white")) 
- save_plot("manuscript/figure_6/area_location.png",
+tile_location
+save_plot("manuscript/figure_6/area_location.png",
            tile_location,
            base_asp = 1)
  
