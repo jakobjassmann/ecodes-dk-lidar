@@ -15,8 +15,11 @@ library(rasterVis)
 library(rnaturalearth)
 library(rnaturalearthdata)
 
+# Set working directory
+setwd("D:/Jakob/dk_nationwide_lidar/")
+
 # Also source playground script for data visualisation
-source("~/Repositories/playground/R/plot_raster_3d.R")
+source("scripts/plot_raster_3d.R")
 
 # Set area of interest
 aoi <- extent(445792.4, 6238762.3, 447477.4, 6240058.2) 
@@ -24,14 +27,14 @@ aoi <- extent(445792.4, 6238762.3, 447477.4, 6240058.2)
 ## 1) Terrain stratification based on TPI ----
 
 # Load terrain model and crop to aoi
-dtm_10m <- raster("documentation/figures/figure_6/data/lidar_vars/dtm_10m/dtm_10m.vrt") / 100
+dtm_10m <- raster("manuscript/figure_6/data/lidar_vars/dtm_10m/dtm_10m.vrt") / 100
 dtm_10m <- crop(dtm_10m, aoi)
 
 # plot dtm in 3d
 dtm_10m_viz <- plot_raster_3d(dtm_10m, dtm_10m,
                                    z_scale = 10/5,
                                    colour_ramp = sequential_hcl(100, palette = "Light Grays"))
-save_plot("documentation/figures/figure_6/dtm_10m.png",
+save_plot("manuscript/figure_6/dtm_10m.png",
           dtm_10m_viz)
 
 # Calculate tpi
@@ -46,7 +49,7 @@ tpi_standard_viz <- plot_raster_3d(tpi_standard, dtm_10m,
                                     max_value = 8,
                                     z_scale = 10/5, 
                                     colour_ramp = diverging_hcl(100, palette = "Purple-Brown"))
-save_plot("documentation/figures/figure_6/tpi_standard.png",
+save_plot("manuscript/figure_6/tpi_standard.png",
           tpi_standard_viz)
 
 # Divide into classes 
@@ -54,13 +57,14 @@ tpi_classes <- reclassify(tpi_standard,
                           c(-Inf, -0.5, 1, # slope bottoms and troughs 
                             -0.5, 0.5, 4, # flats and mid-slopes
                             0.5, +Inf,7)) # tops
+tpi_classes <- ratify(tpi_classes)
 
 # Convert class raster to factorial raster
 tpi_classes_levels <- levels(tpi_classes)[[1]]
 tpi_classes_levels$legend <- c("Troughs & Lower-slopes",
                                "Flats & Mid-slopes",
                                "Ridges & Tops")
-levels(tpi_classes) <- tpi_classes_levels
+levels(tpi_classes) <- list(tpi_classes_levels)
 names(tpi_classes) <- "TPI class"
 
 # Crop a chunck of the raster and plot with amplified elevation as an example
@@ -93,13 +97,13 @@ tpi_standard_hist <- as.data.frame(tpi_standard) %>%
   theme(legend.justification = c(0, 0))
 tpi_standard_hist <- ggdraw(tpi_standard_hist) +
   draw_plot(tpi_classes_example_plot, .5, .45, .5 ,.5)
-save_plot("documentation/figures/figure_6/tpi_hist.png",
+save_plot("manuscript/figure_6/tpi_hist.png",
           tpi_standard_hist)
 ## 2) Vegetation stratification based on proportions in height bins ----
 
 ## Load and prepare LiDAR point counts
 # Get list of lidar variables
-lidar_vars <- list.files("documentation/figures/figure_6/data/lidar_vars/", pattern = ".vrt", 
+lidar_vars <- list.files("manuscript/figure_6/data/lidar_vars/", pattern = ".vrt", 
                          recursive = T,
                          full.names = T)
 
@@ -168,11 +172,11 @@ veg_proportion_scale_bar <- plot_raster_hist_bar(veg_proportion[[1]] * 100,
                                                  max_value = 100,
                                                  colour_ramp = sequential_hcl(100, palette = "Greens 3", rev = T),
                                                  colour_bar_only = T)
-save_plot("documentation/figures/figure_6/veg_prop_lt1-5.png",
+save_plot("manuscript/figure_6/veg_prop_lt1-5.png",
           veg_proportion_below1.5_viz)
-save_plot("documentation/figures/figure_6/veg_prop_1-5_to_3-0.png",
+save_plot("manuscript/figure_6/veg_prop_1-5_to_3-0.png",
           veg_proportion_1.5_3_viz)
-save_plot("documentation/figures/figure_6/veg_prop_gt3-0.png",
+save_plot("manuscript/figure_6/veg_prop_gt3-0.png",
           veg_proportion_above3_viz)
 # Classify vegetation
 veg_classes <- veg_proportion[[1]]
@@ -234,7 +238,7 @@ veg_sample_plot <- ggplot(veg_sample, aes(x = proportion,
   theme_cowplot() +
   theme(legend.position = "none",
         strip.background = element_rect(fill = "white"))
-save_plot("documentation/figures/figure_6/point_props_bins.png",
+save_plot("manuscript/figure_6/point_props_bins.png",
           veg_sample_plot,
           base_height = 5,
           base_asp = 1.1)
@@ -316,7 +320,7 @@ classification_plot <- as_grob(levelplot(tpi_veg_combined_classes,
                                      gp=gpar(cex=1.25 * 2, col = "black", font = 2),
                                      default.units='native')
                                  }, data = list(tpi_veg_combined_classes = tpi_veg_combined_classes)))
-save_plot("documentation/figures/figure_6/final_classification.png",
+save_plot("manuscript/figure_6/final_classification.png",
           classification_plot)
 
 ## 4 Location of are on map of denmark ----
@@ -343,7 +347,7 @@ tile_location <- ggplot() + geom_sf(data = dk_boundary, fill = "white", size = 1
         axis.ticks = element_blank(),
         panel.grid.minor = element_line(colour = "white"),
         panel.grid.major = element_line(colour = "white")) 
- save_plot("documentation/figures/figure_6/area_location.png",
+ save_plot("manuscript/figure_6/area_location.png",
            tile_location,
            base_asp = 1)
  
