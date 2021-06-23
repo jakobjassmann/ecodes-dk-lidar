@@ -92,8 +92,17 @@ list_hist_plots <- lapply(
     # Subset data
     data <- sample_df_long %>% filter(variable == x)
     # If an amplitude variable is requested remove outlier values above 1k
-    if(x == "amplitude_mean") data <- data %>% filter(value <= 1000)
-    if(x == "amplitude_sd") data <- data %>% filter(value <= 1000)
+    if(x == "amplitude_mean" | x == "amplitude_sd") {
+      n_removed <- nrow(data %>% filter(value > 1000))
+      data <- data %>% filter(value <= 1000)
+      removed_msg <- paste0(" outliers (>1k): ", n_removed)
+    } else if(x == "canopy_height" | x == "normalized_z_mean") {
+      n_removed <- nrow(data %>% filter(value > 40))
+      data <- data %>% filter(value <= 40)
+      removed_msg <- paste0(" outliers (>40m): ", n_removed)
+    } else {
+      removed_msg <- ""
+    }
     # Plot histogram
     hist_plot <- ggplot(data, 
                         aes(x = value)) +
@@ -109,7 +118,8 @@ list_hist_plots <- lapply(
              pull(min) %>% pluck(1) %>% round(2),
            "   max: ",
            filter(sample_df_min_max_mean, variable == x) %>%
-             pull(max) %>% pluck(1) %>% round(2))
+             pull(max) %>% pluck(1) %>% round(2),
+           " ", removed_msg)
       ) +
       geom_histogram(bins = 50) +
       theme_cowplot(15) 
