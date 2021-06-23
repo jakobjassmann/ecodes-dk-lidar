@@ -187,6 +187,10 @@ point_prop_violin <- sample_df_long %>%
   labs(x = "", title = "vegetation_proportion per height bin") +
   coord_flip() + 
   theme_cowplot(15)
+save_plot("documentation/figures/hists/vegetation_point_count_violin.png",
+          point_count_violin, base_height = 8)
+save_plot("documentation/figures/hists/vegetation_point_prop_violin.png",
+          point_prop_violin, base_height = 8)
 save_plot("documentation/figures/veg_height_bin_violin.png",
           plot_grid(point_count_violin, point_prop_violin, nrow = 2),
           base_height = 8,
