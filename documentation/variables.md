@@ -1,27 +1,27 @@
-# DK Nation-wide LiDAR Variable Descriptions
+EcoDes-DK15 Variable Descriptions
 
-*Version 0.6*
-
-*Work in progress...*
+*Version 0.9* (23 June 2021)
 
 **Authors:** Jakob J. Assmann, Urs A. Treier, Andràs Zlinsky, Jesper E. Moeslund and Singe Normand
 
 ## Content
-- [Dataset Description](#dataset-description)
+- [Dataset Description and Purpose](#dataset-description-and-purpose)
 - [Overview](#overview)
 - [Point cloud derived variables](#point-cloud-derived-variables)
 - [Terrain model derived variables](#terrain-model-derived-variables)
 - [Auxiliary files](#auxiliary-files)
 
-## Dataset Description
+## Dataset Description and Purpose
 
-This dataset contains ecological and landscape descriptors extracted from the point clouds of Denmark's nationwide LiDAR dataset *'Punktsky'* collected in winter 2014/15. The raw point clouds can be accessed on the website of [Kortforsyningen](#https://download.kortforsyningen.dk/content/dhmpunktsky) and documentation for the raw data is available [here](#https://kortforsyningen.dk/sites/default/files/old_gst/DOKUMENTATION/Data/dk_dhm_punktsky_v2_jan_2015.pdf) and [here](#https://sdfe.dk/hent-data/danmarks-hoejdemodel/).
+This dataset contains ecological and landscape descriptors extracted from the point clouds of Denmark's nationwide ALS/LiDAR dataset *'DHM/Punktsky'* collected in 2014/15. The raw point clouds can be accessed on the website of [Kortforsyningen](#https://download.kortforsyningen.dk/content/dhmpunktsky) and documentation for the raw data is available [here](#https://kortforsyningen.dk/sites/default/files/old_gst/DOKUMENTATION/Data/dk_dhm_punktsky_v2_jan_2015.pdf) and [here](#https://sdfe.dk/hent-data/danmarks-hoejdemodel/).
 
-The purpose of this dataset is to provide a light-weight version of the nationwide data condensed into easyly interpretable descriptors, which summarise the structure of the point cloud data for ecological and biological studies. As the data was collected in winter 2014/15 the data provides a snapshot of Denmark at that time, since then changes are likely to have occurred.
+The purpose of this dataset is to provide a light-weight version of the nationwide ALS data condensed into easyly interpretable descriptors, which summarise the structure of the point cloud data for ecological and biological studies. As the data was collected in 2014/15 the data provides a snapshot of Denmark at that time, since then changes are likely to have occurred.
 
-The extent of the dataset comprises the majority of the Danish land surface (including many of the small islands and Bornholm) split into 49 835 tiles. The data is provided as GeoTIFF rasters projected in ETRS 96 UTM32 (EPSGS:7019). NoData values are globally set to -9999, but please see the description on how to interpret the NoData cells for the individual variables. Masks for sea and small in-land water bodies are provided, but have to be applied manually where appropriate.
+The extent of the dataset comprises the majority of the Danish land surface (including many of the small islands and Bornholm) split into 49 835 tiles. The data is provided as GeoTIFF rasters projected in ETR89 UTM 32 N based on the GRS80 spheroid (EPSG: 25832). NoData values are globally set to -9999, but please see the description on how to interpret the NoData cells for the individual variables. Masks for sea and small in-land water bodies are provided, but have to be applied manually where appropriate.
 
-This document describes the 14 ecological and landscape variables extracted by us and how they were derived. We also highlight any known issues relevant to the interpretation of these variables.
+This document summarises the eighteen ecological and landscape descriptors extracted by us and how they were derived. We also highlight known issues relevant to the interpretation of these variables. 
+
+This document is mainly seen as an online complement to the manuscript accompanying the dataset: *Assmann et al. **in prep** - EcoDes-DK15: High-resolution ecological descriptors of vegetation and terrain derived from Denmark’s national airborne laser scanning dataset* [INSERT DOI!](). In case of any discrepancies between this document and the manuscript, the description in the manuscript prevails unless otherwise stated. 
 
 ## Overview
 The section provides a quick overview of all outputs and auxiliary files.
@@ -30,35 +30,29 @@ The section provides a quick overview of all outputs and auxiliary files.
 
 The data source for these variables are the raw point clouds provided by Kortforsyningen.
 
-| variable name | average file size | average processing time |
-| ---- | ---- | ---- |
-| [amplitude\_mean and amplitude\_sd](#amplitude_mean-and-amplitude_sd) | 46 kb (2x) | 75 s |
-| [canopy\_height](#canopy_height) | 42 kb | 51 s |
-| [normalized\_z\_mean and normalized\_z\_sd](#normalized_z_mean-and-normalized_z_sd)| 50 kb (2x) | 60 s |
-| [point\_counts](#point_counts) | 10 kb (28 x) | 25 min (50 s per count) |
-| [point\_source\_info](#point_source_info) | 110 kb (4x) | 5 min 10 s |
-| [proportions](#proportions) | 19 kb (25x) | 35 s |
+| variable name | average file size |
+| ---- | ---- |
+| [amplitude\_mean and amplitude\_sd](#amplitude_mean-and-amplitude_sd) | 46 kb (2x) |
+| [canopy\_height](#canopy_height) | 42 kb |
+| [normalized\_z\_mean and normalized\_z\_sd](#normalized_z_mean-and-normalized_z_sd)| 50 kb (2x) |
+| [point\_counts](#point_counts) | 10 kb (28 x) |
+| [point\_source\_info](#point_source_info) | 110 kb (4x) |
+| [proportions](#proportions) | 19 kb (25x) |
 
 **Terrain model derived variables**
 
 The data source for these variables are digital terrain model (DTM) rasters ultimately derived from the raw point clouds at a 0.4 m grain size. These 0.4 m DTM rasters are directly provided by Kortforsyningen and can be found [here](#https://download.kortforsyningen.dk/content/dhmterr%C3%A6n-04-m-grid).
 
-| variable name | average file size | average processing time |
-| ---- | ---- | ---- |
-| [aspect](#aspect) | 20 kb | 9 s |
-| [dtm\_10m](#dtm_10m) | 20 kb | 2 s |
-| [heat\_load\_index](#heat_load_index) | 20 kb | 1 s |
-| [openness\_difference](#openness_difference) | 20 kb | 5 s |
-| [openness\_mean](#openness_mean) | 20 kb | 5 s |
-| [slope](#slope) | 20 kb | 8 s |
-| [solar\_radiation](#solar_radiation) | 20 kb | 4 s |
-| [twi](#twi) | 20 kb | 25 s |
-
-**Note:** Processing times are given per tile on a single core and are provided for development purposes only **[to be removed in final documentation]**. The time does not include time penalties for processes and file management or benefits from multicore parallel processing.
-
-For all 49k tiles the processing took around 45 days for the first complete run through using 54 parallel threads on a dedicated machine with 2 x Intel Xenon Platinum 8180 @2.5GHz, 1.5 TB Ram (little used), a fast access RAID and Windows Server 2012 R2. An additional week was needed for re-processing of some of the digital terrain model variables.
-
-The total data volume of the outputs is around 80 GB.
+| variable name | average file size |
+| ---- | ---- |
+| [aspect](#aspect) | 20 kb |
+| [dtm\_10m](#dtm_10m) | 20 kb |
+| [heat\_load\_index](#heat_load_index) | 20 kb |
+| [openness\_difference](#openness_difference) | 20 kb |
+| [openness\_mean](#openness_mean) | 20 kb |
+| [slope](#slope) | 20 kb |
+| [solar\_radiation](#solar_radiation) | 20 kb |
+| [twi](#twi) | 20 kb |
 
 **Auxiliary Files**
 
@@ -69,6 +63,30 @@ Files to support data access and handling.
 | [water masks](#water-masks) | Sea and inland water masks for each tile |
 | [tile footprints](#tile-footprints) | Tile footprints, allows for targeted subsetting of dataset |
 | [vrt files](#vrt-files) | VRT files (virtual mosaic file) for each variable |
+
+**Histogram Overview**
+
+![](figures/hist_plot.png)
+
+**Figure 1:** Overview of sample histograms (n = 50k) for all variables except the point source information variables and the vegetation point counts/proportions per height bin. Note that the histograms for the amplitude variable were curtailed above a value of 1000, and the canopy_height and normalized_z_mean were curtailed at 40 m. The number of outliers above these values is shown in the subtitle. The random geographic distribution of the point sample is shown in the figure below. Individual histograms are provided with each variable entry in the documentation. Samples that were covered by the inland and sea water masks were removed.
+
+![](figures/corr_plot.png)
+
+**Figure 2:** Correlation plot for all variables based on the same sample (n = 50k) as shown in the histogram plots / sample map. Samples that were covered by the inland and sea water masks were removed.
+
+![](figures/sample_locations.png)
+
+**Figure: 3** Map of random sample locations (n = 50k) for data shown in the histogram and correlation plots. The colour scale indicates whether a sample location was covered by the sea or inland water masks. 
+
+**Processing time**
+
+For all 49k tiles the processing took around 45 days for the first complete run through using 54 parallel threads on a dedicated machine with 2 x Intel Xenon Platinum 8180 @2.5GHz, 1.5 TB Ram (little used), a fast access RAID and Windows Server 2012 R2. An additional week and a half was needed for re-processing of some of the digital terrain model variables.
+
+The total data volume of the outputs is around 80 GB (compressed 16.4 GB).
+
+**Completeness**
+
+The data set consists of 49832 tiles. Processing was almost completely successful with an average of only 34 tiles failing to be processed per variable. The majority of those tiles was located on the fringes of the data set. To ascertain that the data set has no gaps, we replaced any tiles that were missing due to processing failures with empty raster of the same extent and grain contain only nodata values (-9999). An overview of the number of tiles affected per variable can be found in [/documentation/empty_tiles.csv](https://github.com/jakobjassmann/ecodes-dk-lidar/blob/master/documentation/empty_tiles.csv) on the GitHub repository. The tile_ids for the affected tiles for each variable can be found in the "empty_tiles_XXX.txt" file in the archive/folder of the variable. 
 
 [Back to content.](#content)
 
@@ -89,8 +107,17 @@ Arithmetic mean and standard deviation of the return amplitude for all points wi
 In the context of LiDAR, the amplitude represents the strength of the signal received by the sensor for each return. For this variable the arithmetic mean and standard deviation of the amplitude were calculated for all points within a 10 m x 10 m cell. Calculations were carried out for a single tile using the [OPALS Cell module](https://opals.geo.tuwien.ac.at/html/stable/ModuleCell.html). Here, all points refers exactly to the following set of classes: ground, water, building, as well as low\-, medium\- and high\-vegetation.  
 
 **Issues:**
+
 - The interpretation of the amplitude variable is not straightforward and its biological meaning can be complex. Nonetheless, the amplitude is sensitive to moisture and captures texture, it can therefore be highly useful for segmenting vegetated and non-vegetated surfaces.
-- Amplitude is not directly comparable across flight strips due to differences in sensor etc. As some cells may contain returns from up to four different flight strips, we recommend using the amplitude variable in conjunction with information on the flight strip ids within each cell contained in the point\_source\_info variables.
+- Amplitude is not directly comparable across point source ids due to potential differences in sensor unit etc. As some cells may contain returns from up to four different point source ids, we recommend using the amplitude variable in conjunction with information on the point source ids within each cell contained in the point\_source\_info variables.
+
+**Sample Histogram(s):**
+
+![](figures/hists/amplitude_mean.png)
+
+![](figures/hists/amplitude_sd.png)
+
+Note: The histograms are based on the sample of 50k cell cells shown in Figure 3. We removed all samples with a value larger than 1000 to illustrate the distributions independently of the outliers. 
 
 **References:**
 No specific references available.
@@ -115,6 +142,12 @@ Calculated with [OPALS Cell](https://opals.geo.tuwien.ac.at/html/stable/ModuleCe
 - If a cell contains no points the value is set to zero, not NA.
 - In rare cases, this variable might lead to erroneous canopy-height readings if vegetation is found on artificial structures. The canopy height is calculated even if there is only a small amount of vegetation returns in a cell. For example: A tall communications tower can be found just south of Aarhus. On top of this tower small patches of vegetation resulted in vegetation point returns. The canopy height for this cell is > 100 m. The building proportion variable may help in identifying such cases.
 
+**Histogram:**
+
+![](figures/hists/canopy_height.png)
+
+Note: The histogram is based on the sample of 50k cell cells shown in Figure 3.  Outliers larger than 40 m were removed from the histogram. 
+
 **References:**
 No specific references available.
 
@@ -138,6 +171,14 @@ The American spelling of the variable name is kept for legacy reasons.
 
 **Issues:**
 - If a cell contains no points the value is set to zero, not NA.
+
+**Histogram(s)**:
+
+![](figures/hists/normalized_z_mean.png)
+
+![](figures/hists/normalized_z_sd.png)
+
+Note: The histograms are based on the sample of 50k cell cells shown in Figure 3. Outliers larger than 40 m were removed from the normalised_z_mean histogram. 
 
 **References:**
 No specific references available.
@@ -200,17 +241,40 @@ The "punktsky" point clouds were pre-classified by Geodatasyrelsen. The followin
 **Additional information:**
 
 ![Canopy Examples Figure](figures/canopy_examples.png)
-**Figure:** A set of canopy examples for visualisation of the point count variables. The approximate height of large bounding boxes is 25 m. a) agricultural field with no / very low vegetation, b) understory / shrub layer in mixed broadleaf woodland, c) dense young-ish coniferous forest (plantation?), d) old and tall mixed broadleaf woodland.
+**Figure 4:** A set of canopy examples for visualisation of the point count variables. The approximate height of large bounding boxes is 25 m. a) agricultural field with no / very low vegetation, b) understory / shrub layer in mixed broadleaf woodland, c) dense young-ish coniferous forest (plantation?), d) old and tall mixed broadleaf woodland.
 
 ![Forest Pond Figure](figures/forest_pond.png)
-**Figure:** Example of the behaviour of returns from shallow waters in a forest pond / marsh area. a) perspective view of the forest pond (pink bounding box has a 10 m x 10 m footprint), b) orthophotograph at nadir view, c) point count intensity of the derived water point count variable (black = low count, white = heigh count), d) nadir view of point cloud. Please notice particularly the many missing returns from the regions in the pond with deep water.
+**Figure 5:** Example of the behaviour of returns from shallow waters in a forest pond / marsh area. a) perspective view of the forest pond (pink bounding box has a 10 m x 10 m footprint), b) orthophotograph at nadir view, c) point count intensity of the derived water point count variable (black = low count, white = high count), d) nadir view of point cloud. Please notice particularly the many missing returns from the regions in the pond with deep water.
 
 **Issues:**
 - Water returns only come from shallow water and even these may not be consistent.
 - This might introduce inaccuracies and edge effects associated with water bodies.
 - Any empty cell (e.g. over deep water) will return zero for all point counts and not NA.
 
+**Histogram(s):**
+
+![](figures/hists/ground_point_count_-01m-01m.png)
+
+![](figures/hists/water_point_count_-01m-01m.png)
+
+![](figures/hists/ground_and_water_point_count_-01m-01m.png)
+
+
+
+![](figures/hists/vegetation_point_count_00m-50m.png)
+
+![](figures/hists/building_point_count_-01m-50m.png)
+
+![](figures/hists/total_point_count_-01m-50m.png)
+
+![](figures/hists/total_point_count_-01m-50m.png)
+
+![](figures/hists/vegetation_point_count_violin.png)
+
+Note: The histograms and violin plots are based on the sample of 50k cell cells shown in Figure 3. 
+
 **References:**
+
 - Point classification outlined in: Geodatastyrelsen 2015. Danmarks Højdemodel, DHM/Punktsky Data version 2.0 - Januar 2015. Accessed online [7 March 2020]. https://kortforsyningen.dk/sites/default/files/old_gst/DOKUMENTATION/Data/dk_dhm_punktsky_v2_jan_2015.pdf
 
 [Back to content.](#content)
@@ -226,7 +290,7 @@ The "punktsky" point clouds were pre-classified by Geodatasyrelsen. The followin
 
 **File name:** `point_source_info_name_xxxx_xxx.tif`
 
-**Filte type and units:**
+**File type and units:**
 - `point_source_counts - 16 bit integer, count`
 - `point_source_ids - 16 bit integer, flight strip ID`
 - `point_source_nids - 16 bit integer, count`
@@ -236,7 +300,7 @@ The "punktsky" point clouds were pre-classified by Geodatasyrelsen. The followin
 
 Four descriptor variables for the points sources (flight strip ids) in each 10 m x 10 m cell.
 
-This information may be helpful for interpreting any variable that might be affected by the flight strip id as a covariate. The flight strip id represents: a) differences between sensors / aircrafts that may have been used during the nationwide LiDAR campaign, b) differences in acquisition time and date, c) differences in view point / acquisition angle of the cells.
+This information may be helpful for interpreting any variable that might be affected by the flight strip id as a covariate. The flight strip id represents: a) differences between sensors / aircraft that may have been used during the nationwide LiDAR campaign, b) differences in acquisition time and date, c) differences in view point / acquisition angle of the cells.
 
 - `point_source_counts` \- Contains the number of points per 10 m x 10 m cell for each flight strip id in a tile. In this multi-layer raster each layer represents the point counts for one flight strip id in the tile. The order of layers matches those in the `point_source_ids` raster, which can be used for matching the point counts to the flight strip ids.
 - `point_source_ids` \- Multi-layer raster containing one layer for each flight strip found in a tile. The presence of a point of the relevant flight strip is indicated by the presence of a string containing the flight strip id in the cell. This layer can be used to match the layers of the `point_source_counts` and `point_source_proportions` layers to a flight strip id.
@@ -303,7 +367,17 @@ These proportions were calculated between the vegetation point count in the resp
 | vegetation\_proportion\_25m-50m | 25 m to 50 m |
 
 **Issues:**
-- Mathematically invalid divisons may occur (i.e. division by zero) if a cell is empty for the point class in the denominator of the ratio. In this case a value of zero is assigned to the cell and not NA.
+- Mathematically invalid divisions may occur (i.e. division by zero) if a cell is empty for the point class in the denominator of the ratio. In this case a value of zero is assigned to the cell and not NA.
+
+**Histogram(s)**:
+
+![](figures/hists/canopy_openness.png)
+
+![](figures/hists/vegetation_density.png)
+
+![](figures/hists/building_proportion.png)
+
+![](figures/hists/vegetation_point_prop_violin.png)Note: The histograms and violin plots are based on the sample of 50k cell cells shown in Figure 3. 
 
 **References:**
 - van Leeuwen, M., Nieuwenhuis, M., 2010. Retrieval of forest structural parameters using LiDAR remote sensing. Eur J Forest Res 129, 749–770. https://doi.org/10.1007/s10342-010-0381-4
@@ -325,13 +399,19 @@ These proportions were calculated between the vegetation point count in the resp
 
 **Description:**
 
-Aspect in degrees (stretched by a factor of 10) with 0° indicating North, 90° East, 180° South and 270° West. Flat areas were assigned an aspect of 0°. Values represent the aspect derived from the 10 m x 10 m aggregated DTM.
+Aspect in degrees (stretched by a factor of 10) with 0° indicating North, 90° East, 180° South and 270° West. Flat areas were assigned an aspect of -1°. Values represent the aspect derived from a 10 m x 10 m aggregate of the DTM.
 
-Calculated using [`gdaldem aspect`](https://gdal.org/programs/gdaldem.html) from the 10 m DTM rasters. To avoid edge effects, all calculations were done on a mosaic including the target tile and all available directly neighbouring tiles (maximum 8). The "-zero-for-flat" option of `gdaldem` was used to assign zeros to flat areas. The final value of each cell was converted from radian to degrees, stretched by a factor of 10 and rounded to the nearest integer. This results in a precision of the outputs of 0.1 degrees.  
+Calculated using [`gdaldem aspect`](https://gdal.org/programs/gdaldem.html)  (Horn's method) from the aggregated 10 m DTM rasters. To avoid edge effects, all calculations were done on a mosaic including the target tile and all available directly neighbouring tiles (maximum 8). The final value of each cell was converted from radian to degrees, stretched by a factor of 10 and rounded to the nearest integer. This results in a precision of the outputs of 0.1 degrees.  
 
 **Issues:**
 
-- Should a neighbourhood mosaic be incomplete (i.e. less than eight neighbouring tiles), very small edge effects may occur. The reason for this is that no aspect can be derived for the outer rows and columns of the 10 m DTM mosaic. These cells will have no neighbouring cells and `gdaldem` assigns a value of zero to these cells. But these zero values will only have a mild effect on the median value of a 10 m cell and will only affect the corners of the tile where no neighbouring tiles are available (very few tiles), where they will cause a small artificial deflation of the median aspect in those corner cells.
+- Should a neighbourhood mosaic be incomplete (i.e. less than eight neighbouring tiles), the aspect is not defined for the outermost cells of the focal tile along the incomplete edges. The nodata value (-9999) has been assigned to these cells.
+
+**Histogram:**
+
+![](figures/hists/aspect.png)
+
+Note: The histograms is based on the sample of 50k cell cells shown in Figure 3. 
 
 **References:**
 No relevant references.
@@ -350,13 +430,19 @@ No relevant references.
 
 **Description:**
 
-Digital Terrain Model (DTM) tiles of Denmark with a grain size of 10 m x 10 m. The 10 m rasters are mean aggregates of the 0.4 m DTM provided by Kortforsyningen.  
+Digital Terrain Model (DTM) tiles of Denmark with a grain size of 10 m x 10 m describing the altitude above sea level for a given cell. The 10 m rasters are mean aggregates of the 0.4 m DTM provided by Kortforsyningen. 
 
-The outputs were streched by a factor of 100 and stored as a 16-bit integer. The output values are therefore in cm - divide by 100 to convert back to metres. 
+The outputs were stretched by a factor of 100 and stored as a 16-bit integer. The output values are therefore in cm - divide by 100 to convert back to metres. 
 
 **Issues:**
 
 - No known issues.
+
+**Histogram:**
+
+![](figures/hists/dtm_10m.png)
+
+Note: The histograms is based on the sample of 50k cell cells shown in Figure 3. 
 
 **References:**
 No relevant references.
@@ -387,13 +473,20 @@ where `A` is the aspect in degrees. The value was then stretched by a factor of 
 
 ![Figure of correlation between solar rad and heat index](figures/solar_rad_vs_heat_index.png)
 
-**Figure:** Illustrating the correlation between solar radiation and heat load index, both variables are moderately correlated (r = 0.49), but the solar radiation value seems to contain more information and is deemed better by the McCune and Keon (2002).
+**Figure 6:** Illustrating the correlation between solar radiation and heat load index, both variables are moderately correlated (r = 0.49), but the solar radiation value seems to contain more information and is deemed better by the McCune and Keon (2002).
 
 **Issues:**
 - The index is not the best indicator for terrain-derived energy influx from the sun, please use the `solar_radiation` variable for this instead.
-- Small edge effects for tiles with incomplete neighbourhoods, propagated from the aspect calculations. See `aspect` for more detail.
+- The heat load index is not defined where the aspect is not defined or where the slope is zero (aspect = -1). The nodata value (-9999) has been assigned to all cells meeting either condition. 
+
+**Histogram:**
+
+![](figures/hists/heat_load_index.png)
+
+Note: The histograms is based on the sample of 50k cell cells shown in Figure 3. 
 
 **References:**
+
 - McCune, B., Keon, D., 2002. Equations for potential annual direct incident radiation and heat load. Journal of Vegetation Science 13, 603–606. https://doi.org/10.1111/j.1654-1103.2002.tb02087.x
 - Moeslund, J.E., Zlinszky, A., Ejrnæs, R., Brunbjerg, A.K., Bøcher, P.K., Svenning, J.-C., Normand, S., 2019. Light detection and ranging explains diversity of plants, fungi, lichens, and bryophytes across multiple habitats and large geographic extent. Ecological Applications 29, e01907. https://doi.org/10.1002/eap.1907
 
@@ -413,12 +506,20 @@ where `A` is the aspect in degrees. The value was then stretched by a factor of 
 Landscape openness calculated following Yokoyama et al. 2002 using the OPALS Openness module and a search radius of 150 m. Landscape openness is a landform descriptor that indicates whether a cell is located in a valley, depression or on a ridge.
 
 First, the 0.4 m DTM was aggregated to a grain size of 10 m. To reduce edge effects in subsequent calculations, this aggregation was carried out for a mosaic including the target tile and all available tiles in the direct neighbourhood (max. eight neighbouring tiles). The mean of the positive openness for all eight cardinal directions with search radius of 150 m was then calculated for all cells in the tile mosaic using the [OPALS Openness module](https://opals.geo.tuwien.ac.at/html/stable/ModuleOpenness.html) (feature = 'positive', kernelSize = 15 and selMode = 0). The output was cropped to the extent of the target tile.
+
 If the neighbourhood mosaic was incomplete, i.e. contained less than eight neighbouring tiles, cells within the first 150 m of all edges where a neighbourhood tile was missing were masked out (set to NA). Finally, the mean openness per cell was converted from radians to degrees and rounded to the nearest full degree.
 
 **Issues:**
 - Cells with incomplete neighbourhoods will have NA values assigned for the first 15 cells (150 m) on the borders with missing neighbours.
 
+**Histogram:**
+
+![](figures/hists/openness_mean.png)
+
+Note: The histograms is based on the sample of 50k cell cells shown in Figure 3. 
+
 **References:**
+
 - Yokoyama, R. / Shirasawa, M. / Pike, R.J. (2002): Visualizing topography by openness: A new application of image processing to digital elevation models. Photogrammetric Engineering and Remote Sensing, Vol.68, pp.251-266.
 
 [Back to content.](#content)
@@ -442,7 +543,14 @@ First, the 0.4 m DTM was aggregated to a grain size of 10 m. To reduce edge effe
 
 - Cells with incomplete neighbourhoods will have NA values assigned for the first 5 cells (50 m) on the borders with missing neighbours.
 
+**Histogram:** 
+
+![](figures/hists/openness_difference.png)
+
+Note: The histograms is based on the sample of 50k cell cells shown in Figure 3. 
+
 **References:**
+
 - Yokoyama, R. / Shirasawa, M. / Pike, R.J. (2002): Visualizing topography by openness: A new application of image processing to digital elevation models. Photogrammetric Engineering and Remote Sensing, Vol.68, pp.251-266.
 
 [Back to content.](#content)
@@ -460,11 +568,17 @@ First, the 0.4 m DTM was aggregated to a grain size of 10 m. To reduce edge effe
 
 Slope in degrees at 10 m grain size derived from the 10 m DTM.
 
-Calculated using [`gdaldem slope`](https://gdal.org/programs/gdaldem.html) on the aggregated 10 m grain size DTM rasters. To avoid edge effects all calculations were done on a mosaic including the target tile and all available directly neighbouring tiles (maximum eight). The outputs values were stretched by a factor of 10 and then rounded to the nearest integer, giving the slope values a precision of 0.1 degrees.
+Calculated using [`gdaldem slope`](https://gdal.org/programs/gdaldem.html) (Horn's method) on an aggregated 10 m grain size DTM raster. To avoid edge effects all calculations were done on a mosaic including the target tile and all available directly neighbouring tiles (maximum eight). The outputs values were stretched by a factor of 10 and then rounded to the nearest integer, giving the slope values a precision of 0.1 degrees.
 
 **Issues:**
 
-- Should a neighbourhood mosaic be incomplete (i.e. less than eight neighbouring tiles), very small edge effects may occur. The reason for this is that no slope can be derived for the outer rows and columns of the 0.4 m DTM mosaic. These cells will have no neighbouring cells and `gdaldem` assigns a value of zero to these cells. But these zero values will only have a mild effect on the median value of a 10 m cell and will only affect the corners of the tile where no neighbouring tiles are available (very few tiles), where they will cause a small artificial deflation of the median slope in those corner cells.
+- Should a neighbourhood mosaic be incomplete (i.e. less than eight neighbouring tiles), the slope for the outermost cells of the focal tile along the respective edges is not defined. For these cells the slope value is set to nodata (-9999).
+
+**Histogram:**
+
+![](figures/hists/slope.png)
+
+Note: The histograms is based on the sample of 50k cell cells shown in Figure 3. 
 
 **References:**
 No relevant references.
@@ -494,11 +608,17 @@ where `L` is the centre latitude of the cell in degrees, `S` is the slope of the
 
 ![Figure of correlation between solar rad and heat index](figures/solar_rad_vs_heat_index.png)
 
-**Figure:** Illustrating the correlation between solar radiation and heat load index, both variables are moderately correlated (r = 0.49), but the solar radiation value seems to contain more information and is deemed better by the authors.
+**Figure 6:** Illustrating the correlation between solar radiation and heat load index, both variables are moderately correlated (r = 0.49), but the solar radiation value seems to contain more information and is deemed better by the authors.
 
 **Issues:**
 
-- Small edge effects for tiles with incomplete neighbourhoods, propagated from the aspect and slope calculations.
+- No data values are propagated from the aspect and slope rasters.
+
+**Histogram:**
+
+![](figures/hists/solar_radiation.png)
+
+Note: The histograms is based on the sample of 50k cell cells shown in Figure 3. 
 
 **References:**
 
@@ -532,6 +652,15 @@ Topographic wetness index (TWI) calculated following Kopecký et al. 2020. Calcu
 
 - Tiles with incomplete neighbourhoods (i.e. less than 8 direct neighbours are available) will suffer from edge effects in the direct vicinity of the relevant border.
 - _Flow accumulation_ is only calculated for the tile neighbourhood. Even in the ideal case of the neighbourhood being complete, for most cells _flow accumulation_ is therefore calculated only within a 30 km x 30 km catchment.
+- General concerns regarding the TWI as a proxy for plant relevant soil moisture apply. See e.g. Kopecký et al. 2020 for more detail.
+
+**Histogram:**
+
+![](figures/hists/twi.png)
+
+Note: The histograms is based on the sample of 50k cell cells shown in Figure 3. 
+
+
 
 **References:**
 
@@ -559,7 +688,7 @@ Topographic wetness index (TWI) calculated following Kopecký et al. 2020. Calcu
 
 **File names:** `inland_water_mask_xxxx_xxx.tif` and `sea_mask_xxxx_xxx.tif`
 
-**File type and units:** `16-bit integer, binary (1 = water and no data)`
+**File type and units:** `16-bit integer, binary (1 = land; no data = water)`
 
 **Description:**
 
@@ -591,7 +720,7 @@ Folder location: `/outpus/tile_footprints`
 
 Tile footprint geometries (polygons) for all processed tiles. This shapefile is particularly useful for identifying which tiles overlap with an area of interest should only a subset of the dataset be required for an analysis.
 
-The file was generated based on the finished products for the `aspect` variable using the `extract_tile_footprints.R` script.  
+The file was generated based on the finished products for the `dtm_10m` variable using the `extract_tile_footprints.R` script.  
 
 **Issues:**
 
@@ -615,13 +744,13 @@ No relevant references.
 
 **Description:**
 
-Each variable folder contains a *.vrt file, where * is the variable name (same as the variable folder). These [VRT files](https://gdal.org/drivers/raster/vrt.html) allows the user to access all tiles for any one variable in a single virtual mosaic without the need of carrying out actual mosaicing of the rasters. 
+Each variable folder/archive contains a *.vrt file, where * is the variable name (same as the variable folder/archive). These [VRT files](https://gdal.org/drivers/raster/vrt.html) allows the user to access all tiles for any one variable in a single virtual mosaic without the need of carrying out actual mosaicing of the rasters. 
 
 The files were generated using the `make_vrt_subfolders.bat` script.
 
 **Issues:**
 
-- On some platforms RStudio R session are unable to open these files, likely due to memory / file number limitations placed on the R session by RStudio. Should you encounter this problem we recommend starting an R session in a console or using an alternative IDE. 
+- On some platforms older RStudio R session are unable to open these files, likely due to memory / file number limitations placed on the R session by RStudio. Should you encounter this problem we recommend updating R studio or starting an R session in a console or using an alternative IDE. 
 - The files can be slow to handle in interactive GIS applications due to the size. We recommend generating pyramids in ArcMap or QGIS upon opening the VRTs in these applications. 
 
 **References:**
