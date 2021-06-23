@@ -43,11 +43,19 @@ sample_list <- parLapply(cl,
                     geom(sample_locations_vect)[,c("x","y")])
 stopCluster(cl)
 
-# convert sample_list into a data frame
-sample_df <- bind_cols(sample_list) %>%
+# Convert to sf and save sample 
+sample_sf <- bind_cols(sample_list) %>%
   setNames(., gsub(".*/(.*).vrt$", "\\1", list_of_vrts[!grepl("point_source", list_of_vrts)])) %>%
   mutate(sample_id = sample_locations_vect$sample_id) %>%
-  select(last_col(), !last_col())
+  select(last_col(), !last_col()) 
+sample_sf$x <- sample_locations$x
+sample_sf$y <- sample_locations$y
+sample_sf <- st_as_sf(sample_sf, coords = c("x", "y"), crs = st_crs(tile_footprints))
+save(sample_sf, file = "documentation/point_sample_sf.Rda")
+# load("documentation/point_sample_sf.Rda")
+
+# dublicate sf and convert to data frame
+sample_df <- st_drop_geometry(sample_sf)
 
 # apply conversion factors
 conv_factors <- read_csv("documentation/conversion_factors.csv")
@@ -107,6 +115,14 @@ list_hist_plots <- lapply(
       theme_cowplot(15) 
     return(hist_plot)
   })
+
+# Export individual histograms
+if(!dir.exists("documentation/figures/hists")) dir.create("documentation/figures/hists")
+lapply(list_hist_plots, function(hist_plot){
+  save_plot(paste0("documentation/figures/hists/", 
+                   hist_plot$labels$title, ".png"), hist_plot)})
+
+# Export panel figure
 hist_grid <- plot_grid(plotlist = list_hist_plots, nrow = 4, ncol = 6)
 save_plot("documentation/figures/hist_plot.png", 
           hist_grid,
@@ -220,20 +236,10 @@ save_plot("documentation/figures/sample_locations.png",
           sample_plot,
           base_height = 8)
 
-# Save sample 
-sample_sf <- bind_cols(sample_list) %>%
-  setNames(., gsub(".*/(.*).vrt$", "\\1", list_of_vrts[!grepl("point_source", list_of_vrts)])) %>%
-  mutate(sample_id = sample_locations_vect$sample_id) %>%
-  select(last_col(), !last_col()) 
-sample_sf$x <- sample_locations$x
-sample_sf$y <- sample_locations$y
-sample_sf <- st_as_sf(sample_sf, coords = c("x", "y"), crs = st_crs(tile_footprints))
-save(sample_sf, file = "documentation/point_sample_sf.Rda")
-
 
 ## End of Script
 
-## The below code is kept for legacy reasons only.
+## The below code is kept for legacy reasons.
 # 
 # # Find maximum canopy height in sample
 # row_max_height <- sample_df[which(sample_df$canopy_height == max(sample_df$canopy_height)),]
@@ -465,7 +471,7 @@ save(sample_sf, file = "documentation/point_sample_sf.Rda")
 #                          min = min_vals,
 #                          max = max_vals)
 # 
-# # Apply confersion factors
+# # Apply conversion factors
 # conv_fac <- read.csv("D:/Jakob/dk_nationwide_lidar/data/auxillary_files/conversion_factors.csv",
 #                      stringsAsFactors = F)
 # sample_df_converted <- sample_df %>% 
