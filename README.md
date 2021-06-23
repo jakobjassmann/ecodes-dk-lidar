@@ -54,6 +54,7 @@ This repository contains the following documentation:
 - Documentation for the pre- / post- processing and processing steps and scripts. See [/scripts/readme.md](/scripts/readme.md).
 - Documentation for the *dklidar* Python processing modules. See [/documentation/dklidar_modules.md](/documentation/dklidar_modules.md).
 - Example scripts for subsetting and working with the dataset. See [/manuscript/figure_6/subset_dataset.R](/manuscript/figure_6/subset_dataset.R) (subsetting) and [/manuscript/figure_6/figure_6.R](/manuscript/figure_6/figure_6.R) (ecological stratification).
+- Scripts and data required to regenerate all figures in the manuscript:  [/manuscript/figure_X/](/manuscript/figure_6/figure_6.R) 
 
 [\[to top\]](#content)
 
@@ -80,7 +81,7 @@ PI overseeing this project: Signe Normand (signe.normand@bio.au.dk)
 
 From the manuscript:
 
-*We would like to thank Andràs Zlinszky for his contributions to earlier versions of the dataset and Charles Davison for feedback regarding data use and handling. We would also like to thank the Section for EcoInformatics at Aarhus University for providing the computing resources required to process this dataset. Funding for this work was provided by the Carlsberg Foundation (XXXX to SN), AUFF Starting Grant (XXXX to SN).*
+*We would like to thank Andràs Zlinszky for his contributions to earlier versions of the dataset and Charles Davison for feedback regarding data use and handling. Funding for this work was provided by the Carlsberg Foundation (Distinguished Associate Professor Fellowships) and Aarhus University Research Foundation (AUFF-E-2015-FLS-8-73) to Signe Normand (SN). This work is a contribution to SustainScapes – Center for Sustainable Landscapes under Global Change (grant NNF20OC0059595 to SN).*
 
 [\[to top\]](#content)
 
