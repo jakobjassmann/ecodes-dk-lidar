@@ -73,5 +73,5 @@ vegetation_proportion_18m-19m,10000
 vegetation_proportion_19m-20m,10000
 vegetation_proportion_20m-25m,10000
 vegetation_proportion_25m-50m,10000
-water_mask,1
+inland_water_mask,1
 water_point_count_-01m-01m,1
