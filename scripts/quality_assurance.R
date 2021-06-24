@@ -47,7 +47,7 @@ stopCluster(cl)
 sample_sf <- bind_cols(sample_list) %>%
   setNames(., gsub(".*/(.*).vrt$", "\\1", list_of_vrts[!grepl("point_source", list_of_vrts)])) %>%
   mutate(sample_id = sample_locations_vect$sample_id) %>%
-  select(last_col(), !last_col()) 
+  dplyr::select(last_col(), !last_col()) 
 sample_sf$x <- sample_locations$x
 sample_sf$y <- sample_locations$y
 sample_sf <- st_as_sf(sample_sf, coords = c("x", "y"), crs = st_crs(tile_footprints))
@@ -64,14 +64,16 @@ for(i in 2:(ncol(sample_df))){
 }
 
 # Remove masked pixels (inland water / sea)
-sample_df <- filter(sample_df, is.na(sea_mask) & is.na(inland_water_mask))
+sample_df <- sample_df %>%
+  filter(sea_mask == 1) %>%
+  filter(inland_water_mask == 1)
 
 # Convert into long form and calculate min and max etc. for all non height bin variables
 sample_df_long <- sample_df %>% 
-  select(!contains("vegetation"), 
+  dplyr::select(!contains("vegetation"), 
          `vegetation_point_count_00m-50m`,
          vegetation_density) %>%
-  select(-inland_water_mask, -sea_mask) %>%
+  dplyr::select(-inland_water_mask, -sea_mask) %>%
   pivot_longer(cols = 2:ncol(.), 
                names_to = "variable", 
                values_to = "value") %>%
@@ -97,9 +99,9 @@ list_hist_plots <- lapply(
       data <- data %>% filter(value <= 1000)
       removed_msg <- paste0(" outliers (>1k): ", n_removed)
     } else if(x == "canopy_height" | x == "normalized_z_mean") {
-      n_removed <- nrow(data %>% filter(value > 40))
-      data <- data %>% filter(value <= 40)
-      removed_msg <- paste0(" outliers (>40m): ", n_removed)
+      n_removed <- nrow(data %>% filter(value > 40 | value < -1))
+      data <- data %>% filter(value <= 40 & value >= -1)
+      removed_msg <- paste0(" outliers (>40m|<-1m): ", n_removed)
     } else {
       removed_msg <- ""
     }
@@ -141,7 +143,7 @@ save_plot("documentation/figures/hist_plot.png",
 
 # Violin plots for Vegetation height bins 
 sample_df_long <- sample_df %>% 
-  select(sample_id,
+  dplyr::select(sample_id,
          contains("vegetation"),
          -vegetation_density,
          -`vegetation_point_count_00m-50m`) %>%
@@ -208,7 +210,7 @@ save_plot("documentation/figures/veg_height_bin_violin.png",
 
 # Correlation plot
 sample_corr <- sample_df %>%
-  select(!contains("mask"), -sample_id) %>%
+  dplyr::select(!contains("mask"), -sample_id) %>%
   na.omit() %>%
   as.matrix() %>%
   cor() 
@@ -221,13 +223,13 @@ save_plot("documentation/figures/corr_plot.png", corr_plot,
 sample_sf <- bind_cols(sample_list) %>%
   setNames(., gsub(".*/(.*).vrt$", "\\1", list_of_vrts[!grepl("point_source", list_of_vrts)])) %>%
   mutate(sample_id = sample_locations_vect$sample_id) %>%
-  select(last_col(), !last_col()) %>%
+  dplyr::select(last_col(), !last_col()) %>%
   mutate(sample_type = case_when(
     !is.na(sea_mask) ~ "Sea",
     !is.na(inland_water_mask) ~ "Inland water",
     TRUE ~ "Land"
   )) %>% 
-  select(sample_id, sample_type)
+  dplyr::select(sample_id, sample_type)
 sample_sf$x <- sample_locations$x
 sample_sf$y <- sample_locations$y
 sample_sf <- st_as_sf(sample_sf, coords = c("x", "y"), crs = st_crs(tile_footprints))
