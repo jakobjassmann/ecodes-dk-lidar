@@ -31,7 +31,8 @@ n_complete <- sapply(
   })
 n_success["processing"] <- n_complete["processing"]
 # Remove tile id and validate crs colums
-n_success <- n_success[c(-1,-5)]
+n_success <- n_success[!(grepl("tile_id", names(n_success)) |
+                            grepl("dtm_validate_crs", names(n_success)))]
 
 # get tile_ids reports for tiles that were not succesffuly completed
 steps_not_completed <- names(n_success[n_success != nrow(overall_progress)])
@@ -76,7 +77,7 @@ incomplete_processing %>%
 
 ## Incomplete processing steps
 
-For __`r nrow(incomplete_processing)` tiles (`r round(nrow(incomplete_processing[incomplete_processing$processing == "complete",])/nrow(overall_progress)*100,2)`%)__ one or multiple of the indiviudal processing steps could not be completed.
+For __`r nrow(incomplete_processing)` tiles (`r round(nrow(incomplete_processing[incomplete_processing$processing != "complete",])/nrow(overall_progress)*100,2)`%)__ one or multiple of the indiviudal processing steps could not be completed.
 
 ```{r incomplete_processing}
 library(knitr)
