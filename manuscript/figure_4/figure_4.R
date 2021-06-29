@@ -4,7 +4,7 @@
 ## 1) Housekeeping ----
 
 # Set wd
-setwd("D:/Jakob/dk_nationwide_lidar/manuscript//figure_3")
+setwd("D:/Jakob/dk_nationwide_lidar/manuscript//figure_4")
 
 # Dependencies
 library(raster)
@@ -225,7 +225,7 @@ combined_plot <- plot_grid(
   )
 
 # Save plot
-save_plot("figure_3.png", combined_plot,
+save_plot("figure_4.png", combined_plot,
           base_height = 4,
           base_aspect_ratio = 2,
           ncol = 3,
