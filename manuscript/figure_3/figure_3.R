@@ -11,7 +11,7 @@ library(rgl)
 library(magick)
 
 # Set wd
-setwd("D:/Jakob/dk_nationwide_lidar/documentation/figures/figure_1")
+setwd("D:/Jakob/dk_nationwide_lidar/documentation/figures/figure_2")
 
 # File paths
 laz_files <- "D:/Jakob/dk_nationwide_lidar/data/laz"
@@ -174,7 +174,7 @@ pixel_plots <- plot_grid(plotlist = pixel_plots[pixel_order], ncol = 4,
                          labels = "auto",
                          label_colour = "black" #"white"
 )
-save_plot("figure_1_top_panel.png", 
+save_plot("figure_3_top_panel.png", 
           pixel_plots,
           base_aspect_ratio = (4*300)/520)
 
@@ -379,7 +379,7 @@ variable_plot <- plot_grid(
   hjust = 0,
   vjust = 1)
 
-# save_plot("figure_1_bottom_oanel.png", variable_plot,
+# save_plot("figure_3_bottom_oanel.png", variable_plot,
 #           ncol = length(pixel_ids),
 #           nrow =  length(pallete_variables$variable_name),
 #           base_asp = 2.5,
@@ -387,10 +387,10 @@ variable_plot <- plot_grid(
 # Composite both plots
 
 # Combine top and bottom into one panel
-save_plot("figure_1.png",
+save_plot("figure_3.png",
           plot_grid(
             ggdraw() +
-              draw_image(image_read("figure_1_top_panel.png")),  
+              draw_image(image_read("figure_3_top_panel.png")),  
           variable_plot,
   nrow= 2, 
   rel_heights = c(1,1.2)),
