@@ -3,7 +3,7 @@ Jakob J. Assmann, Jesper E. Moselund, Urs A. Treier and Signe Normand
 
 Code repository accompanying:
 
-- The **EcoDes-DK15** dataset [!INSERT BADGE!](https://doi.org/10.5281/zenodo.4756557).
+- The **EcoDes-DK15** v1.0.0 dataset `[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4756557.svg)](https://doi.org/10.5281/zenodo.4756557)`    
 - Assmann et al. in prep. - *EcoDes-DK15:* *High-resolution ecological descriptors of vegetation and terrain derived from Denmark’s national airborne laser scanning dataset.* [!LINK TO DOI!]().
 
 ## Content
