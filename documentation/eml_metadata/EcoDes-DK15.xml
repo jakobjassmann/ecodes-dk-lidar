@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<eml:eml xmlns:eml="https://eml.ecoinformatics.org/eml-2.2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:stmml="http://www.xml-cml.org/schema/stmml-1.2" packageId="47a17238-6269-42c7-9004-db71324672cd" system="uuid" xsi:schemaLocation="https://eml.ecoinformatics.org/eml-2.2.0 https://eml.ecoinformatics.org/eml-2.2.0/eml.xsd">
+  <dataset>
+    <title>EcoDes-DK15</title>
+    <creator id="https://orcid.org/0000-0002-3492-8419">
+      <individualName>
+        <givenName>Jakob J.</givenName>
+        <surName>Assmann</surName>
+      </individualName>
+      <electronicMailAddress>j.assmann@bio.au.dk</electronicMailAddress>
+    </creator>
+    <pubDate>2021</pubDate>
+    <abstract>
+      <para>
+  Biodiversity studies could strongly benefit from three dimensional
+  data on ecosystem structure derived from contemporary remote sensing
+  technologies, such as Light Detection and Ranging (LiDAR). Despite the
+  increasing availability of such data at regional and national scales,
+  the average ecologist has been limited in accessing them due to high
+  requirements on computing power and remote-sensing knowledge. We
+  processed Denmark’s publicly available national Airborne Laser
+  Scanning (ALS) dataset acquired in 2014/15 together with the
+  accompanying elevation model to compute rasterized descriptors of
+  interest for ecological studies. With a grain size of 10 m, these data
+  products provide a snapshot of high-resolution measures including
+  vegetation height, structure and density, as well as topographic
+  descriptors including elevation, aspect, slope and wetness across more
+  than forty thousand square kilometers covering almost all of Denmark’s
+  terrestrial surface. The resulting dataset is comparatively small (~87
+  GB, compressed 16.4 GB) and the raster data can be readily integrated
+  into analytical workflows in software familiar to many ecologists (GIS
+  software, R, Python). Source code and documentation for the processing
+  workflow are openly available via a code repository, allowing for
+  transfer to other ALS datasets, as well as modification or
+  re-calculation of future instances of Denmark’s national ALS dataset.
+  We hope that our high-resolution ecological vegetation and terrain
+  descriptors (EcoDes-DK15) will serve as an inspiration for the
+  publication of further such datasets covering other countries and
+  regions and that our rasterized dataset will provide a baseline of the
+  ecosystem structure for current and future studies of biodiversity,
+  within Denmark and beyond.
+</para>
+    </abstract>
+    <keywordSet>
+      <keyword>ALS</keyword>
+      <keyword>LiDAR</keyword>
+      <keyword>Denmark</keyword>
+      <keyword>Biodiversity</keyword>
+      <keyword>Vegetation</keyword>
+      <keyword>Vegeation Structure</keyword>
+      <keyword>Terrain</keyword>
+    </keywordSet>
+    <intellectualRights>This data is licensed under a Creative Commons Attribution 4.0 International License.</intellectualRights>
+    <coverage>
+      <geographicCoverage>
+        <geographicDescription>Denmark's terrestrial surface (incl. Bornholm).</geographicDescription>
+        <boundingCoordinates>
+          <westBoundingCoordinate>8.07</westBoundingCoordinate>
+          <eastBoundingCoordinate>15.2</eastBoundingCoordinate>
+          <northBoundingCoordinate>54.56</northBoundingCoordinate>
+          <southBoundingCoordinate>57.75</southBoundingCoordinate>
+          <boundingAltitudes>
+            <altitudeMinimum>0</altitudeMinimum>
+            <altitudeMaximum>175</altitudeMaximum>
+            <altitudeUnits>meter</altitudeUnits>
+          </boundingAltitudes>
+        </boundingCoordinates>
+      </geographicCoverage>
+      <temporalCoverage>
+        <rangeOfDates>
+          <beginDate>
+            <calendarDate>2014-04-03</calendarDate>
+          </beginDate>
+          <endDate>
+            <calendarDate>2015-11-24</calendarDate>
+          </endDate>
+        </rangeOfDates>
+      </temporalCoverage>
+    </coverage>
+    <contact>
+      <individualName>
+        <givenName>Jakob J.</givenName>
+        <surName>Assmann</surName>
+      </individualName>
+      <electronicMailAddress>j.assmann@bio.au.dk</electronicMailAddress>
+    </contact>
+    <spatialRaster>
+      <alternateIdentifier/>
+      <entityName>canopy_height</entityName>
+      <entityDescription>canopy_height</entityDescription>
+      <physical>
+        <objectName>canopy_height.vrt</objectName>
+        <size>0</size>
+        <authentication/>
+        <dataFormat>
+          <externallyDefinedFormat>
+            <formatName>VRT</formatName>
+          </externallyDefinedFormat>
+        </dataFormat>
+      </physical>
+      <coverage>
+        <geographicCoverage>
+          <geographicDescription>Denmark's terrestrial surface (incl. Bornholm).</geographicDescription>
+          <boundingCoordinates>
+            <westBoundingCoordinate>8.07</westBoundingCoordinate>
+            <eastBoundingCoordinate>15.2</eastBoundingCoordinate>
+            <northBoundingCoordinate>54.56</northBoundingCoordinate>
+            <southBoundingCoordinate>57.75</southBoundingCoordinate>
+            <boundingAltitudes>
+              <altitudeMinimum>0</altitudeMinimum>
+              <altitudeMaximum>175</altitudeMaximum>
+              <altitudeUnits>meter</altitudeUnits>
+            </boundingAltitudes>
+          </boundingCoordinates>
+        </geographicCoverage>
+        <temporalCoverage>
+          <rangeOfDates>
+            <beginDate>
+              <calendarDate>2014-04-03</calendarDate>
+            </beginDate>
+            <endDate>
+              <calendarDate>2015-11-24</calendarDate>
+            </endDate>
+          </rangeOfDates>
+        </temporalCoverage>
+      </coverage>
+      <spatialReference>ETRF_1989_UTM_Zone_32N</spatialReference>
+    </spatialRaster>
+  </dataset>
+</eml:eml>
