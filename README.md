@@ -77,8 +77,6 @@ PI overseeing this project: Signe Normand (signe.normand@bio.au.dk)
 
 ## Acknowledgements
 
-**TO BE COMPLETED**
-
 From the manuscript:
 
 *We would like to thank Andràs Zlinszky for his contributions to earlier versions of the dataset and Charles Davison for feedback regarding data use and handling. Funding for this work was provided by the Carlsberg Foundation (Distinguished Associate Professor Fellowships) and Aarhus University Research Foundation (AUFF-E-2015-FLS-8-73) to Signe Normand (SN). This work is a contribution to SustainScapes – Center for Sustainable Landscapes under Global Change (grant NNF20OC0059595 to SN).*
