@@ -26,22 +26,34 @@ aoi_tiles <- aoi %>%
   filter(tile_footprints, .)
 
 # Get dirs for the available variables 
-# (change according to EcoDes-DK15 directory, using a toy directory here)
-ecodes_dir <- "manuscript/figure_6/data/lidar_vars/" 
+# (change according to EcoDes-DK15 directory, using the teaser directory here)
+ecodes_dir <- "manuscript/figure_6/teaser_data" 
 variable_dirs <- list.dirs(ecodes_dir, 
                            recursive = T, 
                            full.names = F)
 
-# Set list of variables to subset 
+# Filter out folders containing subfolders
+variable_dirs <- variable_dirs[-1]
+variable_dirs <- grepl("(.*)/.*",variable_dirs) %>%
+  variable_dirs[.] %>%
+  gsub("(.*)/.*", "\\1", .) %>%
+  unique() %>%
+  match(., variable_dirs) %>%
+  sapply(function(x)(x*-1)) %>%
+  variable_dirs[.]
+variable_dirs <- variable_dirs[!grepl("tile_footprints", variable_dirs)]
+
+# Set list of variables to subset (if applicable)
 # Matching will be done via regex later, so partial names / groupings are okay
-# i.e. "vegetation_point_count" will match all variables including this string 
+# i.e. "vegetation_point_count" will match all variables including this string
 # their name.
 variables_to_subset <- c("vegetation_point_count", "dtm_10m")
-
 # Subsets dirs suing regex matching
 sub_dirs_to_export <- variables_to_subset %>%
-  map(function(dir_name) variable_dirs[grepl(dir_name, variable_dirs)]) %>% 
+  map(function(dir_name) variable_dirs[grepl(dir_name, variable_dirs)]) %>%
   unlist()
+# (Alternatively use this line for all variables):
+# sub_dirs_to_export <- variable_dirs
 
 # Set target dir to place output:
 target_dir <- "~/Desktop"
@@ -61,7 +73,8 @@ copy_subset <- function(tiles, in_dir, out_dir){
   cat("to:\t", in_dir, "\n")
   # Check whether out dir exists
   if(!dir.exists(out_dir)) dir.create(out_dir, recursive = T)
-  # Copy tiles
+  # Copy tiles with special procedures for point_source counts and proportions
+  if(!grepl("point_source_counts", var_name) & !grepl("point_source_proportion", var_name)) {
   tiles %>% map(function(tile_id){
     file_name <- paste0(var_name, "_", tile_id, ".tif")
     in_path <- paste0(in_dir, "/", file_name)
@@ -69,6 +82,17 @@ copy_subset <- function(tiles, in_dir, out_dir){
     file.copy(in_path, out_path)
     cat(".")
   })
+  } else {
+    cat("Scanning files ...\n")
+    var_files <- shell(paste0("dir /b ", gsub("/", "\\\\", in_dir)), intern = T)
+    cat("Copying files ...\n")
+    tile_files <- unlist(sapply(tiles, function(x) var_files[grepl(x, var_files)]))
+    tile_files %>% map(function(file_name){
+      in_path <- paste0(in_dir, "/", file_name)
+      out_path <- paste0(out_dir, "/", file_name)
+      file.copy(in_path, out_path)
+      cat(".")})
+  } 
   cat("\nDone.\n")
   return(NULL)
 }
@@ -79,15 +103,61 @@ map2(in_dirs,
      function(in_dir, out_dir) copy_subset(aoi_tiles$tile_id, in_dir, out_dir))
 
 # Generate vrt files for subset variables using sf's inbuild gdalutils 
+# Skipping point source id's for which vrt generation is not possible!
 map(out_dirs,
     function(dir_name) {
       oldwd <- getwd()
       setwd(dir_name)
       var_name <- gsub(".*/(.*)$", "\\1", dir_name)
-      gdal_utils("buildvrt",
+      cat("Generating vrt for:", var_name, "\n")
+      try(gdal_utils("buildvrt",
                  source = list.files(getwd(),".tif", full.names = T),
-                 destination = paste0(var_name, ".vrt"))
+                 destination = paste0(var_name, ".vrt")))
       setwd(oldwd)
+      return(NULL)
     })
+
+# ! End of subsetting script!
+
+# # This script can also be used to generate the teaser / sample dataset, 
+# # the following lines complete the sample dataset.
+# 
+# # Generate tile footprints
+# dir.create(paste0(target_dir, "/tile_footprints"))
+# system2("C:/OSGeo4W64/OSGeo4W.bat",
+#         args = c("gdaltindex",
+#                  paste0(getwd(), "/", target_dir,
+#                         "/tile_footprints/tile_footprints.shp"),
+#                  paste0(getwd(), "/", target_dir,
+#                         "/dtm_10m/*.tif")))
+# # Load file as sf object
+# tile_footprints <- read_sf(paste0(target_dir,
+#                                   "/tile_footprints/tile_footprints.shp"))
+# # Extract tile ids from file paths
+# tile_footprints$tile_id <- gsub(".*([0-9]{4}_[0-9]{3}).*",
+#                                 "\\1",
+#                                 tile_footprints$location)
+# # Remove location column
+# tile_footprints <- dplyr::select(tile_footprints, -location)
+# # Save changes
+# write_sf(tile_footprints,
+#          paste0(target_dir,
+#                 "/tile_footprints/tile_footprints.shp"),
+#          delete_layer = T)
+# 
+# # Generate list of vrts
+# list_of_vrts <- list.files(target_dir, "\\.vrt", recursive = T)
+# write.table(list_of_vrts, 
+#             file = paste0(target_dir, "/list_of_vrts.txt"),
+#             row.names = F,
+#             col.names = F,
+#             quote = F)
+# 
+# # Pack it into zip (requires 7z to be installed)
+# current_wd <- getwd()
+# setwd("D:/Jakob/dk_nationwide_lidar/manuscript/figure_6/teaser_data")
+# shell(paste0('"C:\\Program Files\\7-Zip\\7z.exe"', " a ", "../EcoDes-DK15_teaser.zip ",
+#              "."))
+# set_wd(current_wd)
 
 # End of file
