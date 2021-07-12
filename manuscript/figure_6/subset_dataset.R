@@ -158,6 +158,6 @@ map(out_dirs,
 # setwd("D:/Jakob/dk_nationwide_lidar/manuscript/figure_6/teaser_data")
 # shell(paste0('"C:\\Program Files\\7-Zip\\7z.exe"', " a ", "../EcoDes-DK15_teaser.zip ",
 #              "."))
-# set_wd(current_wd)
+# setwd(current_wd)
 
 # End of file
