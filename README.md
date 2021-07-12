@@ -54,6 +54,7 @@ This repository contains the following documentation:
 - Documentation for the pre- / post- processing and processing steps and scripts. See [/scripts/readme.md](/scripts/readme.md).
 - Documentation for the *dklidar* Python processing modules. See [/documentation/dklidar_modules.md](/documentation/dklidar_modules.md).
 - Example scripts for subsetting and working with the dataset. See [/manuscript/figure_6/subset_dataset.R](/manuscript/figure_6/subset_dataset.R) (subsetting) and [/manuscript/figure_6/figure_6.R](/manuscript/figure_6/figure_6.R) (ecological stratification).
+- An example subset "teaser" (5 MB) of EcoDes-DK15 covering the 9 km x 9 km area of the Husby Klit plantation shown in the manuscript Figure 6 can be found here: [/manuscript/figure_6/EcoDes-DK15_teaser.zip](/manuscript/figure_6/EcoDes-DK15_teaser.zip)
 - Scripts and data required to regenerate all figures in the manuscript:  [/manuscript/figure_X/](/manuscript/figure_6/figure_6.R) 
 
 [\[to top\]](#content)
