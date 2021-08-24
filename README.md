@@ -21,6 +21,8 @@ Code repository accompanying:
 
 This repository contains the code for generating the EcoDes-DK15 dataset and the accompanying figures in the manscuript. The repository also provides additional documentation for the code and dataset, for details see [documentation](#documentation) below. 
 
+> For thoughts and suggestions on how to transfer the workflow to another point cloud dataset (i.e. not the Danish DHM/Pointcloud), please see the [code_transfer](documentation/code_transfer.md) document.
+
 To replicate the processing, revisit the [workflow overview](/documentation/dk_lidar_processing_flow.pdf), then carry out the following steps:
 
 1. Obtain a local clone of this repository. 
