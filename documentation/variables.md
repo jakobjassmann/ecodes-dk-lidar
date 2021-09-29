@@ -1,6 +1,6 @@
 EcoDes-DK15 Variable Descriptions
 
-*Version 0.9* (23 June 2021)
+*Version 1.0 (28 September 2021)
 
 **Authors:** Jakob J. Assmann, Urs A. Treier, Andràs Zlinsky, Jesper E. Moeslund and Singe Normand
 
@@ -62,6 +62,7 @@ Files to support data access and handling.
 | ---- | ---- |
 | [water masks](#water-masks) | Sea and inland water masks for each tile |
 | [tile footprints](#tile-footprints) | Tile footprints, allows for targeted subsetting of dataset |
+| [date_stamp](#date_stamp) | Date on which majority of points within a pixel were collected |
 | [vrt files](#vrt-files) | VRT files (virtual mosaic file) for each variable |
 
 **Histogram Overview**
@@ -725,6 +726,50 @@ The file was generated based on the finished products for the `dtm_10m` variable
 **Issues:**
 
 Currently no know issues.
+
+**References:**
+
+No relevant references.
+
+[Back to content](#content).
+
+---
+
+### date_stamp
+
+**Folder locations:** `/outputs/date_stamp`
+
+**File names:** `date_stamp_xxxx_xxx.tif`
+
+**File type:** `32-bit integer, date in fromat YYYYMMDD`
+
+**Description:**
+
+The date_stamp variable provides an indication when the majority of points within a pixel were collected. This information is of use for ecological studies where accounting for within-season differences in timing of the ALS point aquistion is required. 
+
+Using the OPALS Cell module and the "majority" option, we exported the GPS time stamp with the highest frequency (mode) of all time stamps within the pixel. The GPS time stamp was then converted into Central European Time (CET) and reduced into a eight-digit integer with the format YYYYMMMDD, where YYYY is the year, MM the month and DD the date of collection. 
+
+**Issues:**
+
+- Applying the "majority" estimator of the OPALS cell module on the GPS time stamp identifies the mode of points with the same microsecond time stamp. This is precision is potentially counter-beneficial, as in some cases it might not correctly identify the mode of points with the same date. Extracting the mode of the date directly would be more ideal, but also more challenging to implement with OPALS (GPS time to date conversion required before export). While this is worth considering for future version of the dataset, the current version of the date_stamp will likely capture the mode of the date sufficiently in most cases.
+
+- If no points are present in a cell, then a date in September 2011 is assigned (for some reason between 14-20 September 2011). For future versions of this function we should look into why this is the case.
+
+  GPS time stamps in milliseconds per point for tile 6239_447:
+
+  ![](figures/gps_time_6239_447.png)
+
+  
+
+  Date stamps per pixel extracted for tile 6239_447 (note dates assigned to empty cells in top right corner:
+
+  ![](figures/date_stamp_6239_447.png)
+
+  
+
+- The dataset seems to contain not only data from 2014/15, but also from 2013 and 2018:
+
+![](figures/collection_month.png)
 
 **References:**
 
