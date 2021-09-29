@@ -755,17 +755,15 @@ Using the OPALS Cell module and the "majority" option, we exported the GPS time 
 
 - If no points are present in a cell, then a date in September 2011 is assigned (for some reason between 14-20 September 2011). For future versions of this function we should look into why this is the case.
 
-  GPS time stamps in milliseconds per point for tile 6239_447:
-
   ![](figures/gps_time_6239_447.png)
 
   
 
-  Date stamps per pixel extracted for tile 6239_447 (note dates assigned to empty cells in top right corner:
+  **Figure:** GPS time stamps in milliseconds per point for tile 6239_447.
 
   ![](figures/date_stamp_6239_447.png)
 
-  
+  **Figure:** Date stamps per pixel extracted for tile 6239_447 (note September dates assigned to empty cells in top right corner).
 
 - The dataset seems to contain not only data from 2014/15, but also from 2013 and 2018:
 
