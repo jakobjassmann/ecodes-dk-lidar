@@ -22,7 +22,7 @@ from dklidar import common
 os.chdir(settings.wd)
 
 # Set number of parallel processes:
-n_processes = 54 # 54
+n_processes = 72 # 54
 
 # Confirm essential folders exist
 if not os.path.exists(settings.wd):
@@ -178,6 +178,14 @@ def process_tile(tile_id):
     # gather logs for step and tile]
     common.gather_logs('process_tiles', 'odm_export_amplitude', tile_id)
 
+    ## Export date stamps
+    return_value = points.odm_export_date_stamp(tile_id)
+    # Update progress variables
+    steps.append('odm_export_date_stamp')
+    status_steps.append([return_value])
+    # gather logs for step and tile]
+    common.gather_logs('process_tiles', 'odm_export_date_stamp', tile_id)
+    
     ## Remove unneeded odm files
     return_value = points.odm_remove_temp_files(tile_id)
     # Update progress variables

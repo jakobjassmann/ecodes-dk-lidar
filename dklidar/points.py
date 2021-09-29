@@ -10,6 +10,9 @@ import numpy
 import glob
 import shutil
 
+from osgeo import gdal_array
+from datetime import datetime, timedelta
+
 from dklidar import common
 from dklidar import settings
 
@@ -1079,6 +1082,102 @@ def odm_export_point_source_info(tile_id):
             pass
     return return_value
 
+## Export mean and sd of height above ground for all 10 m cells in a tile
+def odm_export_date_stamp(tile_id):
+    """
+    Export estimated most common date stamp for each 10 m x 10 m cells. 
+    This is done by converting GPS time to a Int32 with the format YYYYMMDD.
+    :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number
+    :return: execution status
+    """
+    # Initiate return value
+    return_value = ''
+    log_file = open('log.txt', 'a+')
+
+    # Set file and folder paths
+    odm_file = settings.odm_folder + '/odm_' + tile_id + '.odm'
+    temp_file_maj = os.getcwd() + '/temp_' + tile_id + '_maj.tif'
+    out_folder = settings.output_folder + '/date_stamp'
+    out_file = out_folder + '/date_stamp_' + tile_id + '.tif'
+
+    # Create folders if they do not already exists
+    if not os.path.exists(out_folder): os.mkdir(out_folder)
+
+    # Export time stamp cent, min and max 
+    try:
+        # Initialise exporter
+        export_time_stamp = opals.Cell.Cell()
+
+        # Export most common date stamp
+        export_time_stamp.inFile = odm_file
+        export_time_stamp.outFile = temp_file_maj
+        export_time_stamp.attribute = 'GPSTime'
+        export_time_stamp.feature = 'majority'
+        export_time_stamp.cellSize = settings.out_cell_size
+        export_time_stamp.limit = 'corner' # This switch is really important when working with tiles!
+                                    # It sets the ROI to the extent to the bounding box of points in the ODM
+        export_time_stamp.filter = settings.all_classes
+        export_time_stamp.commons.screenLogLevel = opals.Types.LogLevel.none
+        export_time_stamp.commons.nbThreads = settings.nbThreads
+        export_time_stamp.run()
+        return_value = 'success'
+    except:
+        return_value = 'opalsError'
+
+    # Convert GPS time stamp to date and convert rasterto 16 bit integer
+    try:
+        # Load raster as numpy array
+        temp_raster_maj = gdal_array.LoadFile(temp_file_maj)
+
+        # Add 10^9 to all values (as this has been previously substracted) and copy to new object
+        temp_raster = temp_raster_maj + 10**9
+
+        # close original file connection
+        temp_raster_maj = None
+
+        # Convert time stamp to CET date as integer
+        # Note we assume that the difference in leap seconds is constant despite a shift
+        # on 1 July 2015 (it is 36 afterwards) -> we drop the hours anyways
+        # https://hpiers.obspm.fr/eop-pc/index.php?index=TAI-UTC_tab&lang=en
+        # Conversion based on https://stackoverflow.com/questions/33415475/how-to-get-current-date-and-time-from-gps-unsegment-time-in-python
+        # Thanks to user jfs
+        convert_to_utc = lambda t: int((datetime(1980, 1, 6) + timedelta(seconds=t - (35 - 19) - 3600)).strftime("%Y%m%d"))
+        convert_to_utc_vec = numpy.vectorize(convert_to_utc)
+        temp_raster = convert_to_utc_vec(temp_raster)
+
+        # Write array as raster (Int32 as default - needed for 8 digit date format)
+        temp_raster = gdal_array.SaveArray(temp_raster, out_file, format = "GTiff", prototype = temp_file_maj)
+        
+        # Close file connection
+        temp_raster = None
+
+        # Apply mask(s)
+        common.apply_mask(out_file)
+
+        # Log file output
+        log_file.write('\n' + tile_id + ' time_stamp export successful. \n')
+        
+        return_value = 'success'
+        
+    except:
+        if return_value == 'opalsError':
+            pass
+        else:
+            return_value = 'gdalError'
+            log_file.write('\n' + tile_id + ' normalized_z export failed. \n')
+
+        # Tidy up
+    try:
+        print('Done')
+        os.remove(temp_file_maj)
+    except:
+        pass
+
+    # Close log file
+    log_file.close()
+
+    # Return exist status
+    return return_value
 
 def odm_remove_temp_files(tile_id):
     """
