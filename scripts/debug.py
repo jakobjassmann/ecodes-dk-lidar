@@ -20,10 +20,10 @@ from dklidar import settings
 from dklidar import common
 
 # Set temporary workdirectory
-temp_wd = 'D:/Jakob/dk_nationwide_lidar/scratch/debug'
+temp_wd = 'D:/Jakob/ecodes-dk-lidar/scratch/debug'
 
 # Set temporary out directory
-settings.output_folder = 'D:/Jakob/dk_nationwide_lidar/scratch/debug/output'
+settings.output_folder = 'D:/Jakob/ecodes-dk-lidar/scratch/debug/output'
 
 # Create folders if needed
 for folder in [temp_wd, settings.output_folder]:
@@ -36,13 +36,29 @@ os.chdir(temp_wd)
 # Set tile_id if not set as argument (default a tile in Western Denmark)
 args = [arg for arg in sys.argv[1:] if not arg.startswith("-")]
 if len(args) == 0:
-    tile_id = '6178_454'
+    tile_id = '6255_594'
 else:
     tile_id = args[0]
 print('Processing tile_id: ' + tile_id + '\n')
 
 ### Load opals modules
 opals.loadAllModules()
+
+# Confirm essential folders exist
+if not os.path.exists(settings.wd):
+    print('Working Directory ' + settings.wd + ' does not exist. Exiting script...')
+    exit()
+if not os.path.exists(settings.laz_folder):
+    print('laz_folder ' + settings.laz_folder + ' does not exist. Exiting script...')
+    exit()
+if not os.path.exists(settings.dtm_folder):
+    print('dtm_folder ' + settings.dtm_folder + ' does not exist. Exiting script...')
+    exit()
+# Conmfirm other folders exists and if not create them
+for folder in [settings.dtm_mosaics_folder, settings.dtm_footprint_folder,
+               settings.odm_folder, settings.odm_footprint_folder, settings.output_folder]:
+    if not os.path.exists(folder):
+        os.mkdir(folder)
 
 ## -------------------
 ## Start timer
@@ -122,10 +138,6 @@ print('\n')
 print('#' * 60)
 print('\nTesting Point Cloud Functions\n')
 
-## Generate masks
-print('=> Generating Masks')
-print(common.generate_water_masks(tile_id))
-
 ## Import tile to ODM
 print('=> Importing ODM')
 print(points.odm_import_single_tile(tile_id))
@@ -135,7 +147,7 @@ print('=> Validate CRS of ODMs')
 print(points.odm_validate_crs(tile_id))
 
 ## Export footprint
-print('=> Generating footprings from ODM')
+print('=> Generating footprints from ODM')
 print(points.odm_generate_footprint(tile_id))
 
 ## Normalise height
@@ -170,9 +182,14 @@ print(points.odm_export_amplitude(tile_id))
 print('=> Exporting Date Stamps')
 print(points.odm_export_date_stamp(tile_id))
 
+#### Export total point count
+##print('=> Export Total Point Count')
+##print(points.odm_export_point_count(tile_id, 'total_point_count', -1, 50, [2,3,4,5,6,9]))
+
 ## Remove unneeded odm files
 print('=> Remove ODM Temp Files')
 print(points.odm_remove_temp_files(tile_id))
+
 
 ## -------------------
 # Report time elapsed
