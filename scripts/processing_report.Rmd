@@ -1,7 +1,7 @@
 ---
 title: "DK Nationwide LiDAR 'process_tiles.py' Quality Assurance Report"
 author: "Jakob Assmann"
-date: "29/09/2021"
+date: "19/10/2021"
 output: html_document
 ---
 
@@ -15,7 +15,7 @@ library(tidyverse)
 
 # Load report data
 overall_progress <- 
-  read.csv("D:/Jakob/dk_nationwide_lidar/log/process_tiles/overall_progress.csv",
+  read.csv("D:/Jakob/ecodes-dk-lidar/log/process_tiles/overall_progress.csv",
            stringsAsFactors = F)
 
 # Extract performance stats for each function
@@ -33,7 +33,7 @@ n_success["processing"] <- n_complete["processing"]
 # Remove tile id and validate crs colums
 n_success <- n_success[!(grepl("tile_id", names(n_success)) |
                             grepl("odm_validate_crs", names(n_success)) |
-                           grepl("dem_validate_crs", names(n_success)))]
+                           grepl("dtm_validate_crs", names(n_success)))]
 
 # get tile_ids reports for tiles that were not succesffuly completed
 steps_not_completed <- names(n_success[n_success != nrow(overall_progress)])
@@ -78,7 +78,7 @@ incomplete_processing %>%
 
 ## Incomplete processing steps
 
-For __`r nrow(incomplete_processing)` tiles (`r round(nrow(incomplete_processing[incomplete_processing$processing != "complete",])/nrow(overall_progress)*100,2)`%)__ one or multiple of the indiviudal processing steps could not be completed.
+For __`r nrow(incomplete_processing)` tiles (`r round(nrow(incomplete_processing)/nrow(overall_progress)*100,2)`%)__ one or multiple of the indiviudal processing steps could not be completed.
 
 ```{r incomplete_processing}
 library(knitr)
@@ -98,10 +98,12 @@ did not match the defualt crs.
 ```{r crs_not_matched}
 try(overall_progress[grep('no match', overall_progress$dtm_validate_crs),] %>%
   select(tile_id, odm_validate_crs) %>%
-  kable(caption = "Tiles with an laz file that has a non-default crs:"))
+    slice(1:100) %>%
+  kable(caption = "Tiles with an laz file that has a non-default crs (first 100):"))
 
 try(overall_progress[grep('no match', overall_progress$dtm_validate_crs),] %>%
   select(tile_id, dtm_validate_crs) %>%
-  kable(caption = "Tiles with a dtm file that has a non-default crs:"))
+    slice(1:100) %>%
+  kable(caption = "Tiles with a dtm file that has a non-default crs (first 100):"))
 ```
 
