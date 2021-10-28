@@ -1,6 +1,8 @@
 ---
 title: "DK LiDAR Debug Visualisation"
-output: html_notebook
+output:
+  html_document:
+    df_print: paged
 ---
 
 Run `scripts/debug.py` piror knitting this notebook.
@@ -19,7 +21,7 @@ library(knitr)
 library(kableExtra)
 
 # Set debug folder 
-debug_folder <- "D:/Jakob/dk_nationwide_lidar/scratch/debug"
+debug_folder <- "D:/Jakob/ecodes-dk-lidar/scratch/debug"
 
 # load tiff files
 raster_files <- list.files(debug_folder, 
@@ -36,10 +38,10 @@ raster_list <- lapply(raster_files, raster)
 # Define function to generate markdown section
 analyse_raster <- function(index){
   # Load raster and set variables
-  variable_name <- gsub(".*/([A-Za-z0-9_]*).*_[0-9]{4}_[0-9]{3}.tif", 
+  variable_name <- gsub(".*/([A-Za-z0-9_\\-]*).*_[0-9]{4}_[0-9]{3}.*.tif", 
                         "\\1",
                         raster_files[index])
-  tile_id <- gsub(".*([0-9]{4}_[0-9]{3}).tif", 
+  tile_id <- gsub(".*([0-9]{4}_[0-9]{3}).*.tif", 
                         "\\1",
                         raster_files[index])
   target_raster <- raster_list[[index]]
@@ -57,8 +59,9 @@ analyse_raster <- function(index){
     raster_plot <- levelplot(target_raster,
                              margin = F)
     # Histogram Plot
-    hist_plot <- ggplot(as.data.frame(target_raster), 
-                        aes(x = get(paste0(variable_name, "_", tile_id)))) +
+    target_raster_df <- as.data.frame(target_raster)
+    hist_plot <- ggplot(target_raster_df, 
+                        aes(x = get(names(target_raster_df)))) +
       geom_histogram(bins = 100) +
       labs(x = "", y = "n cells") +
       theme_cowplot()
