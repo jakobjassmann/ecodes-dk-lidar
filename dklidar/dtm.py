@@ -660,7 +660,10 @@ def dtm_calc_solar_radiation(tile_id):
         aspect_file = '-A ' + settings.output_folder + '/aspect/aspect_' + tile_id + '.tif '
 
         # Construct numpy equation (based on McCune and Keon 2002) and stretch by 1000 and round to nearest int.
-        solar_rad_eq = 'rint(1000*(0.339+0.808*cos(radians(L))*cos(radians((S/10)))-0.196*sin(radians(L))*sin(radians((S/10)))-0.482*cos(radians(180-absolute(180-(A/10))))*sin(radians((S/10)))))'
+        #solar_rad_eq = 'rint(1000*(0.339+0.808*cos(radians(L))*cos(radians((S/10)))-0.196*sin(radians(L))*sin(radians((S/10)))-0.482*cos(radians(180-absolute(180-(A/10))))*sin(radians((S/10)))))'
+       
+        # Construct numpy equation (based on McCune and Keon 2002), convert to MJ/yr/100m2 (cell) and round to nearest int.
+        solar_rad_eq = 'rint(1000000*(numpy.exp(0.339+0.808*cos(radians(L))*cos(radians((S/10)))-0.196*sin(radians(L))*sin(radians((S/10)))-0.482*cos(radians(180-absolute(180-(A/10))))*sin(radians((S/10))))))'
 
         # Specify output path
         out_file = out_folder + '/solar_radiation_' + tile_id + '.tif '
@@ -672,7 +675,7 @@ def dtm_calc_solar_radiation(tile_id):
               aspect_file + \
               '--outfile=' + out_file + \
               '--calc=' + solar_rad_eq + ' ' + \
-              '--type=Int16 --NoDataValue=-9999 --overwrite'
+              '--type=Int32 --NoDataValue=-9999 --overwrite' #Int16 if original equation is used.
 
         log_file.write('\n calculating solar radiaiton with gdal calc: ' + cmd)
 
