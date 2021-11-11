@@ -66,6 +66,7 @@ Note:
 - If for some reason the processing needs to be interrupted, use `stop.bat` to kill all Python processs and sub-processes on the machine. **NB: This will also kill any Python processes not related to the processing of the LiDAR data.**
 - `process_tiles.py` uses a CSV-based database created in the `log/process_tiles`  to keep track of which tiles have been processed. The progress database allows the script to resume without data loss, should the processing be interrupted. Once the processing is resumed, all already processed tiles will be skipped and any partially processed tiles will be re-processed. If, for some reason, you would like to start a fresh processing attempt that overwrites any existing progress, then you will have to delete the script's log folder and its contents (`log/process_tiles`).  
 - To process only a subset of the variables, comment out any unwanted processing steps in `process_tiles.py`.
+- If you change the number of parallel processing threads in the `process_tiles.py` script, you will also have to update the same variable in the `progress_monitor.py` script. 
 - `progress_monitor.py` uses a linear estimate for the ETA, this should give a general idea for when the processing might finish, but becomes inaccurate once the first parallel processes are starting to be completed.
 - `progress_monitor.py` might fail to keep track of the progress once less tiles than the number of parallel processes are remaining. In that case, check the output from `process_tiles.py` to confirm the final completion. 
 
