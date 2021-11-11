@@ -16,7 +16,8 @@ library(tidyverse)
 # Load report data
 overall_progress <- 
   read.csv("D:/Jakob/ecodes-dk-lidar/log/process_tiles/overall_progress.csv",
-           stringsAsFactors = F)
+           stringsAsFactors = F) %>%
+  filter(processing == "complete") 
 
 # Extract performance stats for each function
 n_success <- sapply(
@@ -70,9 +71,9 @@ A __total of `r nrow(overall_progress)`__ tiles were processed, of these __`r su
 
 ```{r processing success}
 library(knitr)
-incomplete_processing %>% 
-  filter(processing != "complete") %>% 
-  select(tile_id, processing) %>% 
+incomplete_processing %>%
+  filter(processing != "complete") %>%
+  select(tile_id, processing) %>%
   kable(caption = "Tiles where processing failed completely:")
 ```
 
