@@ -10,19 +10,19 @@ python_exec_path = 'C:/Program Files/opals_nightly_2.3.2/opals/python.exe'
 # remember the trailing spaces at the end!
 # simply set to the gdal command e.g. 'gdalwarp ' if you want to use the OPALS gdal binaries (gdaldem slope won't work)
 
-gdalwarp_bin = 'C:/OSGeo4W64/OSGeo4W.bat gdalwarp '
-gdaldem_bin = 'C:/OSGeo4W64/OSGeo4W.bat gdaldem '
-gdaltlindex_bin = 'C:/OSGeo4W64/OSGeo4W.bat gdaltindex '
-gdal_translate_bin = 'C:/OSGeo4W64/OSGeo4W.bat gdal_translate '
-gdal_calc_bin = 'C:/OSGeo4W64/OSGeo4W.bat gdal_calc '
-gdal_merge_bin = 'C:/OSGeo4W64/OSGeo4W.bat gdal_merge '
-gdaltransform_bin = 'C:/OSGeo4W64/OSGeo4W.bat gdaltransform '
-gdalinfo_bin = 'C:/OSGeo4W64/OSGeo4W.bat gdalinfo '
-gdal_rasterize_bin = 'C:/OSGeo4W64/OSGeo4W.bat gdal_rasterize '
-gdalsrsinfo_bin = 'C:/OSGeo4W64/OSGeo4W.bat gdalsrsinfo '
+gdalwarp_bin = 'C:/OSGeo4W/OSGeo4W.bat gdalwarp '
+gdaldem_bin = 'C:/OSGeo4W/OSGeo4W.bat gdaldem '
+gdaltlindex_bin = 'C:/OSGeo4W/OSGeo4W.bat gdaltindex '
+gdal_translate_bin = 'C:/OSGeo4W/OSGeo4W.bat gdal_translate '
+gdal_calc_bin = 'C:/OSGeo4W/OSGeo4W.bat gdal_calc '
+gdal_merge_bin = 'C:/OSGeo4W/OSGeo4W.bat gdal_merge '
+gdaltransform_bin = 'C:/OSGeo4W/OSGeo4W.bat gdaltransform '
+gdalinfo_bin = 'C:/OSGeo4W/OSGeo4W.bat gdalinfo '
+gdal_rasterize_bin = 'C:/OSGeo4W/OSGeo4W.bat gdal_rasterize '
+gdalsrsinfo_bin = 'C:/OSGeo4W/OSGeo4W.bat gdalsrsinfo '
 # Saga binary commands
-saga_wetness_bin = 'C:/OSGeo4W64/apps/saga-ltr/saga_cmd.exe --cores=1 ta_hydrology 15 '
-saga_openness_bin = 'C:/OSGeo4W64/apps/saga-ltr/saga_cmd.exe --cores=1 ta_lighting 5 '
+saga_wetness_bin = 'C:/OSGeo4W/apps/saga-ltr/saga_cmd.exe --cores=1 ta_hydrology 15 '
+saga_openness_bin = 'C:/OSGeo4W/apps/saga-ltr/saga_cmd.exe --cores=1 ta_lighting 5 '
 saga_bin = 'D:/Jakob/saga-7.8.2_x64/saga_cmd.exe --cores=1 '
 
 ### Set folder locations
