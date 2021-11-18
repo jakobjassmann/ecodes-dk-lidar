@@ -599,8 +599,11 @@ def dtm_calc_solar_radiation(tile_id):
         log_file.write('\n gdal transform completed. ')
 
         # Load lat long file as pandas df
+        skip_rows = 1
+        if settings.gdal_version == '3.3.3':
+            skip_rows = 0
         xy_latlong = pandas.read_csv(wd + '/xy_' + tile_id + '_latlong.csv', sep='\s+', names=['X', 'Y', 'return_status'],
-                                     skiprows=1)
+                                     skiprows=skip_rows)
 
         log_file.write('\n check whether lenght matches. ')
 
