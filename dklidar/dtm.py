@@ -128,13 +128,14 @@ def dtm_validate_crs(tile_id, mosaic = True):
 
     # Retrieve CRS string for single tile
     try:
-        crs_str = subprocess.check_output(settings.gdalsrsinfo_bin + '-o wkt ' + dtm_file,
-                                          shell=False, stderr=subprocess.STDOUT)
+        crs_str = subprocess.check_output(settings.gdalsrsinfo_bin + '-o proj4 ' + dtm_file,
+                                              shell=False, stderr=subprocess.STDOUT)  
+            
         # Clean up string by removing first line all white space before and after just in case
         crs_str = re.sub('^.*?\n', '', crs_str)
 
         # Check whether CRS exists, if different issue warning.
-        if crs_str.strip() == settings.crs_wkt_gdal.strip():
+        if crs_str.strip() == settings.crs_proj4_gdal.strip():
             return_value = 'Tile: match'
         else:
             return_value = 'Tile: warning - no match'
@@ -144,12 +145,13 @@ def dtm_validate_crs(tile_id, mosaic = True):
     # Retrieve CRS string for mosaic
     if mosaic == True:
         try:
-            crs_str = subprocess.check_output(settings.gdalsrsinfo_bin + '-o wkt ' + dtm_mosaic,
-                                              shell=False, stderr=subprocess.STDOUT)
+            crs_str = subprocess.check_output(settings.gdalsrsinfo_bin + '-o proj4 ' + dtm_mosaic,
+                                              shell=False, stderr=subprocess.STDOUT)            
             # Clean up string by removing first line all white space before and after just in case
             crs_str = re.sub('^.*?\n', '', crs_str)
+            
             # Check whether CRS exists, if not assign, if different throw error.
-            if crs_str.strip() == settings.crs_wkt_gdal.strip():
+            if crs_str.strip() == settings.crs_proj4_gdal.strip():
                 return_value = return_value + '; Mosaic: match'
             else:
                 return_value = return_value + '; Mosaic: warning - no match'
