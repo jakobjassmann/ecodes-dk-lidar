@@ -20,6 +20,10 @@ gdaltransform_bin = 'C:/OSGeo4W/OSGeo4W.bat gdaltransform '
 gdalinfo_bin = 'C:/OSGeo4W/OSGeo4W.bat gdalinfo '
 gdal_rasterize_bin = 'C:/OSGeo4W/OSGeo4W.bat gdal_rasterize '
 gdalsrsinfo_bin = 'C:/OSGeo4W/OSGeo4W.bat gdalsrsinfo '
+
+# set gdal version (this matters for the crs outputs)
+gdal_version = '3.3.3' # '2.2.4'
+
 # Saga binary commands
 saga_wetness_bin = 'C:/OSGeo4W/apps/saga-ltr/saga_cmd.exe --cores=1 ta_hydrology 15 '
 saga_openness_bin = 'C:/OSGeo4W/apps/saga-ltr/saga_cmd.exe --cores=1 ta_lighting 5 '
@@ -27,7 +31,7 @@ saga_bin = 'D:/Jakob/saga-7.8.2_x64/saga_cmd.exe --cores=1 '
 
 ### Set folder locations
 # Main working directory
-wd = 'D:/Jakob/ecodes-dk-lidar'
+wd = 'D:/Jakob/ecodes-dk-lidar-reprocessing'
 
 # Point cloud folder
 laz_folder = wd + '/data/laz/'
@@ -56,15 +60,15 @@ scratch_folder =  wd + '/scratch'
 log_folder = wd + '/log'
 
 # Mask files
-dk_coastline_poly = 'D:/Jakob/ecodes-dk-lidar/auxillary_files/dk_bounds_jesper_poly.shp'
-dk_lakes_poly = 'D:/Jakob/ecodes-dk-lidar/auxillary_files/lake_mask_jesper.shp'
+dk_coastline_poly = 'D:/Jakob/ecodes-dk-lidar-reprocessing/auxillary_files/dk_bounds_jesper_poly.shp'
+dk_lakes_poly = 'D:/Jakob/ecodes-dk-lidar-reprocessing/auxillary_files/lake_mask_jesper.shp'
 
 ## Spatial reference settings
 
 # common crs as WKT string
 crs_wkt_opals = r'PROJCS["ETRS89 / UTM 32N",GEOGCS["ETRS89",DATUM["European_Terrestrial_Reference_System_1989",SPHEROID["GRS 1980",6378137,298.257222101,AUTHORITY["EPSG","7019"]],AUTHORITY["EPSG","6258"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4258"]],PROJECTION["Transverse_Mercator"],PARAMETER["latitude_of_origin",0],PARAMETER["central_meridian",9],PARAMETER["scale_factor",0.9996],PARAMETER["false_easting",500000],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Easting",EAST],AXIS["Northing",NORTH],AUTHORITY["EPSG","25832"]]'
 crs_wkt_gdal = r'PROJCS["ETRS89 / UTM zone 32N",GEOGCS["ETRS89",DATUM["European_Terrestrial_Reference_System_1989",SPHEROID["GRS 1980",6378137,298.257222101,AUTHORITY["EPSG","7019"]],TOWGS84[0,0,0,0,0,0,0],AUTHORITY["EPSG","6258"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4258"]],PROJECTION["Transverse_Mercator"],PARAMETER["latitude_of_origin",0],PARAMETER["central_meridian",9],PARAMETER["scale_factor",0.9996],PARAMETER["false_easting",500000],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Easting",EAST],AXIS["Northing",NORTH],AUTHORITY["EPSG","25832"]]'
-
+crs_proj4_gdal = r'+proj=utm +zone=32 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs'
 ## Multiprocessing settings
 
 # common nbThreads parameter - a throttle limiter for OPALS, ensures Opals subprocesses use only a single core
