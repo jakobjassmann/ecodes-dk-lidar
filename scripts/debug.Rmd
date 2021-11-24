@@ -21,7 +21,7 @@ library(knitr)
 library(kableExtra)
 
 # Set debug folder 
-debug_folder <- "D:/Jakob/ecodes-dk-lidar/scratch/debug"
+debug_folder <- "D:/Jakob/ecodes-dk-lidar-reprocessing/scratch/debug"
 
 # load tiff files
 raster_files <- list.files(debug_folder, 
