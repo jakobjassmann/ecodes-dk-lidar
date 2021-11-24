@@ -14,7 +14,7 @@ from dklidar import settings
 os.chdir(settings.wd)
 
 # Set number of parallel processes:
-n_processes = 54 # 54
+n_processes = 62 # 54
 
 # set update interval
 update_interval = 60 # 60 s
