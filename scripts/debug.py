@@ -20,10 +20,10 @@ from dklidar import settings
 from dklidar import common
 
 # Set temporary workdirectory
-temp_wd = 'D:/Jakob/ecodes-dk-lidar/scratch/debug'
+temp_wd = 'D:/Jakob/ecodes-dk-lidar-reprocessing/scratch/debug'
 
 # Set temporary out directory
-settings.output_folder = 'D:/Jakob/ecodes-dk-lidar/scratch/debug/output'
+settings.output_folder = 'D:/Jakob/ecodes-dk-lidar-reprocessing/scratch/debug/output'
 
 # Create folders if needed
 for folder in [temp_wd, settings.output_folder]:
@@ -33,10 +33,10 @@ for folder in [temp_wd, settings.output_folder]:
 # Change to temporary work dir
 os.chdir(temp_wd)
 
-# Set tile_id if not set as argument (default a tile in Western Denmark)
+# Set tile_id if not set as argument 
 args = [arg for arg in sys.argv[1:] if not arg.startswith("-")]
 if len(args) == 0:
-    tile_id = '6255_594'
+    tile_id = '6186_524'
 else:
     tile_id = args[0]
 print('Processing tile_id: ' + tile_id + '\n')
@@ -182,9 +182,14 @@ print(points.odm_export_amplitude(tile_id))
 print('=> Exporting Date Stamps')
 print(points.odm_export_date_stamp(tile_id))
 
+## Additional export for selected point counts (to speed up testing)
 #### Export total point count
 ##print('=> Export Total Point Count')
 ##print(points.odm_export_point_count(tile_id, 'total_point_count', -1, 50, [2,3,4,5,6,9]))
+##
+#### Export veg point count
+##print('=> Export Total Point Count')
+##print(points.odm_export_point_count(tile_id, 'vegetation_point_count', 0, 50, [3,4,5]))
 
 ## Remove unneeded odm files
 print('=> Remove ODM Temp Files')
