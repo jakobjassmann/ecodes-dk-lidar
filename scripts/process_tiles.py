@@ -23,7 +23,7 @@ from dklidar import common
 os.chdir(settings.wd)
 
 # Set number of parallel processes:
-n_processes = 36 # 54
+n_processes = 62 # 54
 
 # Confirm essential folders exist
 if not os.path.exists(settings.wd):
@@ -334,10 +334,12 @@ if __name__ == '__main__':
     ## If processing of a specific subset of tiles is needed 
     ## the following lines can be helpful in achieving the task
     ## Remove comments as needed. 
-    #tiles_to_process_completed = set(progress_df.index.values[progress_df['processing'] == 'complete'].tolist())
-    #tiles_to_process_2018 = set(pandas.read_csv("auxillary_files/2018_tiles.csv")["tile_id"].tolist())
-    #tiles_to_process = tiles_to_process_2018 - tiles_to_process_completed
-    #print("Processing " + str(len(tiles_to_process)) + " tiles. \n")
+##    tiles_to_process_completed = set(progress_df.index.values[progress_df['processing'] == 'complete'].tolist())
+##    tiles_to_process_dhm201415 = set(pandas.read_csv('auxillary_files/tiles_to_process_dhm201415_merger.csv')['tile_id'].tolist())
+##    tiles_to_process = tiles_to_process_dhm201415 - tiles_to_process_completed
+##    tiles_to_process = tiles_to_process - (tiles_to_process - set(progress_df.index.values.tolist()))
+##    print('Processing ' + str(len(tiles_to_process)) + ' tiles. \n')
+##    time.sleep(60)
     
     # Set up processing pool
     multiprocessing.set_executable(settings.python_exec_path)
@@ -352,7 +354,7 @@ if __name__ == '__main__':
 
     # Clear scratch folder
     shutil.rmtree('scratch')
-    os.makedir('scratch')
+    os.mkdir('scratch')
     shutil.copy('data/empty_on_purpose.txt', 'scratch/empty_on_purpose.txt') 
     
     # Update progress status
