@@ -15,9 +15,9 @@ library(tidyverse)
 
 # Load report data
 overall_progress <- 
-  read.csv("D:/Jakob/ecodes-dk-lidar/log/process_tiles/overall_progress.csv",
+  read.csv("D:/Jakob/ecodes-dk-lidar-reprocessing/log/process_tiles/overall_progress.csv",
            stringsAsFactors = F) %>%
-  filter(processing == "complete") 
+  filter(processing == "complete")
 
 # Extract performance stats for each function
 n_success <- sapply(
