@@ -1090,48 +1090,118 @@ def odm_export_date_stamp(tile_id):
     :param tile_id: tile id in the format "rrrr_ccc" where rrrr is the row number and ccc is the column number
     :return: execution status
     """
+    
     # Initiate return value
     return_value = ''
     log_file = open('log.txt', 'a+')
-
+    
     # Set file and folder paths
     odm_file = settings.odm_folder + '/odm_' + tile_id + '.odm'
-    temp_file_maj = os.getcwd() + '/temp_' + tile_id + '_maj.tif'
-    out_folder = settings.output_folder + '/date_stamp'
-    out_file = out_folder + '/date_stamp_' + tile_id + '.tif'
-
+    temp_file_maj = re.sub('\\\\', '/', os.getcwd()) + '/temp_' + tile_id + '_maj.tif'
+    temp_file_min = re.sub('\\\\', '/', os.getcwd()) + '/temp_' + tile_id + '_min.tif'
+    temp_file_max = re.sub('\\\\', '/', os.getcwd()) + '/temp_' + tile_id + '_max.tif'
+    temp_file_maj_2 = re.sub('\\\\', '/', os.getcwd()) + '/temp_' + tile_id + '_maj_2.tif'
+    temp_file_min_2 = re.sub('\\\\', '/', os.getcwd()) + '/temp_' + tile_id + '_min_2.tif'
+    temp_file_max_2 = re.sub('\\\\', '/', os.getcwd()) + '/temp_' + tile_id + '_max_2.tif'
+    out_folder_all = settings.output_folder + '/date_stamp'
+    out_folder_maj = out_folder_all + '/date_stamp_mode'
+    out_folder_min = out_folder_all + '/date_stamp_min'
+    out_folder_max = out_folder_all + '/date_stamp_max'
+    out_file_maj = out_folder_maj + '/date_stamp_' + tile_id + '_maj.tif'
+    out_file_min = out_folder_min + '/date_stamp_' + tile_id + '_min.tif'
+    out_file_max = out_folder_max + '/date_stamp_' + tile_id + '_max.tif'
+    
     # Create folders if they do not already exists
-    if not os.path.exists(out_folder): os.mkdir(out_folder)
-
-    # Export time stamp cent, min and max 
+    for folder in [out_folder_all, out_folder_maj, out_folder_min, out_folder_max]:
+        if not os.path.exists(folder): os.mkdir(folder)
+    
+    # Add GPSDate attribute to point cloud (veg points only)
+    try:
+        log_file.write('\n' + tile_id + ' adding GPSdate. \n')
+        add_GPSDate = opals.AddInfo.AddInfo()
+        add_GPSDate.inFile = odm_file
+        add_GPSDate.attribute = '_GPSDay=floor(GPSTime/(60*60*24))'
+        add_GPSDate.commons.screenLogLevel = opals.Types.LogLevel.none
+        add_GPSDate.commons.nbThreads = settings.nbThreads
+        add_GPSDate.filter = settings.veg_classes_filter
+        add_GPSDate.run()
+        add_GPSDate.reset()
+        add_GPSDate = None
+        log_file.write(tile_id + ' success. \n')
+    except:
+        return_value = 'opalsError'
+    
+    # Export time stamp mode, min and max
     try:
         # Initialise exporter
         export_time_stamp = opals.Cell.Cell()
-
-        # Export most common date stamp
+        
+        # Export most common date stamp (mode)
+        log_file.write(tile_id + ' exporting mode GPSDate raster... \n')
         export_time_stamp.inFile = odm_file
         export_time_stamp.outFile = temp_file_maj
-        export_time_stamp.attribute = 'GPSTime'
+        export_time_stamp.attribute = '_GPSDay'
         export_time_stamp.feature = 'majority'
         export_time_stamp.cellSize = settings.out_cell_size
         export_time_stamp.limit = 'corner' # This switch is really important when working with tiles!
-                                    # It sets the ROI to the extent to the bounding box of points in the ODM
-        export_time_stamp.filter = settings.all_classes
+        export_time_stamp.filter = settings.veg_classes_filter
+        export_time_stamp.noData = 0.0
         export_time_stamp.commons.screenLogLevel = opals.Types.LogLevel.none
         export_time_stamp.commons.nbThreads = settings.nbThreads
         export_time_stamp.run()
-        return_value = 'success'
+        export_time_stamp.reset()
+        log_file.write(tile_id + ' success. \n')
+
+        # Export earliest date stamp (min)
+        log_file.write(tile_id + ' exporting min GPSDate raster... \n')
+        export_time_stamp.inFile = odm_file
+        export_time_stamp.outFile = temp_file_min
+        export_time_stamp.attribute = '_GPSDay'
+        export_time_stamp.feature = 'min'
+        export_time_stamp.cellSize = settings.out_cell_size
+        export_time_stamp.limit = 'corner' # This switch is really important when working with tiles!
+        export_time_stamp.filter = settings.veg_classes_filter
+        export_time_stamp.noData = 0.0
+        export_time_stamp.commons.screenLogLevel = opals.Types.LogLevel.none
+        export_time_stamp.commons.nbThreads = settings.nbThreads
+        export_time_stamp.run()
+        export_time_stamp.reset()
+        log_file.write(tile_id + ' success. \n')
+
+        # Export most recent date stamp (max)
+        log_file.write(tile_id + ' exporting max GPSDate raster... \n')
+        export_time_stamp.inFile = odm_file
+        export_time_stamp.outFile = temp_file_max
+        export_time_stamp.attribute = '_GPSDay'
+        export_time_stamp.feature = 'max'
+        export_time_stamp.cellSize = settings.out_cell_size
+        export_time_stamp.limit = 'corner' # This switch is really important when working with tiles!
+        export_time_stamp.filter = settings.veg_classes_filter
+        export_time_stamp.noData = 0.0
+        export_time_stamp.commons.screenLogLevel = opals.Types.LogLevel.none
+        export_time_stamp.commons.nbThreads = settings.nbThreads
+        export_time_stamp.run()    
+        export_time_stamp.reset()
+        log_file.write(tile_id + ' success. \n')
+        
     except:
         return_value = 'opalsError'
+        
 
-    # Convert GPS time stamp to date and convert rasterto 16 bit integer
+    # Convert GPSDate to YYYYMMDD date and save as 32 bit integer
     try:
+        ## GPSDate mode ----
+        log_file.write(tile_id + ' converting mode raster... \n')
+
         # Load raster as numpy array
         temp_raster_maj = gdal_array.LoadFile(temp_file_maj)
 
-        # Add 10^9 to all values (as this has been previously substracted) and copy to new object
-        temp_raster = temp_raster_maj + 10**9
+        # Generate mask
+        temp_raster_mask = temp_raster_maj == 0
 
+        # Convert to seconds and add 10^9 to all values (as this has been previously substracted) and copy to new object
+        temp_raster = temp_raster_maj * (60*60*24) + 10**9
+       
         # close original file connection
         temp_raster_maj = None
 
@@ -1145,14 +1215,138 @@ def odm_export_date_stamp(tile_id):
         convert_to_utc_vec = numpy.vectorize(convert_to_utc)
         temp_raster = convert_to_utc_vec(temp_raster)
 
+        # Re-assing NA values 
+        temp_raster[temp_raster_mask] = -9999
+        
+        # Set any values in 2011 to NA (these result from GPS time stamps that
+        # were not converted from GPS seconds per week to GPS time => they end up in Sept. 2011).
+        # We know that there were no flights in 2011 which allows us to create this mask.
+        temp_raster[numpy.logical_and(temp_raster >= 20110101, temp_raster <= 20111231)] = -9999
+
         # Write array as raster (Int32 as default - needed for 8 digit date format)
-        temp_raster = gdal_array.SaveArray(temp_raster, out_file, format = "GTiff", prototype = temp_file_maj)
+        temp_raster = gdal_array.SaveArray(temp_raster, temp_file_maj_2, format = "GTiff", prototype = temp_file_maj)
+
+        log_file.write(tile_id + ' done. \n')
         
         # Close file connection
         temp_raster = None
 
+        # Reset no data value
+        cmd = settings.gdal_translate_bin + ' -of GTiff -a_nodata -9999 '  + \
+              temp_file_maj_2 + ' ' + out_file_maj
+        # Execute gdal command
+        log_file.write('\n' + tile_id + ' re-setting no data value... \n' + \
+                       subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT))
+
         # Apply mask(s)
-        common.apply_mask(out_file)
+        common.apply_mask(out_file_maj)
+
+        # Log file output
+        log_file.write('\n' + tile_id + ' time_stamp export successful. \n')
+
+        ## GPSDate min -----
+        log_file.write(tile_id + ' converting min raster... \n')
+
+        # Load raster as numpy array
+        temp_raster_min = gdal_array.LoadFile(temp_file_min)
+
+        # Generate mask
+        temp_raster_mask = temp_raster_min == 0
+
+        # Convert to seconds and add 10^9 to all values (as this has been previously substracted) and copy to new object
+        temp_raster = temp_raster_min * (60*60*24) + 10**9
+       
+        # close original file connection
+        temp_raster_min = None
+
+        # Convert time stamp to CET date as integer
+        # Note we assume that the difference in leap seconds is constant despite a shift
+        # on 1 July 2015 (it is 36 afterwards) -> we drop the hours anyways
+        # https://hpiers.obspm.fr/eop-pc/index.php?index=TAI-UTC_tab&lang=en
+        # Conversion based on https://stackoverflow.com/questions/33415475/how-to-get-current-date-and-time-from-gps-unsegment-time-in-python
+        # Thanks to user jfs
+        convert_to_utc = lambda t: int((datetime(1980, 1, 6) + timedelta(seconds=t - (35 - 19) - 3600)).strftime("%Y%m%d"))
+        convert_to_utc_vec = numpy.vectorize(convert_to_utc)
+        temp_raster = convert_to_utc_vec(temp_raster)
+
+        # Re-assing NA values 
+        temp_raster[temp_raster_mask] = -9999
+
+        # Set any values in 2011 to NA (these result from GPS time stamps that
+        # were not converted from GPS seconds per week to GPS time => they end up in Sept. 2011).
+        # We know that there were no flights in 2011 which allows us to create this mask.
+        temp_raster[numpy.logical_and(temp_raster >= 20110101, temp_raster <= 20111231)] = -9999
+
+        # Write array as raster (Int32 as default - needed for 8 digit date format)
+        temp_raster = gdal_array.SaveArray(temp_raster, temp_file_min_2, format = "GTiff", prototype = temp_file_min)
+
+        log_file.write(tile_id + ' done. \n')
+        
+        # Close file connection
+        temp_raster = None
+
+        # Reset no data value
+        cmd = settings.gdal_translate_bin + ' -of GTiff -a_nodata -9999 '  + \
+              temp_file_min_2 + ' ' + out_file_min
+        # Execute gdal command
+        log_file.write('\n' + tile_id + ' re-setting no data value... \n' + \
+                       subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT))
+
+        # Apply mask(s)
+        common.apply_mask(out_file_min)
+
+        ## GPSDate max -----
+        log_file.write(tile_id + ' converting max raster... \n')
+
+        # Load raster as numpy array
+        temp_raster_max = gdal_array.LoadFile(temp_file_max)
+
+        # Generate mask
+        temp_raster_mask = temp_raster_max == 0
+
+        # Convert to seconds and add 10^9 to all values (as this has been previously substracted) and copy to new object
+        temp_raster = temp_raster_max * (60*60*24) + 10**9
+       
+        # close original file connection
+        temp_raster_max = None
+
+        # Convert time stamp to CET date as integer
+        # Note we assume that the difference in leap seconds is constant despite a shift
+        # on 1 July 2015 (it is 36 afterwards) -> we drop the hours anyways
+        # https://hpiers.obspm.fr/eop-pc/index.php?index=TAI-UTC_tab&lang=en
+        # Conversion based on https://stackoverflow.com/questions/33415475/how-to-get-current-date-and-time-from-gps-unsegment-time-in-python
+        # Thanks to user jfs
+        convert_to_utc = lambda t: int((datetime(1980, 1, 6) + timedelta(seconds=t - (35 - 19) - 3600)).strftime("%Y%m%d"))
+        convert_to_utc_vec = numpy.vectorize(convert_to_utc)
+        temp_raster = convert_to_utc_vec(temp_raster)
+
+        # Re-assing NA values 
+        temp_raster[temp_raster_mask] = -9999
+
+        # Set any values in 2011 to NA (these result from GPS time stamps that
+        # were not converted from GPS seconds per week to GPS time => they end up in Sept. 2011).
+        # We know that there were no flights in 2011 which allows us to create this mask.
+        temp_raster[numpy.logical_and(temp_raster >= 20110101, temp_raster <= 20111231)] = -9999
+
+
+        # Write array as raster (Int32 as default - needed for 8 digit date format)
+        temp_raster = gdal_array.SaveArray(temp_raster, temp_file_max_2, format = "GTiff", prototype = temp_file_max)
+
+        log_file.write(tile_id + ' done. \n')
+        
+        # Close file connection
+        temp_raster = None
+
+        # Reset no data value
+        cmd = settings.gdal_translate_bin + ' -of GTiff -a_nodata -9999 '  + \
+              temp_file_max_2 + ' ' + out_file_max
+        # Execute gdal command
+        log_file.write('\n' + tile_id + ' re-setting no data value... \n' + \
+                       subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT))
+
+        # Apply mask(s)
+        common.apply_mask(out_file_max)
+
 
         # Log file output
         log_file.write('\n' + tile_id + ' time_stamp export successful. \n')
@@ -1164,12 +1358,16 @@ def odm_export_date_stamp(tile_id):
             pass
         else:
             return_value = 'gdalError'
-            log_file.write('\n' + tile_id + ' normalized_z export failed. \n')
+            log_file.write('\n' + tile_id + ' date_stamp export failed. \n')
 
         # Tidy up
     try:
-        print('Done')
         os.remove(temp_file_maj)
+        os.remove(temp_file_min)
+        os.remove(temp_file_max)
+        os.remove(temp_file_maj_2)
+        os.remove(temp_file_min_2)
+        os.remove(temp_file_max_2)
     except:
         pass
 
