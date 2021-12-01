@@ -21,7 +21,7 @@ Global settings file with:
 - paths to mask shapefiles.
 - common crs as WKT string / proj 4 interpretable by OPALS and gdal.
 - nbThreads - number of subthreads used by OPALS.
-- out\_cell\_size - the default cell size for raster export with OPALS. **NB: changing this variable will not affect raster manipulations with gdal.**
+- out\_cell\_size - the default cell size for raster export with OPALS. **NB: changing this variable will not affect raster manipulations with gdal. The gdal cell size values are defined in the respective functions in the dtm.py module.**
 - filter strings for commonly used OPALS filters. 
 - gdal version.
 
