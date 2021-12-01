@@ -38,7 +38,7 @@ To replicate the processing, revisit the [workflow overview](/documentation/dk_l
 |- auxillary_files/   shapefiles needed for generating the sea and water masks. 
 |- data/              empty, place-holder for input (imported) and output (generated) data.
 |- dklidar/           Python modules providing the processing functions.
-|- documentation/     documentation for Python modules and output variables. 
+|- documentation/     documentation for Python modules and output descriptors. 
 |- log/               empty, place-holder for log file output.
 |- manuscript/        scripts accompanying the manuscript.
 |- qa_local/          quallity assurance outputs and processing reports.
@@ -51,8 +51,8 @@ To replicate the processing, revisit the [workflow overview](/documentation/dk_l
 
 This repository contains the following documentation:
 
-- A summary description of the output variables. See [/documentation/variables.md](/documentation/variables.md) (or as [pdf](/documentation/variables.pdf)).
-- A lookup table for easy access to the variable conversion factors [/documentation/conversion_factors.csv](/documentation/conversion_factors.csv).
+- A summary of the output descriptors. See [/documentation/descriptors.md](/documentation/descriptors.md) (or as [pdf](/documentation/descriptors.pdf)).
+- A lookup table for easy access to the descriptor conversion factors [/documentation/conversion_factors.csv](/documentation/conversion_factors.csv).
 - Documentation for the pre- / post- processing and processing steps and scripts. See [/scripts/readme.md](/scripts/readme.md).
 - Documentation for the *dklidar* Python processing modules. See [/documentation/dklidar_modules.md](/documentation/dklidar_modules.md).
 - Example scripts for subsetting and working with the dataset. See [/manuscript/figure_6/subset_dataset.R](/manuscript/figure_6/subset_dataset.R) (subsetting) and [/manuscript/figure_6/figure_6.R](/manuscript/figure_6/figure_6.R) (ecological stratification).
@@ -63,7 +63,7 @@ This repository contains the following documentation:
 
 ## Software Requirements
 
-The processing workflow was developed with OPALS 2.3.2.0, Python 2.7 (as distributed with OPALS), pandas (0.24.2), GDAL 2.2.4 and SAGA GIS 7.8.2. Newer versions of these software packages will likely work, but have not been tested. 
+The processing workflow was developed with OPALS 2.3.2.0, Python 2.7 (as distributed with OPALS), pandas (0.24.2), GDAL 2.2.4 and SAGA GIS 7.8.2. Newer versions of these software packages will likely work, but have not been tested. During peer-review we updated the processing pipeline for compatibility with GDAL 3.3.3. 
 
 The R example scripts require R and the raster package. 
 

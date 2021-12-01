@@ -1,9 +1,0 @@
-D:/Jakob/scratch/husby/lidar_vars//point_count/ground_and_water_point_count_-01m-01m/ground_and_water_point_count_-01m-01m_6238_445.tif
-D:/Jakob/scratch/husby/lidar_vars//point_count/ground_and_water_point_count_-01m-01m/ground_and_water_point_count_-01m-01m_6238_446.tif
-D:/Jakob/scratch/husby/lidar_vars//point_count/ground_and_water_point_count_-01m-01m/ground_and_water_point_count_-01m-01m_6238_447.tif
-D:/Jakob/scratch/husby/lidar_vars//point_count/ground_and_water_point_count_-01m-01m/ground_and_water_point_count_-01m-01m_6239_445.tif
-D:/Jakob/scratch/husby/lidar_vars//point_count/ground_and_water_point_count_-01m-01m/ground_and_water_point_count_-01m-01m_6239_446.tif
-D:/Jakob/scratch/husby/lidar_vars//point_count/ground_and_water_point_count_-01m-01m/ground_and_water_point_count_-01m-01m_6239_447.tif
-D:/Jakob/scratch/husby/lidar_vars//point_count/ground_and_water_point_count_-01m-01m/ground_and_water_point_count_-01m-01m_6240_445.tif
-D:/Jakob/scratch/husby/lidar_vars//point_count/ground_and_water_point_count_-01m-01m/ground_and_water_point_count_-01m-01m_6240_446.tif
-D:/Jakob/scratch/husby/lidar_vars//point_count/ground_and_water_point_count_-01m-01m/ground_and_water_point_count_-01m-01m_6240_447.tif
