@@ -77,7 +77,7 @@ Note:
 Once the processing has finished, a few post-processing steps need to be carried out:
 
 1. Generate a tile_footprints shapefile by running `extract_tile_footprints.R`. You might have to update the global parmeters with your local file paths at the beginning of the script.
-2. Generate VRT files for each variable using the `make_vrt_subfolders.bat` batch script. Execute this script in the parent folder containing all your output rasters (the one specified in the settings.output_folder variable of the settings.py module). **NB: Unlike the other scripts this batch script will have to be run in an ordinary (non-OPALS) Windows command prompt. You will also need to update the file path to the OSgeo4W binaries (line 18) in the make_vrt.bat script.** 
+2. Generate VRT files for each variable using the `make_vrt_subfolders.bat` batch script. Execute this script in the parent folder containing all your output rasters (the one specified in the settings.output_folder variable of the settings.py module). **NB: Unlike the other scripts this batch script will have to be run in an ordinary (non-OPALS) Windows command prompt. You will also need to update the file path to the OSgeo4W binaries (line 18) in the make_vrt.bat script and the file path to the make_vrt.bat script in the make_vrt_subfolders.bat (line 11).** 
    - The script will recursively loop through the folder tree and generate a vrt file in any folder that contains tif files. 
    - The script will name the VRT file based on the folder that contains it and all file paths used will be relative.
    - The VRT file will be generated for the  extent of the nationwide datset, consider adjusting the extent parameter in `make_vrs.bat` in case only a subset has been processed. 
