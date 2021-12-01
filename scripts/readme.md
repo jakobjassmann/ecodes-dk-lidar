@@ -76,9 +76,9 @@ Note:
 
 Once the processing has finished, a few post-processing steps need to be carried out:
 
-1. Generate a tile_footprints shapefile by running `extract_tile_footprints.R`. You might have to update the global parmeters with your local file paths at the beginning of the script.
+1. Generate a tile_footprints shapefile by running `generate_tile_footprints.py`. 
 2. Fill in processing gaps using `fill_processing_gaps.py`.
-   - A small number of tiles (< 100), e.g. on the fringes of the dataset (including sand banks, spits etc.), may fail processing for some of the variables - especially the point cloud derived variables. This script fills these "processing gaps", by creating empty rasters containing onlly NA for the missing tiles and variables. The script also outputs a csv file summarising the number of tiles missing for each variable [/documentation/empty_tiles_summary.csv](/documentation/empty_tiles_summary.csv). The specific tile ids of the missing variable / tile combinations can be retrieved from the log files and/or [/documentation/empty_tile_ids.csv](/documentation/empty_tile_ids.csv). 
+   - A small number of tiles (< 100), e.g. on the fringes of the dataset (including sand banks, spits etc.), may fail processing for some of the variables - especially the point cloud derived variables. This script fills these "processing gaps", by creating empty rasters containing only NA for the missing tiles and variables. The script also outputs a csv file summarising the number of tiles missing for each variable [/documentation/empty_tiles_summary.csv](/documentation/empty_tiles_summary.csv). The specific tile ids of the missing variable / tile combinations can be retrieved from the log files and/or [/documentation/empty_tile_ids.csv](/documentation/empty_tile_ids.csv). 
 3. Generate VRT files for each variable using the `make_vrt_subfolders.bat` batch script. Execute this script in the parent folder containing all your output rasters (the one specified in the settings.output_folder variable of the settings.py module). **NB: Unlike the other scripts this batch script will have to be run in an ordinary (non-OPALS) Windows command prompt. You will also need to update the file path to the OSgeo4W binaries (line 18) in the make_vrt.bat script and the file path to the make_vrt.bat script in the make_vrt_subfolders.bat (line 11).** 
    - The script will recursively loop through the folder tree and generate a vrt file in any folder that contains tif files. 
    - The script will name the VRT file based on the folder that contains it and all file paths used will be relative.
@@ -109,10 +109,10 @@ create_checksums_archives.bat | Generates checksums for outputs packed into arch
 debug.py | Script for testing / debugging the processing workflow based on a single tile. Processing is done sequentially, one variable after the other. Timings are provided. 
 debug.Rmd | R Markdown document for visual quality assurance of the debug.py outputs. 
 download_files.py | Helper script to download DHM\Punktsky pointclouds and DHM dtm rasters from the Kortforsyningen website. 
-extract_tile_footprints.R | Collates and exports tile footprints shapefile based on the dtm_10m exports. 
 fill_processing_gaps.py | Fills incomplete variables with empty rasters (all NA) for the missing tiles. To be executed after processing. 
 generate_dems.py | Generates DTMs from the pointclouds that are missing a corresponding DTM file. 
 generate_list_of_vrts.py | Generates a text file containing a list of all vrt files in each subfolder of a given directory. 
+generate_tile_footprints.py | Generates tile_footprint variable (based on dtm_10m by default).
 make_vrt.bat | Creates a vrt from all .tif files in the folder from which it is executed, 1st argument specifies the name of the output vrt file. 
 make_vrt_subfolders.bat | Recursively creates vrt files within all subfolders of the current directory that contain tif images. Each VRT file is named with the subfolder name. 
 plot_raster_3d.R | Set of helper functions to generate publication ready 3D plots of rasters in R using the *rayshader* package. (Used to generate the figures for the manuscript). 
