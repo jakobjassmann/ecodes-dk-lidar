@@ -3,13 +3,13 @@ Overview of the functions for processing and rasterising DK's nationwide ALS/LiD
 
 ## Overview
 
-1. [Parameters in /dklidar/settings.py - global settings](#settings.py)
+1. [Parameters in /dklidar/settings.py - global settings](#settingspy)
 
-2. [Functions in /dklidar/common.py - functions for logging, process managment etc.](#common.py)
+2. [Functions in /dklidar/common.py - functions for logging, process managment etc.](#commonpy)
 
-3. [Functions in /dklidar/points.py - functions for processing point clouds](#points.py)
+3. [Functions in /dklidar/points.py - functions for processing point clouds](#pointspy)
 
-4. [Functions in /dklidar/dtm.py - functions for processing the terrain model](#dtm.py)
+4. [Functions in /dklidar/dtm.py - functions for processing the terrain model](#dtmpy)
 
 ----
 
@@ -19,12 +19,13 @@ Global settings file with:
 - paths to working directories.
 - paths to input / output folders.
 - paths to mask shapefiles.
-- common crs as WKT string interpretable by OPALS.
+- common crs as WKT string / proj 4 interpretable by OPALS and gdal.
 - nbThreads - number of subthreads used by OPALS.
 - out\_cell\_size - the default cell size for raster export with OPALS. **NB: changing this variable will not affect raster manipulations with gdal.**
 - filter strings for commonly used OPALS filters. 
+- gdal version.
 
-[\[to top\]](#modules)
+[\[to top\]](#overview)
 
 ----
 
@@ -39,7 +40,7 @@ gather_logs | Gathers log files from a temporary working directory after process
 generate_water_masks | Generates sea and inland water masks for a tile (at 10 m). 
 apply_mask | Applies water mask(s) (sea and/or in-lane water) to a raster file. Called for each raster output. **NB: Default is to apply neither of the two mask.** 
 
-[\[to top\]](#modules)
+[\[to top\]](#overview)
 
 ----
 
@@ -61,9 +62,10 @@ odm_calc_proportions | Caluclates the ratio between two point count rasters.
 odm_export_proportions | Exports a pre-defined set of proportions for a given tile using the odm_calc_proportions() function. 
 odm_export_amplitude | Exports the mean and sd of the amplitude for a given tile. 
 odm_export_point_source_info | Exports point source (i.e. flight line) statistics for a given tile. 
+odm_export_date_stamp | Exports the date_stamp variables (min, max and mode) based on the respective statistics for the most common GPS time stamp in each 10 m x 10 m cell. 
 odm_remove_temp_files | Cleans up the temp folder after point cloud processing has finished for a given tile. 
 
-[\[to top\]](#modules)
+[\[to top\]](#overview)
 
 ----
 
@@ -88,6 +90,6 @@ dtm_saga_wetness | Calculates the SAGA wetness index with default settings for a
 dtm_saga_landscape_openness | Calclulates landscape openness following Yokoyama et al. 2002 using SAGA GIS with a search radius of 150 m (redundant) for a given tile. Calculations are carried out on the aggregated 10 m neighbourhood mosaic of the tile. The result is then cropped to the footprint of the tile. **NB: This function was not used in the generation of EcoDes-DK15!** 
 dtm_remove_temp_files | Function to clean up temp folder after point cloud processing has finished for a given tile. 
 
-[\[to top\]](#modules)
+[\[to top\]](#overview)
 
 ----
