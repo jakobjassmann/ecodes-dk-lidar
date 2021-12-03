@@ -9,9 +9,10 @@ library(tidyverse)
 library(ggcorrplot)
 library(sf)
 library(parallel)
+library(pbapply)
 
 # set path to repository
-path_to_repo <- "D:/Jakob/dk_nationwide_lidar/"
+path_to_repo <- "D:/Jakob/ecodes-dk-lidar-rev1/"
 setwd(path_to_repo)
 
 # Load list of vrts
@@ -29,9 +30,9 @@ sample_locations_vect <- vect(sample_locations)
 sample_locations_vect$sample_id <- 1:nrow(sample_locations_vect)
 
 # extract sample across all vrts in parallel (except point_source_ids)
-cl <- makeCluster(54)
+cl <- makeCluster(62)
 clusterEvalQ(cl, library(terra))
-sample_list <- parLapply(cl, 
+sample_list <- pblapply(cl = cl, 
                       list_of_vrts[!grepl("point_source", list_of_vrts)], 
                     function(vrt_file, sample_locations){
                       vrt_rast <- rast(vrt_file)
@@ -45,12 +46,14 @@ stopCluster(cl)
 
 # Convert to sf and save sample 
 sample_sf <- bind_cols(sample_list) %>%
-  setNames(., gsub(".*/(.*).vrt$", "\\1", list_of_vrts[!grepl("point_source", list_of_vrts)])) %>%
+  setNames(., gsub(".*/(.*).vrt$", "\\1", 
+                   list_of_vrts[!grepl("point_source", list_of_vrts)])) %>%
   mutate(sample_id = sample_locations_vect$sample_id) %>%
   dplyr::select(last_col(), !last_col()) 
 sample_sf$x <- sample_locations$x
 sample_sf$y <- sample_locations$y
-sample_sf <- st_as_sf(sample_sf, coords = c("x", "y"), crs = st_crs(tile_footprints))
+sample_sf <- st_as_sf(sample_sf, coords = c("x", "y"), 
+                      crs = st_crs(tile_footprints))
 save(sample_sf, file = "documentation/point_sample_sf.Rda")
 # load("documentation/point_sample_sf.Rda")
 
@@ -60,7 +63,8 @@ sample_df <- st_drop_geometry(sample_sf)
 # apply conversion factors
 conv_factors <- read_csv("documentation/conversion_factors.csv")
 for(i in 2:(ncol(sample_df))){
-  sample_df[,i] <- sample_df[,i] / conv_factors$conv_fac[conv_factors$var_name == colnames(sample_df)[i]]
+  sample_df[,i] <- sample_df[,i] / 
+    conv_factors$conv_fac[conv_factors$var_name == colnames(sample_df)[i]]
 }
 
 # Remove masked pixels (inland water / sea)
@@ -68,7 +72,7 @@ sample_df <- sample_df %>%
   filter(sea_mask == 1) %>%
   filter(inland_water_mask == 1)
 
-# Convert into long form and calculate min and max etc. for all non height bin variables
+# Convert into long form and calc min, max etc. for all non height bin variables
 sample_df_long <- sample_df %>% 
   dplyr::select(!contains("vegetation"), 
          `vegetation_point_count_00m-50m`,
@@ -87,7 +91,7 @@ sample_df_min_max_mean <- sample_df_long %>%
             q2 = quantile(value, 0.02, na.rm = T),
             q98 = quantile(value, 0.98, na.rm = T))
 
-# Historgram plot for all non height bin variables
+# Histogram plot for all non height bin variables
 list_hist_plots <- lapply(
   levels(sample_df_long$variable_fac), 
   function(x) {
@@ -221,7 +225,8 @@ save_plot("documentation/figures/corr_plot.png", corr_plot,
 
 # Visualise sample 
 sample_sf <- bind_cols(sample_list) %>%
-  setNames(., gsub(".*/(.*).vrt$", "\\1", list_of_vrts[!grepl("point_source", list_of_vrts)])) %>%
+  setNames(., gsub(".*/(.*).vrt$", "\\1",
+                   list_of_vrts[!grepl("point_source", list_of_vrts)])) %>%
   mutate(sample_id = sample_locations_vect$sample_id) %>%
   dplyr::select(last_col(), !last_col()) %>%
   mutate(sample_type = case_when(
@@ -232,7 +237,8 @@ sample_sf <- bind_cols(sample_list) %>%
   dplyr::select(sample_id, sample_type)
 sample_sf$x <- sample_locations$x
 sample_sf$y <- sample_locations$y
-sample_sf <- st_as_sf(sample_sf, coords = c("x", "y"), crs = st_crs(tile_footprints))
+sample_sf <- st_as_sf(sample_sf, coords = c("x", "y"),
+                      crs = st_crs(tile_footprints))
 sample_plot <- ggplot() +
   geom_sf(data = st_as_sf(tile_footprints), 
           colour = NA, fill = "grey") +
@@ -252,6 +258,24 @@ save_plot("documentation/figures/sample_locations.png",
           sample_plot,
           base_height = 8)
 
+# Solar radiation vs. heat load index
+solar_rad_vs_heat_load <- ggplot(
+  sample_df, 
+  aes(x = solar_radiation,
+      y = heat_load_index)) +
+  geom_point() +
+  annotate("text", 
+           x = 1600000, 
+           y = 0.9, 
+           label = paste0("r = ", round(cor(sample_df$solar_radiation,
+                                      sample_df$heat_load_index, 
+                                      "complete.obs"), 2)),
+           size = 6) +
+  theme_cowplot()
+save_plot("documentation/figures/solar_rad_vs_heat_index.png",
+          solar_rad_vs_heat_load,
+          base_height = 6,
+          base_asp = 1.1)
 
 ## End of Script
 
