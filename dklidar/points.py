@@ -1107,9 +1107,9 @@ def odm_export_date_stamp(tile_id):
     out_folder_maj = out_folder_all + '/date_stamp_mode'
     out_folder_min = out_folder_all + '/date_stamp_min'
     out_folder_max = out_folder_all + '/date_stamp_max'
-    out_file_maj = out_folder_maj + '/date_stamp_' + tile_id + '_maj.tif'
-    out_file_min = out_folder_min + '/date_stamp_' + tile_id + '_min.tif'
-    out_file_max = out_folder_max + '/date_stamp_' + tile_id + '_max.tif'
+    out_file_maj = out_folder_maj + '/date_stamp_mode_' + tile_id + '.tif'
+    out_file_min = out_folder_min + '/date_stamp_min_' + tile_id + '.tif'
+    out_file_max = out_folder_max + '/date_stamp_max_' + tile_id + '.tif'
     
     # Create folders if they do not already exists
     for folder in [out_folder_all, out_folder_maj, out_folder_min, out_folder_max]:
