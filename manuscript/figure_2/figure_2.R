@@ -4,7 +4,7 @@
 ## 1) Housekeeping ----
 
 # Set wd
-setwd("D:/Jakob/dk_nationwide_lidar/manuscript/figure_2/")
+setwd("D:/Jakob/ecodes-dk-lidar-rev1/manuscript/figure_2/")
 
 # Dependencies
 library(sf)
@@ -23,7 +23,7 @@ eval(parse("../../scripts/plot_raster_3d.R", encoding = "UTF-8"))
 tile_id <- "6230_595"
 
 # Set folder paths
-ecodes_path <- "O:/Nat_Ecoinformatics-tmp/au634851/dk_lidar_backup_2021-05-12/"
+ecodes_path <- "D:/Jakob/ecodes-dk-lidar-rev1/data/outputs/"
 dtm_10m <- paste0(ecodes_path, "dtm_10m")
 aspect <- paste0(ecodes_path, "aspect")
 slope <- paste0(ecodes_path, "slope")
@@ -38,7 +38,7 @@ dtm_10m_raster <- raster(paste0(dtm_10m, "/dtm_10m_", tile_id, ".tif"))/ 100
 aspect_raster <- raster(paste0(aspect, "/aspect_", tile_id, ".tif"))/ 10
 slope_raster <- raster(paste0(slope, "/slope_", tile_id, ".tif"))/ 10
 heat_load_index_raster <- raster(paste0(heat_load_index, "/heat_load_index_", tile_id, ".tif"))/ 10000
-solar_radiation_raster <- raster(paste0(solar_radiation, "/solar_radiation_", tile_id, ".tif"))/ 1000
+solar_radiation_raster <- raster(paste0(solar_radiation, "/solar_radiation_", tile_id, ".tif"))/ 100000
 openness_mean_raster <- raster(paste0(openness_mean, "/openness_mean_", tile_id, ".tif"))
 openness_difference_raster <- raster(paste0(openness_difference, "/openness_difference_", tile_id, ".tif"))
 twi_raster <- raster(paste0(twi, "/twi_", tile_id, ".tif"))/ 1000
@@ -64,12 +64,12 @@ parameters <- tibble(
                     "openness_difference",
                     "twi"),
   variable_name = c("Height asl (m)",
-                    "Aspect (Â°)",
-                    "Slope (Â°)",
+                    "Aspect (°)",
+                    "Slope (°)",
                     "Heat Load Index (unitless)",
-                    "Solar Radiation (ln(MJ/cm2/yr))",
-                    "Openness Mean (Â°)",
-                    "Openness Difference (Â°)",
+                    "Energy (10^5 MJ / 100 m2 / yr)",
+                    "Openness Mean (°)",
+                    "Openness Difference (°)",
                     "TWI (unitless)"),
   raster_object = list(dtm_10m_raster,
                          aspect_raster,
@@ -95,9 +95,9 @@ parameters <- tibble(
                      sequential_hcl(99, palette = "Viridis"),
                      sequential_hcl(99, palette = "Viridis"),
                      sequential_hcl(99, palette = "Blues3", rev = T)),
-  min_value = c(25,0,0,0,0.45, 75,0, 0),
-  max_value = c(125,360,30,1,0.86, 95, 40, 20),
-  y_max = c(700, 600, 400, 500, 1500, 3000, 700, 1000),
+  min_value = c(25,0,0,0,1600000/100000,75,0, 0),
+  max_value = c(125,360,30,1,2400000/100000, 95, 40, 20),
+  y_max = c(700, 600, 400, 500, 750, 3000, 700, 1000),
   z_scale = 5
   )
 
@@ -162,9 +162,10 @@ combined_plot <- plot_grid(
   )
 
 # Save plot
-save_plot("figure_2.png", combined_plot,
+save_plot("fig02.png", combined_plot,
           base_height = 4,
           base_aspect_ratio = 2,
           ncol = 3,
-          nrow = 3)
+          nrow = 3,
+          bg = "white")
  
