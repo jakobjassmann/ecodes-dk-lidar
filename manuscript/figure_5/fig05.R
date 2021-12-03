@@ -92,11 +92,11 @@ month_plot <- ggplot() +
           colour = NA) +
   labs(fill = "Year, Month", title = "EcoDes-DK15 Vegetation Point Collection Dates", 
        subtitle = "Aggregate of date_stamp_mode for each tile") +
-  scale_fill_manual(values = c('#F2620F',
-                               rep('#F2C53D', 3),
-                               rep('#5259D9', 3),
-                               rep('#A63348', 3),
-                               '#0F0F0F')) +
+  scale_fill_manual(values = c('#F2620FBB',
+                               rep('#F2C53DBB', 3),
+                               rep('#5259D9BB', 3),
+                               rep('#A63348BB', 3),
+                               '#0F0F0FBB')) +
   theme_cowplot() +
   theme(axis.line = element_blank(),
         axis.text = element_blank(),
