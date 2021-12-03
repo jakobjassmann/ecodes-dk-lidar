@@ -31,7 +31,7 @@ saga_bin = 'D:/Jakob/saga-7.8.2_x64/saga_cmd.exe --cores=1 '
 
 ### Set folder locations
 # Main working directory
-wd = 'D:/Jakob/ecodes-dk-lidar-reprocessing'
+wd = 'D:/Jakob/ecodes-dk-lidar-rev1'
 
 # Point cloud folder
 laz_folder = wd + '/data/laz/'
@@ -60,8 +60,8 @@ scratch_folder =  wd + '/scratch'
 log_folder = wd + '/log'
 
 # Mask files
-dk_coastline_poly = 'D:/Jakob/ecodes-dk-lidar-reprocessing/auxillary_files/dk_bounds_jesper_poly.shp'
-dk_lakes_poly = 'D:/Jakob/ecodes-dk-lidar-reprocessing/auxillary_files/lake_mask_jesper.shp'
+dk_coastline_poly = 'D:/Jakob/ecodes-dk-lidar-rev1/auxillary_files/dk_bounds_jesper_poly.shp'
+dk_lakes_poly = 'D:/Jakob/eecodes-dk-lidar-rev1/auxillary_files/lake_mask_jesper.shp'
 
 ## Spatial reference settings
 
