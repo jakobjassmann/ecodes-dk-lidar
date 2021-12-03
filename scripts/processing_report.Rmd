@@ -1,7 +1,7 @@
 ---
 title: "DK Nationwide LiDAR 'process_tiles.py' Quality Assurance Report"
 author: "Jakob Assmann"
-date: "19/10/2021"
+date: "30/11/2021"
 output: html_document
 ---
 
@@ -15,7 +15,7 @@ library(tidyverse)
 
 # Load report data
 overall_progress <- 
-  read.csv("D:/Jakob/ecodes-dk-lidar-reprocessing/log/process_tiles/overall_progress.csv",
+  read.csv("D:/Jakob/ecodes-dk-lidar-rev1/log/process_tiles/overall_progress.csv",
            stringsAsFactors = F) %>%
   filter(processing == "complete")
 
