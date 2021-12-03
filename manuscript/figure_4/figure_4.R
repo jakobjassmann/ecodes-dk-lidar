@@ -4,7 +4,7 @@
 ## 1) Housekeeping ----
 
 # Set wd
-setwd("D:/Jakob/dk_nationwide_lidar/manuscript//figure_4")
+setwd("D:/Jakob/ecodes-dk-lidar-rev1//manuscript/figure_4")
 
 # Dependencies
 library(raster)
@@ -13,6 +13,7 @@ library(cowplot)
 library(tidyverse)
 library(rnaturalearth)
 library(rnaturalearthdata)
+library(colorspace)
 
 # Source 3D plotting funcitions for rasters
 # Contains special characters and stored in UTF-8 does not work with "source"
@@ -23,7 +24,7 @@ eval(parse("../../scripts/plot_raster_3d.R", encoding = "UTF-8"))
 tile_id <- "6171_541" #"6210_570"
 
 # Set folder paths
-ecodes_path <- "O:/Nat_Ecoinformatics-tmp/au634851/dk_lidar_backup_2021-05-12/"
+ecodes_path <- "D:/Jakob/ecodes-dk-lidar-rev1/data/outputs/"
 dtm_10m <- paste0(ecodes_path, "dtm_10m")
 amplitude_mean <- paste0(ecodes_path, "amplitude_mean")
 amplitude_sd <- paste0(ecodes_path, "amplitude_sd")
@@ -156,7 +157,7 @@ parameters <- tibble(
                      sequential_hcl(10, palette = "Greens 3", rev = T),
                      sequential_hcl(4, palette = "Reds 3", rev = T)),
   min_value = c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-  max_value = c(350, 150, 50, 40, 15, 3, 1.5, 10, 3, 12, 3, 1, 1, 0.5),
+  max_value = c(200, 100, 50, 40, 20, 3, 1.5, 3, 1.5, 3, 3, 1, 1, 0.5),
   # y_max = c(600, 300, 4000, 5000, 4000, 1500, 10000, 6000, 10000, 3000, 7000, 3000, 3000, 10000),
   z_scale = 5
   )
@@ -225,9 +226,10 @@ combined_plot <- plot_grid(
   )
 
 # Save plot
-save_plot("figure_4.png", combined_plot,
+save_plot("fig04.png", combined_plot,
           base_height = 4,
           base_aspect_ratio = 2,
           ncol = 3,
-          nrow = 5)
+          nrow = 5,
+          bg = "white")
  
