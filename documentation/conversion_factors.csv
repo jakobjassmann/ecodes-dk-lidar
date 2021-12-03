@@ -7,6 +7,9 @@ building_proportion,10000
 canopy_height,100
 canopy_openness,10000
 dtm_10m,100
+date_stamp_min,1
+date_stamp_max,1
+date_stamp_mode,1 
 ground_and_water_point_count_-01m-01m,1
 ground_point_count_-01m-01m,1
 heat_load_index,10000
@@ -20,7 +23,7 @@ point_source_nids,1
 point_source_proportion,10000
 sea_mask,1
 slope,10
-solar_radiation,1000
+solar_radiation,1
 total_point_count_-01m-50m,1
 twi,1000
 vegetation_density,10000
