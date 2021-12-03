@@ -11,7 +11,7 @@ library(rgl)
 library(magick)
 
 # Set wd
-setwd("D:/Jakob/dk_nationwide_lidar/documentation/figures/figure_2")
+setwd("D:/Jakob/dk_nationwide_lidar/documentation/figures/figure_3")
 
 # File paths
 laz_files <- "D:/Jakob/dk_nationwide_lidar/data/laz"
@@ -387,7 +387,7 @@ variable_plot <- plot_grid(
 # Composite both plots
 
 # Combine top and bottom into one panel
-save_plot("figure_3.png",
+save_plot("fig03.png",
           plot_grid(
             ggdraw() +
               draw_image(image_read("figure_3_top_panel.png")),  
