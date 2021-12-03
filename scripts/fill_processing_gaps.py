@@ -20,6 +20,10 @@ from dklidar import settings
 
 ## 1) Determine output folder structure
 
+# Status
+print('#' * 80 + 'Check EcoDes-DK processing outputs for completness' + '\n\n')
+print('Preparing environment...'),
+
 # Initiate list
 folders = []
 
@@ -43,20 +47,41 @@ dtm_10m = [folder for folder in folders if bool(re.match('.*dtm_10m.*', folder))
 dtm_10m_tiles = [re.sub('.*_(\d*_\d*).tif', '\g<1>', file_name) for file_name in glob.glob(dtm_10m + '/*.tif')]
 dtm_10m_tiles = set(dtm_10m_tiles)
 
+print(' done.')
+
 ## 2) Check completeness of tiles for all variables
+# Status
+print('Scanning tiles for...')
+
 # Initiate empty dictionary
 missing_tiles = {}
-
-print('Scanning tiles for...')
 
 # Scan folders for missing tiles
 for folder in folders:
     variable_name = re.sub('.*[\\\\\/]', '', folder)
-    print(variable_name)
+    print('\t' + variable_name)
     tiles = [re.sub('.*_(\d*_\d*).tif', '\g<1>', file_name) for file_name in glob.glob(folder + '/*.tif')]
     tiles = set(tiles)
     tiles_missing = dtm_10m_tiles - tiles
     missing_tiles.update({variable_name: tiles_missing})
+
+# Status
+print('Scan complete.\n')
+print('Exporting missing tile_ids to csv...'),
+
+# Save missing tiles for each variable to csv
+missing_tiles_df_list = []
+for variable in missing_tiles.keys():
+    missing_diles_df_local = pandas.DataFrame(missing_tiles[variable], columns = ['tile_id'])
+    missing_diles_df_local['variable'] = variable
+    missing_tiles_df_list.append(missing_diles_df_local)
+
+# Concatenate list of dfs into one df and export to csv
+missing_tiles_df = pandas.concat(missing_tiles_df_list)
+missing_tiles_df.to_csv(settings.wd + '/documentation/empty_tile_ids.csv', index = False)
+
+# Status
+print(' done.')
 
 ## 3) Generate empty tiles for all missing tile ids
 
@@ -69,7 +94,7 @@ unique_missing_tiles = [tile_id for tile_list in missing_tiles.values() for tile
 unique_missing_tiles = set(unique_missing_tiles)
 
 # Status
-print('Generating ' + str(len(unique_missing_tiles)) + ' empty tiles in temp folder')
+print('Generating ' + str(len(unique_missing_tiles)) + ' empty tiles in temp folder...')
 
 # Generate empty tiles using gdal
 for tile_id in unique_missing_tiles:
@@ -80,7 +105,13 @@ for tile_id in unique_missing_tiles:
     sys.stdout.write('.')
     sys.stdout.flush()
 
+# Status
+print(' done.')
+
 ## 4) Perpare summary oputput and fill missing rasters
+
+# Status
+print('Generating stummary stats...'),
 
 # Duplicate missing_tiles dict for summary stats
 summary_stats = copy.copy(missing_tiles)
@@ -107,12 +138,20 @@ for variable, tiles_missing in missing_tiles.items():
     stats_file.write(variable + '\n' + '' + str(len(tiles_missing)) + ' tiles did not complete processing and were replaced with empty tiles (all values = NA).\nThe affected tile_ids are:\n' + '\n'.join(list(tiles_missing)) + '\n')
     stats_file.close()
 
+# Status
+print(' done.')
+print('Exporting summary stats to csv...'),
+
 # Export stats as csv
 summary_stats_df = pandas.DataFrame()
 summary_stats_df['variable'] = summary_stats.keys()
 summary_stats_df['n_missing_tiles'] = summary_stats.values()
 summary_stats_df = summary_stats_df.sort_values('variable')
-summary_stats_df.to_csv(settings.wd + '/documentation/empty_tiles.csv', index=False)
+summary_stats_df.to_csv(settings.wd + '/documentation/empty_tiles_summary.csv', index=False)
+
+# Status
+print(' done.')
+print('Cleaning up temp files...'),
 
 # Remove temp files
 for tile_id in unique_missing_tiles:
@@ -120,8 +159,12 @@ for tile_id in unique_missing_tiles:
     os.remove(temp_file)
 os.rmdir(settings.scratch_folder + '/fill_temp/')
 
-## End
-print('Done.')
+# Status
+print(' done.')
+print('Script complete.' + '\n' + 80 * '#')
+
+## End of File
+
 
    
 
