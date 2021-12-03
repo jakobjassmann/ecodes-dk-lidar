@@ -15,7 +15,7 @@ REM remember directory for return after gdbuildvrt execution
 set curdir=%cd%
 
 REM make vrt
-call C:\OSGeo4W64\OSGeo4W.bat gdalbuildvrt -input_file_list list_of_files.txt %filename%.vrt -te 441000 6049000 894000 6403000
+call C:\OSGeo4W\OSGeo4W.bat gdalbuildvrt -input_file_list list_of_files.txt %filename%.vrt -te 441000 6049000 894000 6403000
 
 REM go back and delet list of files
 cd %curdir%
