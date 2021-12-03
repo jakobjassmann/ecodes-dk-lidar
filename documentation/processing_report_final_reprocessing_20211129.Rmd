@@ -1,0 +1,110 @@
+---
+title: "DK Nationwide LiDAR 'process_tiles.py' Quality Assurance Report"
+author: "Jakob Assmann"
+date: "30/11/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r prep, include = FALSE}
+library(dplyr)
+library(tidyverse)
+
+# Load report data
+overall_progress <- 
+  read.csv("D:/Jakob/ecodes-dk-lidar-rev1/log/process_tiles/overall_progress.csv",
+           stringsAsFactors = F) %>%
+  filter(processing == "complete")
+
+# Extract performance stats for each function
+n_success <- sapply(
+  colnames(overall_progress), 
+  function(x){
+    sum(overall_progress[,x] == "success")
+  })
+n_complete <- sapply(
+  colnames(overall_progress), 
+  function(x){
+    sum(overall_progress[,x] == "complete")
+  })
+n_success["processing"] <- n_complete["processing"]
+# Remove tile id and validate crs colums
+n_success <- n_success[!(grepl("tile_id", names(n_success)) |
+                            grepl("odm_validate_crs", names(n_success)) |
+                           grepl("dtm_validate_crs", names(n_success)))]
+
+# get tile_ids reports for tiles that were not succesffuly completed
+steps_not_completed <- names(n_success[n_success != nrow(overall_progress)])
+
+
+# Obtain error codes
+errors <- lapply(
+  steps_not_completed,
+  function(x){
+    print(x)
+    print(unique(overall_progress[,x]))
+  }
+) %>% unlist() %>%
+  unique()
+errors <- errors[!(errors %in% c("success", steps_not_completed))]
+
+# subset only rows with errors
+tiles_with_errors <- apply(overall_progress, 1, function(x){
+  if(sum(x %in% errors) >= 1) {
+    cat(x[x %in% errors])
+    return(x[1])
+    }
+  else return(0)
+})
+tiles_with_errors <- tiles_with_errors[tiles_with_errors != "0"]
+
+incomplete_processing <- overall_progress[overall_progress$tile_id %in% tiles_with_errors,]
+
+```
+
+## Summary
+
+A __total of `r nrow(overall_progress)`__ tiles were processed, of these __`r sum(overall_progress$processing == "complete")` tiles (`r round(sum(overall_progress$processing == "complete")/nrow(overall_progress)*100,2)`%) completed__  the processing.  
+
+```{r processing success}
+library(knitr)
+incomplete_processing %>%
+  filter(processing != "complete") %>%
+  select(tile_id, processing) %>%
+  kable(caption = "Tiles where processing failed completely:")
+```
+
+## Incomplete processing steps
+
+For __`r nrow(incomplete_processing)` tiles (`r round(nrow(incomplete_processing)/nrow(overall_progress)*100,2)`%)__ one or multiple of the indiviudal processing steps could not be completed.
+
+```{r incomplete_processing}
+library(knitr)
+incomplete_processing %>% 
+  filter(processing == "complete") %>% 
+  kable(caption = "Tiles with incomplete processing steps:")
+```
+
+## Projections
+
+Of all tiles, __`r length(grep('empty - set', overall_progress$odm_validate_crs))` laz tiles (`r round(length(grep('empty - set', overall_progress$odm_validate_crs))/nrow(overall_progress)*100,2)`%)__ did not have a CRS set and __`r length(grep('empty - set', overall_progress$drm_validate_crs))` dtm tiles (`r round(length(grep('empty - set', overall_progress$dtm_validate_crs))/nrow(overall_progress)*100,2)`%)__ did not have a CRS set.
+
+For __`r length(grep('no match', overall_progress$odm_validate_crs))` laz
+tiles (`r round(length(grep('no match', overall_progress$odm_validate_crs))/nrow(overall_progress)*100,2)`%)__ the crs did not match the default crs and __`r length(grep('no match', overall_progress$drm_validate_crs))` dtm tiles (`r round(length(grep('no match', overall_progress$odm_validate_crs))/nrow(overall_progress)*100,2)`%)__ the crs
+did not match the defualt crs.
+
+```{r crs_not_matched}
+try(overall_progress[grep('no match', overall_progress$dtm_validate_crs),] %>%
+  select(tile_id, odm_validate_crs) %>%
+    slice(1:100) %>%
+  kable(caption = "Tiles with an laz file that has a non-default crs (first 100):"))
+
+try(overall_progress[grep('no match', overall_progress$dtm_validate_crs),] %>%
+  select(tile_id, dtm_validate_crs) %>%
+    slice(1:100) %>%
+  kable(caption = "Tiles with a dtm file that has a non-default crs (first 100):"))
+```
+
