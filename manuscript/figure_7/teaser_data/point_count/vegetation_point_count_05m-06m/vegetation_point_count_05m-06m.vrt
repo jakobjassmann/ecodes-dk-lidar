@@ -5,7 +5,7 @@
     <NoDataValue>-9999</NoDataValue>
     <ColorInterp>Gray</ColorInterp>
     <ComplexSource>
-      <SourceFilename relativeToVRT="0">D:/Jakob/dk_nationwide_lidar/manuscript/figure_6/teaser_data/point_count/vegetation_point_count_05m-06m/vegetation_point_count_05m-06m_6238_445.tif</SourceFilename>
+      <SourceFilename relativeToVRT="0">D:/Jakob/ecodes-dk-lidar-rev1/manuscript/figure_7/teaser_data/point_count/vegetation_point_count_05m-06m/vegetation_point_count_05m-06m_6238_445.tif</SourceFilename>
       <SourceBand>1</SourceBand>
       <SourceProperties RasterXSize="97" RasterYSize="100" DataType="Int16" BlockXSize="97" BlockYSize="42" />
       <SrcRect xOff="0" yOff="0" xSize="97" ySize="100" />
@@ -13,7 +13,7 @@
       <NODATA>-9999</NODATA>
     </ComplexSource>
     <ComplexSource>
-      <SourceFilename relativeToVRT="0">D:/Jakob/dk_nationwide_lidar/manuscript/figure_6/teaser_data/point_count/vegetation_point_count_05m-06m/vegetation_point_count_05m-06m_6238_446.tif</SourceFilename>
+      <SourceFilename relativeToVRT="0">D:/Jakob/ecodes-dk-lidar-rev1/manuscript/figure_7/teaser_data/point_count/vegetation_point_count_05m-06m/vegetation_point_count_05m-06m_6238_446.tif</SourceFilename>
       <SourceBand>1</SourceBand>
       <SourceProperties RasterXSize="100" RasterYSize="100" DataType="Int16" BlockXSize="100" BlockYSize="40" />
       <SrcRect xOff="0" yOff="0" xSize="100" ySize="100" />
@@ -21,7 +21,7 @@
       <NODATA>-9999</NODATA>
     </ComplexSource>
     <ComplexSource>
-      <SourceFilename relativeToVRT="0">D:/Jakob/dk_nationwide_lidar/manuscript/figure_6/teaser_data/point_count/vegetation_point_count_05m-06m/vegetation_point_count_05m-06m_6238_447.tif</SourceFilename>
+      <SourceFilename relativeToVRT="0">D:/Jakob/ecodes-dk-lidar-rev1/manuscript/figure_7/teaser_data/point_count/vegetation_point_count_05m-06m/vegetation_point_count_05m-06m_6238_447.tif</SourceFilename>
       <SourceBand>1</SourceBand>
       <SourceProperties RasterXSize="100" RasterYSize="100" DataType="Int16" BlockXSize="100" BlockYSize="40" />
       <SrcRect xOff="0" yOff="0" xSize="100" ySize="100" />
@@ -29,7 +29,7 @@
       <NODATA>-9999</NODATA>
     </ComplexSource>
     <ComplexSource>
-      <SourceFilename relativeToVRT="0">D:/Jakob/dk_nationwide_lidar/manuscript/figure_6/teaser_data/point_count/vegetation_point_count_05m-06m/vegetation_point_count_05m-06m_6239_445.tif</SourceFilename>
+      <SourceFilename relativeToVRT="0">D:/Jakob/ecodes-dk-lidar-rev1/manuscript/figure_7/teaser_data/point_count/vegetation_point_count_05m-06m/vegetation_point_count_05m-06m_6239_445.tif</SourceFilename>
       <SourceBand>1</SourceBand>
       <SourceProperties RasterXSize="100" RasterYSize="100" DataType="Int16" BlockXSize="100" BlockYSize="40" />
       <SrcRect xOff="0" yOff="0" xSize="100" ySize="100" />
@@ -37,7 +37,7 @@
       <NODATA>-9999</NODATA>
     </ComplexSource>
     <ComplexSource>
-      <SourceFilename relativeToVRT="0">D:/Jakob/dk_nationwide_lidar/manuscript/figure_6/teaser_data/point_count/vegetation_point_count_05m-06m/vegetation_point_count_05m-06m_6239_446.tif</SourceFilename>
+      <SourceFilename relativeToVRT="0">D:/Jakob/ecodes-dk-lidar-rev1/manuscript/figure_7/teaser_data/point_count/vegetation_point_count_05m-06m/vegetation_point_count_05m-06m_6239_446.tif</SourceFilename>
       <SourceBand>1</SourceBand>
       <SourceProperties RasterXSize="100" RasterYSize="100" DataType="Int16" BlockXSize="100" BlockYSize="40" />
       <SrcRect xOff="0" yOff="0" xSize="100" ySize="100" />
@@ -45,7 +45,7 @@
       <NODATA>-9999</NODATA>
     </ComplexSource>
     <ComplexSource>
-      <SourceFilename relativeToVRT="0">D:/Jakob/dk_nationwide_lidar/manuscript/figure_6/teaser_data/point_count/vegetation_point_count_05m-06m/vegetation_point_count_05m-06m_6239_447.tif</SourceFilename>
+      <SourceFilename relativeToVRT="0">D:/Jakob/ecodes-dk-lidar-rev1/manuscript/figure_7/teaser_data/point_count/vegetation_point_count_05m-06m/vegetation_point_count_05m-06m_6239_447.tif</SourceFilename>
       <SourceBand>1</SourceBand>
       <SourceProperties RasterXSize="100" RasterYSize="100" DataType="Int16" BlockXSize="100" BlockYSize="40" />
       <SrcRect xOff="0" yOff="0" xSize="100" ySize="100" />
@@ -53,7 +53,7 @@
       <NODATA>-9999</NODATA>
     </ComplexSource>
     <ComplexSource>
-      <SourceFilename relativeToVRT="0">D:/Jakob/dk_nationwide_lidar/manuscript/figure_6/teaser_data/point_count/vegetation_point_count_05m-06m/vegetation_point_count_05m-06m_6240_445.tif</SourceFilename>
+      <SourceFilename relativeToVRT="0">D:/Jakob/ecodes-dk-lidar-rev1/manuscript/figure_7/teaser_data/point_count/vegetation_point_count_05m-06m/vegetation_point_count_05m-06m_6240_445.tif</SourceFilename>
       <SourceBand>1</SourceBand>
       <SourceProperties RasterXSize="100" RasterYSize="100" DataType="Int16" BlockXSize="100" BlockYSize="40" />
       <SrcRect xOff="0" yOff="0" xSize="100" ySize="100" />
@@ -61,7 +61,7 @@
       <NODATA>-9999</NODATA>
     </ComplexSource>
     <ComplexSource>
-      <SourceFilename relativeToVRT="0">D:/Jakob/dk_nationwide_lidar/manuscript/figure_6/teaser_data/point_count/vegetation_point_count_05m-06m/vegetation_point_count_05m-06m_6240_446.tif</SourceFilename>
+      <SourceFilename relativeToVRT="0">D:/Jakob/ecodes-dk-lidar-rev1/manuscript/figure_7/teaser_data/point_count/vegetation_point_count_05m-06m/vegetation_point_count_05m-06m_6240_446.tif</SourceFilename>
       <SourceBand>1</SourceBand>
       <SourceProperties RasterXSize="100" RasterYSize="100" DataType="Int16" BlockXSize="100" BlockYSize="40" />
       <SrcRect xOff="0" yOff="0" xSize="100" ySize="100" />
@@ -69,7 +69,7 @@
       <NODATA>-9999</NODATA>
     </ComplexSource>
     <ComplexSource>
-      <SourceFilename relativeToVRT="0">D:/Jakob/dk_nationwide_lidar/manuscript/figure_6/teaser_data/point_count/vegetation_point_count_05m-06m/vegetation_point_count_05m-06m_6240_447.tif</SourceFilename>
+      <SourceFilename relativeToVRT="0">D:/Jakob/ecodes-dk-lidar-rev1/manuscript/figure_7/teaser_data/point_count/vegetation_point_count_05m-06m/vegetation_point_count_05m-06m_6240_447.tif</SourceFilename>
       <SourceBand>1</SourceBand>
       <SourceProperties RasterXSize="100" RasterYSize="100" DataType="Int16" BlockXSize="100" BlockYSize="40" />
       <SrcRect xOff="0" yOff="0" xSize="100" ySize="100" />

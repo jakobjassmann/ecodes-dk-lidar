@@ -8,16 +8,16 @@ library(raster)
 
 # Set area of interest (here Husby Klit Dune reserve)
 aoi <- st_polygon(list(matrix(c(8.12534,56.30670,
-                                8.12700,56.28855,
                                 8.14738,56.30377,
                                 8.14606,56.28725,
+                                8.12700,56.28855,
                                 8.12534,56.30670), 
                               ncol = 2,
                               byrow = T))) %>%
   st_sfc(crs = 4326)
 
 # Read in tile footprints
-tile_footprints <- read_sf("manuscript/figure_6/data/lidar_vars/tile_footprints/tile_footprints.shp")
+tile_footprints <- read_sf("manuscript/figure_7/data/lidar_vars/tile_footprints/tile_footprints.shp")
 
 # Determine intersecting tiles
 aoi_tiles <- aoi %>%
@@ -27,20 +27,15 @@ aoi_tiles <- aoi %>%
 
 # Get dirs for the available variables 
 # (change according to EcoDes-DK15 directory, using the teaser directory here)
-ecodes_dir <- "manuscript/figure_6/teaser_data" 
-variable_dirs <- list.dirs(ecodes_dir, 
-                           recursive = T, 
-                           full.names = F)
+ecodes_dir <- "D:/Jakob/ecodes-dk-lidar-rev1/data/outputs" 
+variable_dirs <- shell(paste0("dir /b /s /a:d ", gsub("/", "\\\\", ecodes_dir)), intern = T)
+variable_dirs <- gsub("\\\\", "/", variable_dirs)
+variable_dirs <- gsub(paste0(ecodes_dir, "/"), "", variable_dirs)
 
 # Filter out folders containing subfolders
-variable_dirs <- variable_dirs[-1]
-variable_dirs <- grepl("(.*)/.*",variable_dirs) %>%
-  variable_dirs[.] %>%
-  gsub("(.*)/.*", "\\1", .) %>%
-  unique() %>%
-  match(., variable_dirs) %>%
-  sapply(function(x)(x*-1)) %>%
-  variable_dirs[.]
+variable_dirs <- variable_dirs[variable_dirs %>% 
+  map(function(x) sum(grepl(x, variable_dirs)) == 1) %>%
+  unlist()]
 variable_dirs <- variable_dirs[!grepl("tile_footprints", variable_dirs)]
 
 # Set list of variables to subset (if applicable)
@@ -56,6 +51,7 @@ sub_dirs_to_export <- variables_to_subset %>%
 # sub_dirs_to_export <- variable_dirs
 
 # Set target dir to place output:
+# target_dir <- "manuscript/figure_7/teaser_data/"
 target_dir <- "~/Desktop"
 
 # Create absolute folder paths
@@ -116,6 +112,15 @@ map(out_dirs,
       setwd(oldwd)
       return(NULL)
     })
+
+# Create list of vrts
+vrts <- list.files(target_dir, ".vrt", full.names = T, recursive = T)
+vrts <- gsub(paste0(target_dir, "/"), "", vrts)
+write_csv(data.frame(vrts), paste0(target_dir, "/list_of_vrts.txt"))
+
+# Export aoi_tiles as tile_footprints variable
+dir.create(paste0(target_dir, "/tile_footprints"))
+write_sf(aoi_tiles, paste0(target_dir, "/tile_footprints/tile_footprints.shp"))
 
 # ! End of subsetting script!
 
