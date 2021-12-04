@@ -167,4 +167,7 @@ contact PI Signe Normand (<signe.normand@bio.au.dk>).
              |- copy_files.py                           # Script to merge source data sets
              |- extractmeta_v2.R                        # Zofia Koma's script used to generate meta data
              |- merge_outputs.py                        # Script to merg output data sets
-    readme-file/                                        # Image files for this readme
+
+    readme-files/                                       # Image files for this readme
+
+    dhm201415_merger_files/                             # Image files for the dhm201415_merger.md report
