@@ -1,0 +1,341 @@
+---
+title: "EcoDes-DK15 v1.1.0 Source Data"
+author: "Jakob J. Assmann"
+date: "3/12/2021"
+output: rmarkdown::github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# Dependencies
+library(tidyverse)
+library(sf)
+library(xml2)
+library(ggplot2)
+library(cowplot)
+
+```
+
+``` {r echo = FALSE}
+# # # Optional code block that prepares and converts the meta-data shape files to
+# # geojson for efficent data storage on the core-repository
+# # Worked best in REPL
+# read_sf("D:/Jakob/dhm201415_merger/source_meta_data/DHM2018_20211102_1551.shp") %>%
+#   mutate(year_string = case_when(Year == 2011 ~ "No Date",
+#                    is.na(Year) ~ "No Date",
+#                    TRUE ~ Year)) %>%
+#   mutate(tile_id = BlockID) %>%
+#   write_sf("DHM_punktsky_meta_data.geojson")
+# read_sf("D:/Jakob/dhm201415_merger/source_meta_data/DHM2015_punktsky_20211102_1408.shp") %>%
+#   mutate(year_string = case_when(Year == 2011 ~ "No Date",
+#                    is.na(Year) ~ "No Date",
+#                    TRUE ~ Year)) %>%
+#   mutate(tile_id = BlockID) %>%
+#   st_make_valid() %>%
+#   write_sf("DHM2015_punktsky_meta_data.geojson")
+# read_sf("D:/Jakob/dhm201415_merger/source_meta_data/GST_2014_20211102_0549.shp") %>%
+#   mutate(year_string = case_when(Year == 2011 ~ "No Date",
+#                    is.na(Year) ~ "No Date",
+#                    TRUE ~ Year)) %>%
+#   mutate(tile_id = BlockID) %>%
+#   st_make_valid() %>%
+#   write_sf("GST_2014_meta_data.geojson")
+# 
+# # readKML function thanks to github user https://github.com/r-spatial/sf/issues/499
+# # https://github.com/r-spatial/sf/issues/499
+# readKML<-function(file,...) {
+#   sp_obj<-st_read(file,...)
+#   xml1<-read_xml(file)
+# 
+#     # extract name and type of variables
+#   variable_names<-xml_find_first(xml1,".//d1:Schema[@name]") %>%
+#     xml2::xml_contents() %>%
+#     xml2::xml_attrs() %>%
+#     do.call(rbind,.)
+# 
+#   # return sp_obj if no ExtendedData is present
+#   if (is.null(variable_names)) return(sp_obj)
+# 
+#   data<-lapply(seq(nrow(variable_names)),function(x) {
+#     x1<-xml_find_all(xml1,paste0(".//d1:SimpleData[@name=\"",variable_names[x,1],"\"]")) %>%
+#       xml_contents()
+#     if (variable_names[x,2]=="string") return(xml_text(x1))
+#     xml_double(x1)
+#   }) %>%
+#     do.call(cbind,.) %>%
+#     as.data.frame()
+# 
+#   colnames(data)<-variable_names[,1]
+# 
+#     sp_obj[,variable_names[,1]]<-data
+#   sp_obj
+# }
+# 
+# dhm_merged <- readKML("D:/Jakob/dhm201415_merger/meta_data/dhm_merged.kml")
+# dhm_incomplete <- read_csv("D:/Jakob/dhm201415_merger/incomplete_tile_pairs.csv")
+# dhm_merged <- dhm_merged %>%
+#   filter(!(tile_id %in% dhm_incomplete$tile_id))
+# dhm_merged_meta <- read_sf("D:/Jakob/dhm201415_merger/meta_data/dhm201415_merger_20211117_1932.shp")
+# sum(!(dhm_merged_meta$BlockID %in% dhm_merged$tile_id))
+# dhm_merged_meta <- dhm_merged %>%
+#   filter(!(tile_id %in% dhm_incomplete$tile_id)) %>%
+#   st_drop_geometry() %>%
+#   full_join(dhm_merged_meta %>% mutate(tile_id = BlockID), .,
+#             by = c("tile_id" = "tile_id")) %>% st_make_valid()  %>%
+#   mutate(year_string = case_when(Year == 2011 ~ "No Date",
+#                    is.na(Year) ~ "No Date",
+#                    TRUE ~ Year))
+# write_sf(dhm_merged_meta, "DHM201415_meta_data.geojson")
+```
+
+``` {r echo = FALSE, message = FALSE, warning = FALSE}
+# Load meta data
+dhm2018 <- read_sf("DHM_punktsky_meta_data.geojson") %>%
+  mutate(year_string = factor(year_string))
+dhm2015 <- read_sf("DHM2015_punktsky_meta_data.geojson") %>%
+  mutate(year_string = factor(year_string))
+gst2014 <- read_sf("GST_2014_meta_data.geojson") %>%
+  mutate(year_string = factor(year_string))
+dhm201415 <- read_sf("DHM201415_meta_data.geojson")
+```
+
+This document describes the source data for the EcoDes-DK15 v1.1.0 data set.
+
+## Overview
+
+To our best knowledge (and despite frequent attempts to contact the relevant
+authorities), at the time point of writing (3 December 2021), there are no 
+publicly available versions of the Danish national point cloud (DHM/Punktsky) 
+and terrain model (DHM/Terraen) that contain only data from the 2014/15 survey 
+campaigns. As consistency in survey timing was key for our endeavour to 
+create a data set of ecological descriptors for Denmark that is comparable 
+across the nation, we opted for creating our own version of the source data set 
+that would contain as much data as possible from the 2014/15 surveys, with no
+data from later surveys and as little data as possible from earlier surveys. 
+This document provides an overview on this source data set and the versions of 
+the publicly available DHM/Punktsky and DHM/Terraen data sets on which it is
+based.
+
+We used the following three versions of DHM/Punktsky and DHM/Terraen, all 
+provided by the Danish Agency for Data Supply and Efficiency (SDFE):
+
+## DHM/Punktsky and DHM/Terraen "DHM_2018" 
+Download: 24 April 2020 from kortforsyningen.dk 
+
+This version of the point cloud / terrain model was downloaded from the https 
+web interface of the https://kortforsyningen.dk website as outlined in the 
+download instructions on the EcoDes-DK15 GitHub code-repository. The download 
+completed on the 24 April 2020. At the time point of the download (and writing)
+the data on kortforyiningen.dk was not versioned. To our current understanding,
+the data is continuously updated with new data from recent / current survey 
+flights (these were started again in 2018 following a break after 2015). 
+
+Based on the GPS time stamps, the version of the point cloud downloaded in April
+2020 contains data from 2007 through to 2018. 
+
+```{r echo = FALSE, warnings = FALSE}
+dhm2018_plot <- ggplot() +
+  geom_sf(data = dhm2018,
+          aes(fill = year_string),
+          colour = NA) +
+  labs(fill = "Year", title = 'DHM/Punktsky "DHM_2018" (24 April 2020)', 
+       subtitle = "Most recent GPS timestamp per tile, given as year") +
+  scale_fill_manual(values = c("#F2C53DBB",
+                               "#5259D9BB",
+                               "#A63348BB",
+                               "#F2620FBB",
+                               "#0F0F0FBB")) +
+  theme_cowplot() +
+  theme(axis.line = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank())
+suppressWarnings(print(dhm2018_plot))
+```
+
+Please note that EcoDes-DK15 v1.0.0 was solely based on this data.
+
+## DHM2015_punktsky and DHM_2015_terraen
+Download: 13 September 2021 from datafordeler.dk
+
+This version of the data sets was downloaded from https://datafordeler.dk
+after contacting Andrew Flatman and Peter Bartels at SDFE, who recommended
+this version of the data sets that supposedly stem from 2014/15. The data can be
+accessed via the datafordeler.dk system. The data is available for openly, but 
+the user will have to register and order the data. The data can then be 
+downloaded via ftp. A detailed description on how to access the datafordeler 
+system is provided (in Danish) in the support section on the datafordeler 
+website. The data sets downloaded by us were "DHM2015_punktsky" version 1.0.0 
+and "DHM2015_terraen" version 1.0.0. We completed the download on the 13
+September 2021. 
+
+Based on the GPS time stamps, this version of the point cloud contains data 
+from 2007 through to 2018. It also contains large regions where no GPS time is
+provided. Based on auxiliary information (point source ids / flight line) and 
+comparison with the GST_2014 version of the point cloud, we know that the 
+affected regions in the Mols Bjerge and Sønderborg areas were surveyed in 
+April-May 2015 and October 2014, respectively. 
+
+```{r echo = FALSE, warnings = FALSE}
+dhm2015_plot <- ggplot() +
+  geom_sf(data = dhm2015,
+          aes(fill = year_string),
+          colour = NA) +
+  labs(fill = "Year", title = "DHM2015_punktsky (13 September 2021)", 
+       subtitle = "Most recent GPS timestamp per tile, given as year") +
+  scale_fill_manual(values = c("#F2C53DBB",
+                               "#5259D9BB",
+                               "#A63348BB",
+                               "#F2620FBB",
+                               "#F2620FBB",
+                               "#F2620FBB",
+                               "#0F0F0FBB")) +
+  theme_cowplot() +
+  theme(axis.line = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank())
+suppressWarnings(print(dhm2015_plot))
+```
+
+## GST_2014 punktsky and DTM 
+Download: unknown (before 2017) from kortforsyningen.dk
+
+The GST_2014 version of the data sets is (at the time point of writing) of 
+uncertain origin. Hence, we tried to rely on them as little as possible for the 
+merger. The data sets are from the 2014/15 campaign and can be found on the 
+Aarhus University’s Section for Ecoinfomartics internal data servers. It was 
+most likely downloaded from the Kortforsyining servers (akin to the April 2020 
+version) by Peder Klith Boecher, a former member of the section. This download 
+may have happened shortly after the release of the first version of the data 
+sets following the 2014/15 surveys and was used by Jesper Moeslund, Andras 
+Zlinszky et al in their [2019 paper](https://esajournals.onlinelibrary.wiley.com/doi/abs/10.1002/eap.1907).
+
+In addition to the uncertainty about the origins of the data sets, there is an
+issue with the headers of approximately half of the laz point clouds which 
+prevents the CRS to be read correctly into OPALS 2.3.2.0. Manual assignment of 
+the CRS is required in those cases. Another reason for why we were careful not
+to rely too heavily on this data set for the source data. 
+
+Based on the GPS time stamps, this version of the point cloud contains data 
+from 2007 through to 2015.
+
+```{r echo = FALSE, warnings = FALSE}
+gst2014_plot <- ggplot() +
+  geom_sf(data = gst2014,
+          aes(fill = year_string),
+          colour = NA) +
+  labs(fill = "Year", title = "GST_2014 punktsky (unkown, before 2017)", 
+       subtitle = "Most recent GPS timestamp per tile, given as year") +
+  scale_fill_manual(values = c("#F2C53DBB",
+                               "#F2C53DBB",
+                               "#5259D9BB",
+                               "#A63348BB",
+                               # "#F2620FBB",
+                               # "#F2620FBB",
+                               # "#F2620FBB",
+                               "#0F0F0FBB")) +
+  theme_cowplot() +
+  theme(axis.line = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank())
+suppressWarnings(print(gst2014_plot))
+```
+
+---
+
+## Merger to create EcoDes-DK15 v1.1.0 source data
+
+We merged the three versions of the data sets above into one version containing 
+as much as 2014/15 data as possible, with no data from after 2015 and as little 
+data prior 2014 as possible. The merger was done hierarchically in the above 
+presented order (DHM_2018, DHM_2015, GST2014). We started with DHM_2018, 
+identified all point cloud tiles with a GPS max time stamp from 2018 and sourced 
+those from DHM_2015. We then checked the tiles from DHM2015 and excluded all 
+tiles from 2018, sourcing those from GST_2014. The exact procedure is describe
+in [this report](/documentation/source_data/dhm201415_merger.html). Lastly, we
+removed all tiles that did not have a complete pair of point cloud and terrain
+model files. The result is a final version of the source data sets (point clouds
+and paired terrain model tiles) optimised in collection time for the EcoDes-DK15
+v1.1.0 descriptors. 
+
+## EcoDes-DK15 v1.1.0 source data
+
+The final merger of the source data included 38671 tiles (point clouds and 
+paired terrain model rasters) from the DHM/Punktsky data sets, 10955 tiles from
+DHM2015_punktsky and 47 tiles from GST_2014.
+
+``` {r echo = FALSE, warnings = FALSE}
+dhm201415_plot1 <- ggplot() + 
+  geom_sf(data = dhm201415, 
+          aes(fill = data_source),
+          colour = NA) +
+  scale_fill_manual(values = c("#6D8BA6", "#1D2F40", "#F26E22")) +
+  labs(title = "DHM201415 tile origins (EcoDes-DK15 v1.1.0 source data)",
+       fill = "Data Source") +
+    theme_cowplot() +
+  theme(axis.line = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank())
+suppressWarnings(print(dhm201415_plot1))
+```
+
+The final source data set contains data from 2007 through to 2015, with the 
+maximum date in all tiles not exceeding 2015.
+
+```{r echo = FALSE}
+dhm201415_plot2 <- ggplot() +
+  geom_sf(data = dhm201415,
+          aes(fill = year_string),
+          colour = NA) +
+  labs(fill = "Year", title = "DHM201415 (EcoDes-DK15 v1.1.0 source data)", 
+       subtitle = "Most recent GPS timestamp per tile, given as year") +
+  scale_fill_manual(values = c("#F2C53DBB",
+                               "#5259D9BB",
+                               "#A63348BB",
+                               "#0F0F0FBB")) +
+  theme_cowplot() +
+  theme(axis.line = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank())
+suppressWarnings(print(dhm201415_plot2))
+```
+
+## Source data storage and access
+
+All source data sets (DHM_2018, DHM_2015, GST2014 and DHM201415), including 
+both point clouds and terrain model rasters are archived on the internal 
+long-term data repositories of Aarhus University’s Section for Ecoinfomartics. 
+All data is availabe on request. For access, please contact PI Signe Normand 
+(signe.normand@bio.au.dk).
+
+## Files contained in this folder
+```
+redme.md                            # This file.
+readme.Rmd                          # Source file for this readme
+
+dhm201415_merger.Rmd                # RMarkdown script documenting merger of source data sets
+DHM2018_na_tiles_zoom.png           # Image figure dhm201415_merger.Rmd   
+dhm201415_merger.html               # Output of dhm201415_merger.Rmd
+
+DHM201415_meta_data.geojson         # Meta data for merged source data DHM201415
+DHM2015_punktsky_meta_data.geojson  # Meta data for DHM2015
+DHM_punktsky_meta_data.geojson      # Meta data for DHM2018
+GST_2014_meta_data.geojson          # Meta data for GST2014 
+
+merger_log/                                         # Log files from merger
+         |- 2018_tiles_available.csv                # DHM2018 tiles already pre-processed
+         |- checkusm_errors.csv                     # Checksum errors after merging the outputs 
+         |- final_merger_missing_files.csv          # Missing tiles after merging the outputs
+         |- final_output_merger_qc.txt              # Summary stats missing tiles after merging outputs  
+         |- incomplete_tile_pairs.csv               # Tile pairs not complete after merger
+         |- tiles_from_DHM2015.csv                  # Tiles sourced from DHM2015
+         |- tiles_from_DHM2018.csv                  # Tiles sourced from DHM2018
+         |- tiles_from_GST2014.csv                  # Tiles sourced from GST2014
+         |- tiles_to_process_dhm201415_merger.csv   # Tiles requiring re-processing
+merger_scripts/ 
+         |- check_merged_outputs.py                 # Script to check merger of outputs
+         |- copy_files.py                           # Script to merge source data sets
+         |- extractmeta_v2.R                        # Zofia Koma's script used to generate meta data
+         |- merge_outputs.py                        # Script to merg output data sets
+readme-file/                                        # Image files for this readme
+```

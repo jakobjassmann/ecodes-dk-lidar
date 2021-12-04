@@ -1,0 +1,157 @@
+
+
+Quality control:
+
+        /amplitude_mean is missing: 19 tiles.
+
+        /amplitude_sd is missing: 19 tiles.
+
+        /aspect complete.
+
+        /building_proportion is missing: 19 tiles.
+
+        /canopy_height is missing: 65 tiles.
+
+        /canopy_openness is missing: 19 tiles.
+
+        /dtm_10m complete.
+
+        /heat_load_index complete.
+
+        /masks\inland_water_mask complete.
+
+        /masks\sea_mask complete.
+
+        /normalized_z_mean is missing: 65 tiles.
+
+        /normalized_z_sd is missing: 65 tiles.
+
+        /openness_difference complete.
+
+        /openness_mean complete.
+
+        /point_count\building_point_count_-01m-50m is missing: 19 tiles.
+
+        /point_count\ground_and_water_point_count_-01m-01m is missing: 19 tiles.
+
+        /point_count\ground_point_count_-01m-01m is missing: 19 tiles.
+
+        /point_count\total_point_count_-01m-50m is missing: 19 tiles.
+
+        /point_count\vegetation_point_count_00.0m-00.5m is missing: 19 tiles.
+
+        /point_count\vegetation_point_count_00.5m-01.0m is missing: 19 tiles.
+
+        /point_count\vegetation_point_count_00m-50m is missing: 19 tiles.
+
+        /point_count\vegetation_point_count_01.0m-01.5m is missing: 19 tiles.
+
+        /point_count\vegetation_point_count_01.5m-02.0m is missing: 19 tiles.
+
+        /point_count\vegetation_point_count_02m-03m is missing: 19 tiles.
+
+        /point_count\vegetation_point_count_03m-04m is missing: 19 tiles.
+
+        /point_count\vegetation_point_count_04m-05m is missing: 19 tiles.
+
+        /point_count\vegetation_point_count_05m-06m is missing: 19 tiles.
+
+        /point_count\vegetation_point_count_06m-07m is missing: 19 tiles.
+
+        /point_count\vegetation_point_count_07m-08m is missing: 19 tiles.
+
+        /point_count\vegetation_point_count_08m-09m is missing: 19 tiles.
+
+        /point_count\vegetation_point_count_09m-10m is missing: 19 tiles.
+
+        /point_count\vegetation_point_count_10m-11m is missing: 19 tiles.
+
+        /point_count\vegetation_point_count_11m-12m is missing: 19 tiles.
+
+        /point_count\vegetation_point_count_12m-13m is missing: 19 tiles.
+
+        /point_count\vegetation_point_count_13m-14m is missing: 19 tiles.
+
+        /point_count\vegetation_point_count_14m-15m is missing: 19 tiles.
+
+        /point_count\vegetation_point_count_15m-16m is missing: 19 tiles.
+
+        /point_count\vegetation_point_count_16m-17m is missing: 19 tiles.
+
+        /point_count\vegetation_point_count_17m-18m is missing: 19 tiles.
+
+        /point_count\vegetation_point_count_18m-19m is missing: 19 tiles.
+
+        /point_count\vegetation_point_count_19m-20m is missing: 19 tiles.
+
+        /point_count\vegetation_point_count_20m-25m is missing: 19 tiles.
+
+        /point_count\vegetation_point_count_25m-50m is missing: 19 tiles.
+
+        /point_count\water_point_count_-01m-01m is missing: 19 tiles.
+
+        /point_source_info\point_source_counts is missing: 36 tiles.
+
+        /point_source_info\point_source_ids is missing: 20 tiles.
+
+        /point_source_info\point_source_nids is missing: 19 tiles.
+
+        /point_source_info\point_source_proportion is missing: 37 tiles.
+
+        /slope complete.
+
+        /twi is missing: 1 tiles.
+
+        /vegetation_density is missing: 19 tiles.
+
+        /vegetation_proportion\vegetation_proportion_00.0m-00.5m is missing: 19 tiles.
+
+        /vegetation_proportion\vegetation_proportion_00.5m-01.0m is missing: 19 tiles.
+
+        /vegetation_proportion\vegetation_proportion_01.0m-01.5m is missing: 19 tiles.
+
+        /vegetation_proportion\vegetation_proportion_01.5m-02.0m is missing: 19 tiles.
+
+        /vegetation_proportion\vegetation_proportion_02m-03m is missing: 19 tiles.
+
+        /vegetation_proportion\vegetation_proportion_03m-04m is missing: 19 tiles.
+
+        /vegetation_proportion\vegetation_proportion_04m-05m is missing: 19 tiles.
+
+        /vegetation_proportion\vegetation_proportion_05m-06m is missing: 19 tiles.
+
+        /vegetation_proportion\vegetation_proportion_06m-07m is missing: 19 tiles.
+
+        /vegetation_proportion\vegetation_proportion_07m-08m is missing: 19 tiles.
+
+        /vegetation_proportion\vegetation_proportion_08m-09m is missing: 19 tiles.
+
+        /vegetation_proportion\vegetation_proportion_09m-10m is missing: 19 tiles.
+
+        /vegetation_proportion\vegetation_proportion_10m-11m is missing: 19 tiles.
+
+        /vegetation_proportion\vegetation_proportion_11m-12m is missing: 19 tiles.
+
+        /vegetation_proportion\vegetation_proportion_12m-13m is missing: 19 tiles.
+
+        /vegetation_proportion\vegetation_proportion_13m-14m is missing: 19 tiles.
+
+        /vegetation_proportion\vegetation_proportion_14m-15m is missing: 19 tiles.
+
+        /vegetation_proportion\vegetation_proportion_15m-16m is missing: 19 tiles.
+
+        /vegetation_proportion\vegetation_proportion_16m-17m is missing: 19 tiles.
+
+        /vegetation_proportion\vegetation_proportion_17m-18m is missing: 19 tiles.
+
+        /vegetation_proportion\vegetation_proportion_18m-19m is missing: 19 tiles.
+
+        /vegetation_proportion\vegetation_proportion_19m-20m is missing: 19 tiles.
+
+        /vegetation_proportion\vegetation_proportion_20m-25m is missing: 19 tiles.
+
+        /vegetation_proportion\vegetation_proportion_25m-50m is missing: 19 tiles.
+
+A total of 1429 files are missing.
+
+Quality control complete.
