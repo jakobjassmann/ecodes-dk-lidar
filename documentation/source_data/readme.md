@@ -166,7 +166,7 @@ contact PI Signe Normand (<signe.normand@bio.au.dk>).
              |- check_merged_outputs.py                 # Script to check merger of outputs
              |- copy_files.py                           # Script to merge source data sets
              |- extractmeta_v2.R                        # Zofia Koma's script used to generate meta data
-             |- merge_outputs.py                        # Script to merg output data sets
+             |- merge_outputs.py                        # Script to merge output data sets
 
     readme-files/                                       # Image files for this readme
 
