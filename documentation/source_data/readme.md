@@ -1,4 +1,4 @@
-EcoDes-DK15 v1.1.0 Source Data
+﻿EcoDes-DK15 v1.1.0 Source Data
 ================
 Jakob J. Assmann
 3/12/2021
@@ -111,7 +111,7 @@ GST2014). We started with DHM_2018, identified all point cloud tiles
 with a GPS max time stamp from 2018 and sourced those from DHM_2015. We
 then checked the tiles from DHM2015 and excluded all tiles from 2018,
 sourcing those from GST_2014. The exact procedure is describe in [this
-report](/documentation/source_data/dhm201415_merger.html). Lastly, we
+report](/documentation/source_data/dhm201415_merger.md). Lastly, we
 removed all tiles that did not have a complete pair of point cloud and
 terrain model files. The result is a final version of the source data
 sets (point clouds and paired terrain model tiles) optimised in
@@ -145,7 +145,7 @@ contact PI Signe Normand (<signe.normand@bio.au.dk>).
 
     dhm201415_merger.Rmd                # RMarkdown script documenting merger of source data sets
     DHM2018_na_tiles_zoom.png           # Image figure dhm201415_merger.Rmd   
-    dhm201415_merger.html               # Output of dhm201415_merger.Rmd
+    dhm201415_merger.md	                # Output of dhm201415_merger.Rmd
 
     DHM201415_meta_data.geojson         # Meta data for merged source data DHM201415
     DHM2015_punktsky_meta_data.geojson  # Meta data for DHM2015

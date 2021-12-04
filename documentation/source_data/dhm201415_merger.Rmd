@@ -2,9 +2,7 @@
 title: "DHM2018+ and DHM2015 merger to create DHM2014/15"
 author: "Jakob J. Assmann j.assmann@bio.au.dk"
 date: "2/11/2021"
-output:
-  html_document: default
-  pdf_document: default
+output: rmarkdown::github_document
 ---
 
 ```{r setup, include=FALSE}
@@ -363,7 +361,7 @@ not present in the DHM2015 data set.
 sum(!(tiles_to_source_from_DHM2015 %in% dhm2015$tile_id))
 ```
 
-Indeed, there are 2 tiles that are not in the DHM2015 data. 
+Indeed, there are 146 tiles that are not in the DHM2015 data. 
 Where are these located?
 
 ``` {r echo = FALSE}
@@ -535,6 +533,14 @@ dhm2018 %>%
   select(tile_id) %>%
   write_csv("tiles_from_DHM2018.csv")
 
+```
+
+The data breaks down as follows:
+
+``` {r }
+dhm_merged %>% 
+  group_by(data_source) %>%
+  summarize(n = n())
 ```
 
 Next, we find out which cells have at least one neighbour from the other source
