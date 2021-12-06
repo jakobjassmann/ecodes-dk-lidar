@@ -756,6 +756,18 @@ We used the *OPALS addInfo* module to generate a new “GPSDay” attribute for 
 - The date_stamp descriptors only cover points that are classified as vegetation and therefore do not provide information about the time point at which points belonging to other classes were surveyed (e.g., ground point, building points etc). We chose to not include other point classes in the date_stamp descriptors, as we are aware that all versions of the source data sets include some ground points from 2007, and as we believe that clear information about the vegetation points is most relevant for the end-users conducting ecological research. 
 - Determining the date_stamps was not possible for a proportion of tiles where the GPSTime in the source data was not converted from seconds per GPS week to GPS time in seconds since 6 January 1980. A post-hoc conversion is not possible without the knowledge of the exact GPS week number, which is not provided in the source data. In these cases, we assigned the no data value to the date_stamps. The majority of the tiles affected by this issue is located in the areas around Mols Bjerge and Sønderborg. However, from auxiliary information about the source data sets we know that these areas were surveyed April-May 2015 and October 2014, respectively. 
 
+**Histograms:**
+
+![](figures/hists/date_stamp_max.png)
+
+![](figures/hists/date_stamp_min.png)
+
+![](figures/hists/date_stamp_mode.png)
+
+![](../manuscript/figure_5/fig05.png)
+
+
+
 **References:**
 
 No relevant references.
@@ -774,7 +786,9 @@ No relevant references.
 
 **Description:**
 
-Each descriptor folder/archive contains a *.vrt file, where * is the descriptor name (same as the descriptor folder/archive). These [VRT files](https://gdal.org/drivers/raster/vrt.html) allows the user to access all tiles for any one descriptor in a single virtual mosaic without the need of carrying out actual mosaicing of the rasters. 
+Each descriptor folder/archive contains a *.vrt file, where * is the descriptor name (same as the descriptor folder/archive). The only exceptions are the mulitlayer descriptors (point_source_counts, point_source_ids and point_source_proportion), as the creation of VRT files for these rasters with variable amounts of layers was not possible.
+
+The [VRT files](https://gdal.org/drivers/raster/vrt.html) allow the user to access all tiles for any one descriptor in a single virtual mosaic without the need of carrying out actual mosaicing of the rasters. 
 
 The files were generated using the `make_vrt_subfolders.bat` script.
 
