@@ -3,7 +3,7 @@ Jakob J. Assmann, Jesper E. Moselund, Urs A. Treier and Signe Normand
 
 Code repository accompanying:
 
-- The **EcoDes-DK15** v1.1.0 dataset [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4756557.svg)](https://doi.org/10.5281/zenodo.4756557)   
+- The **EcoDes-DK15** v1.1.0 dataset [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4756556.svg)](https://doi.org/10.5281/zenodo.4756556)   
 - Assmann, J. J., Moeslund, J. E., Treier, U. A., and Normand, S.: EcoDes-DK15: High-resolution ecological descriptors of vegetation and terrain derived from Denmark's national airborne laser scanning data set, Earth Syst. Sci. Data Discuss. [preprint], [https://doi.org/10.5194/essd-2021-222](https://doi.org/10.5194/essd-2021-222), in review, 2021. 
 
 ## Update: EcoDes-DK15 v1.1.0 (4 Dec. 2021)
@@ -92,7 +92,7 @@ PI overseeing this project: Signe Normand (signe.normand@bio.au.dk)
 
 From the manuscript:
 
-*We would like to thank Andràs Zlinszky for his contributions to earlier versions of the dataset and Charles Davison for feedback regarding data use and handling. Funding for this work was provided by the Carlsberg Foundation (Distinguished Associate Professor Fellowships) and Aarhus University Research Foundation (AUFF-E-2015-FLS-8-73) to Signe Normand (SN). This work is a contribution to SustainScapes – Center for Sustainable Landscapes under Global Change (grant NNF20OC0059595 to SN).*
+*We would like to thank Andràs Zlinszky for his contributions to earlier  versions of the data set, Charles Davison for feedback regarding data  use and handling, as well as Matthew Barbee and Zsófia Koma for sharing  their insights on the source data merger and Zsófia’s script to generate summary statistics for the different versions of the DHM point clouds.  Funding for this work was provided by the Carlsberg Foundation  (Distinguished Associate Professor Fellowships) and Aarhus University  Research Foundation (AUFF-E-2015-FLS-8-73) to Signe Normand (SN). This  work is a contribution to SustainScapes – Center for Sustainable  Landscapes under Global Change (grant NNF20OC0059595 to SN).*
 
 [\[to top\]](#content)
 
