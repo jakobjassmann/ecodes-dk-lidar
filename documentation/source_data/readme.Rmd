@@ -279,8 +279,7 @@ dhm201415_plot1 <- ggplot() +
 suppressWarnings(print(dhm201415_plot1))
 ```
 
-The final source data set contains data from 2007 through to 2015, with the 
-maximum date in all tiles not exceeding 2015.
+The final source data set contains data from 2007 through to 2015 (all point classes) and no vegetation points prior 2013, with the maximum date in all tiles not exceeding 2015 (all points). 
 
 ```{r echo = FALSE}
 dhm201415_plot2 <- ggplot() +
@@ -304,9 +303,8 @@ suppressWarnings(print(dhm201415_plot2))
 
 All source data sets (DHM_2018, DHM_2015, GST2014 and DHM201415), including 
 both point clouds and terrain model rasters are archived on the internal 
-long-term data repositories of Aarhus University’s Section for Ecoinfomartics. 
-All data is availabe on request. For access, please contact PI Signe Normand 
-(signe.normand@bio.au.dk).
+long-term data repositories of Aarhus University. All data is available on 
+request. For access, please contact PI Signe Normand (signe.normand@bio.au.dk).
 
 ## Files contained in this folder
 ```

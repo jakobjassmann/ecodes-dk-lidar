@@ -1,4 +1,4 @@
-﻿EcoDes-DK15 v1.1.0 Source Data
+EcoDes-DK15 v1.1.0 Source Data
 ================
 Jakob J. Assmann
 3/12/2021
@@ -125,33 +125,31 @@ tiles from DHM2015_punktsky and 47 tiles from GST_2014.
 
 ![](readme_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
-The final source data set contains data from 2007 through to 2015, with
-the maximum date in all tiles not exceeding 2015.
+The final source data set contains data from 2007 through to 2015 (all point classes) and no vegetation points prior 2013, with the maximum date in all tiles not exceeding 2015 (all points). 
 
 ![](readme_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 ## Source data storage and access
 
-All source data sets (DHM_2018, DHM_2015, GST2014 and DHM201415),
-including both point clouds and terrain model rasters are archived on
-the internal long-term data repositories of Aarhus University’s Section
-for Ecoinfomartics. All data is availabe on request. For access, please
-contact PI Signe Normand (<signe.normand@bio.au.dk>).
+All source data sets (DHM_2018, DHM_2015, GST2014 and DHM201415), including 
+both point clouds and terrain model rasters are archived on the internal 
+long-term data repositories of Aarhus University. All data is available on 
+request. For access, please contact PI Signe Normand (signe.normand@bio.au.dk).
 
 ## Files contained in this folder
 
     redme.md                            # This file.
     readme.Rmd                          # Source file for this readme
-
+    
     dhm201415_merger.Rmd                # RMarkdown script documenting merger of source data sets
     DHM2018_na_tiles_zoom.png           # Image figure dhm201415_merger.Rmd   
     dhm201415_merger.md	                # Output of dhm201415_merger.Rmd
-
+    
     DHM201415_meta_data.geojson         # Meta data for merged source data DHM201415
     DHM2015_punktsky_meta_data.geojson  # Meta data for DHM2015
     DHM_punktsky_meta_data.geojson      # Meta data for DHM2018
     GST_2014_meta_data.geojson          # Meta data for GST2014 
-
+    
     merger_log/                                         # Log files from merger
              |- 2018_tiles_available.csv                # DHM2018 tiles already pre-processed
              |- checkusm_errors.csv                     # Checksum errors after merging the outputs 
@@ -167,7 +165,7 @@ contact PI Signe Normand (<signe.normand@bio.au.dk>).
              |- copy_files.py                           # Script to merge source data sets
              |- extractmeta_v2.R                        # Zofia Koma's script used to generate meta data
              |- merge_outputs.py                        # Script to merge output data sets
-
+    
     readme-files/                                       # Image files for this readme
-
+    
     dhm201415_merger_files/                             # Image files for the dhm201415_merger.md report
