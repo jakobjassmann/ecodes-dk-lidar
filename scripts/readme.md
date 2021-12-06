@@ -18,7 +18,7 @@ Carry out the following steps to prepare the processing. **Unless explicitly sta
 1. Make a local clone of the repository.
 2. Update the relevant paths and parameters in `dklidar/settings.py` according to your local system.
 3. Modify the `set_environment.bat` script to set the absolute paths to your OPALS Python executable and the *dklidar* modules. **Note: You will have to run this batch script every time you open a new OPALS shell for processing using this workflow.**
-4. If you have not already installed `pandas` in your OPALS Python environment do this now, for example by running: `python -m pip install pandas --user`
+4. If you have not already installed `pandas` in your OPALS Python environment do this now, for example by running: `python -m pip install pandas --user`. It is also worth checking whether `numpy`, `osgeo` (`gdal`) and `ogr` are provided by your OPALS install (they should be), but if not install those also. Furthermore, some of the suppport scripts require addtional modules which might need to be installed if you would like to use those scripts later (see [list](#python-modules-required-by-support-scripts) at end of document).
 5. Download the source dtm and point clouds:
    1. Order / check out all [pointcloud](https://download.kortforsyningen.dk/content/dhmpunktsky) and [DTM](https://download.kortforsyningen.dk/content/dhmterr%C3%A6n-04-m-grid) tile bundles on the Kortforsyningen website, but don't download these files via your browser yet. We will download them in step 3 using the `download_files.py` script\*.
    2. Follow instructions in the comments of the `download_files.py` script to retrieve a cookie for the Kortforsyningen website using *Google Chrome* (you could also do that in a different browser, but we only provide instructions for *Chrome* here). 
@@ -79,12 +79,17 @@ Once the processing has finished, a few post-processing steps need to be carried
 1. Generate a tile_footprints shapefile by running `generate_tile_footprints.py`. 
 2. Fill in processing gaps using `fill_processing_gaps.py`.
    - A small number of tiles (< 100), e.g. on the fringes of the dataset (including sand banks, spits etc.), may fail processing for some of the variables - especially the point cloud derived variables. This script fills these "processing gaps", by creating empty rasters containing only NA for the missing tiles and variables. The script also outputs a csv file summarising the number of tiles missing for each variable [/documentation/empty_tiles_summary.csv](/documentation/empty_tiles_summary.csv). The specific tile ids of the missing variable / tile combinations can be retrieved from the log files and/or [/documentation/empty_tile_ids.csv](/documentation/empty_tile_ids.csv). 
+   - `fill_processing_gaps.py` will automatically generate Int16 NA tiles, this is not suitable for the Int32 and Float32 variables (amplitude* and date_stamp_*). Run `fix_na_tile_data_type.py`  after the `fill_processing_gaps.py` run is complete. 
 3. Generate VRT files for each variable using the `make_vrt_subfolders.bat` batch script. Execute this script in the parent folder containing all your output rasters (the one specified in the settings.output_folder variable of the settings.py module). **NB: Unlike the other scripts this batch script will have to be run in an ordinary (non-OPALS) Windows command prompt. You will also need to update the file path to the OSgeo4W binaries (line 18) in the make_vrt.bat script and the file path to the make_vrt.bat script in the make_vrt_subfolders.bat (line 11).** 
    - The script will recursively loop through the folder tree and generate a vrt file in any folder that contains tif files. 
    - The script will name the VRT file based on the folder that contains it and all file paths used will be relative.
    - The VRT file will be generated for the  extent of the nationwide datset, consider adjusting the extent parameter in `make_vrs.bat` in case only a subset has been processed. 
+   - Note that the script will try (and fail) to generate VRTs for the *tile_footprints* and the *point_source_counts*, *point_source_ids* and *point_source_proportion* variables. The shapefiles and multilayer rasters cannot be inccorporated into VRT files. *I suggest removing the relevant dummy *.vrt files created by this script after completion.*  
 4. Optional: Bundle and compress outputs as tar.bz2 archives by running `archive_outputs.py`. Note: Adjust the destination folder for archives (line 14) prior execution. You can also generate md5 checksums for those archives using `create_checksums_archives.bat`, again update the folder path(s) in the script.
-5. Optional: Generate a list of all the VRT files with in the settings.output_folder folder structre using `generate_list_of_vrts.py`. This file can be handy for fast access to the data, especially in R as listing files in a folder tree with a large amount of files can be very slow. 
+5. Optional: Generate a list of all the VRT files with in the settings.output_folder folder structre using `generate_list_of_vrts.py`. This file can be handy for fast access to the data, especially in R as listing files in a folder tree with a large amount of files can be very slow (albeit you can work around by calling `dir` or `ls` using `shell()`).
+6. Optional: Check output file integrity using `check_putputs_integrity.py`. 
+   - If you run the full EcoDes-DK processing you will have likely created something along the lines of 4-5 million tif files. Some errors might have occured when generating those files. We only had one of these errors for all of the different processing batches that we did, but it is worth checking! The `check_outputs_integrity.py` script checks the integrity of the output tif files by loading each of them into a python environment using gdal. Should the file be corrupt, the script will catch the error and report the tile_id and error in the output csv log file. You can then repocress the tiles (e.g using the `debug.py` script or if many a new `process_tiles.py` batch - see commented out section in main script on how to process only a small batch). 
+   - Runs in parallel so that you won't have to wait too long. 
 
 [\[to top\]](#content)
 
@@ -103,6 +108,8 @@ Note: The logging database used for processe management in also contains informa
 Script | Description 
 --- | ---
 archive_outputs.py | Simple scripts to bundle and compress the output files by variable / group, based on the subfolders of the output folder defined in `settings.py`. 
+check_outputs_integrity.py | Checks integrity of raster outputs by scannning the output folder and tries to load every individual tif file with gdal. Opperates in parallel for speed. Documents any errors that occur. 
+check_vrt_completeness.py | Scand output dir for vrts and then checks whether any files have been missed in these vrts. 
 checksum_qa.py | Validates checksums for downloads, and cross-compares dtm and pointcloud datasets for completnness. Requires `checksum_qa.py` to be run previously. 
 create_checksums.bat | Generates checksums for downloaded files. 
 create_checksums_archives.bat | Generates checksums for outputs packed into archives using `archive_outputs.py`. 
@@ -110,11 +117,12 @@ debug.py | Script for testing / debugging the processing workflow based on a sin
 debug.Rmd | R Markdown document for visual quality assurance of the debug.py outputs. 
 download_files.py | Helper script to download DHM\Punktsky pointclouds and DHM dtm rasters from the Kortforsyningen website. 
 fill_processing_gaps.py | Fills incomplete variables with empty rasters (all NA) for the missing tiles. To be executed after processing. 
+fix_na_tile_data_type.py | Helper script to assist with post-processing after running fill_processing_gaps.py. Fixes the data type for any non Int16 descriptors, translting outputs to the relevant data types (e.g. Int32 or Float32)/ 
 generate_dems.py | Generates DTMs from the pointclouds that are missing a corresponding DTM file. 
 generate_list_of_vrts.py | Generates a text file containing a list of all vrt files in each subfolder of a given directory. 
 generate_tile_footprints.py | Generates tile_footprint variable (based on dtm_10m by default).
 make_vrt.bat | Creates a vrt from all .tif files in the folder from which it is executed, 1st argument specifies the name of the output vrt file. 
-make_vrt_subfolders.bat | Recursively creates vrt files within all subfolders of the current directory that contain tif images. Each VRT file is named with the subfolder name. 
+make_vrt_subfolders.bat | Recursively creates vrt files within all subfolders of the current directory that contain tif images. Each VRT file is named with the subfolder name. (Scripts works, but is a bit buggy, should be replaced by a Python version in the long run). 
 plot_raster_3d.R | Set of helper functions to generate publication ready 3D plots of rasters in R using the *rayshader* package. (Used to generate the figures for the manuscript). 
 **process_tiles.py** | **Main script for processing**. Controls process managment and defines which processing steps are carried out. Uses the functions defined in the *dklidar* modules. 
 **progress_monitor.py** | **Progress monitor**. Run this script in a separate OPALS shell to keep track of the processing. Launch after initating processing using `process_tiles.py`. 
@@ -125,5 +133,11 @@ remove_missing_tiles.py | Removes incomplete sets of tiles from the DTM and laz 
 **stop.bat** | **Stops process_tiles.py** by killing all pyhton.exe processes currently running. Can be used to interrupt `process_tiles.py`. **NB: Kills ALL Python processes!** 
 
 *Note: Other scripts may appear here that are version controlled for temporary purposes.*
+
+[\[to top\]](#content)
+
+## Python modules required by support scripts
+
+In addtion to the modules provided by the OPALS shell / install, the support scripts require the following Python 2.7 modules also (version used): `pandas`(0.24.2), `numpy`(1.16.6), `scandir`(1.10.0) and `tqdm`(4.62.3).
 
 [\[to top\]](#content)
