@@ -109,7 +109,7 @@ Script | Description
 --- | ---
 archive_outputs.py | Simple scripts to bundle and compress the output files by variable / group, based on the subfolders of the output folder defined in `settings.py`. 
 check_outputs_integrity.py | Checks integrity of raster outputs by scannning the output folder and tries to load every individual tif file with gdal. Opperates in parallel for speed. Documents any errors that occur. 
-check_vrt_completeness.py | Scand output dir for vrts and then checks whether any files have been missed in these vrts. 
+check_vrt_completeness.py | Scans output dir for vrts and then checks whether any tif files have been missed in these vrts. 
 checksum_qa.py | Validates checksums for downloads, and cross-compares dtm and pointcloud datasets for completnness. Requires `checksum_qa.py` to be run previously. 
 create_checksums.bat | Generates checksums for downloaded files. 
 create_checksums_archives.bat | Generates checksums for outputs packed into archives using `archive_outputs.py`. 
@@ -117,7 +117,7 @@ debug.py | Script for testing / debugging the processing workflow based on a sin
 debug.Rmd | R Markdown document for visual quality assurance of the debug.py outputs. 
 download_files.py | Helper script to download DHM\Punktsky pointclouds and DHM dtm rasters from the Kortforsyningen website. 
 fill_processing_gaps.py | Fills incomplete variables with empty rasters (all NA) for the missing tiles. To be executed after processing. 
-fix_na_tile_data_type.py | Helper script to assist with post-processing after running fill_processing_gaps.py. Fixes the data type for any non Int16 descriptors, translting outputs to the relevant data types (e.g. Int32 or Float32)/ 
+fix_na_tile_data_type.py | Helper script to assist with post-processing after running fill_processing_gaps.py. Fixes the data type for any non Int16 descriptors, translating outputs to the relevant data types (e.g. Int32 or Float32). 
 generate_dems.py | Generates DTMs from the pointclouds that are missing a corresponding DTM file. 
 generate_list_of_vrts.py | Generates a text file containing a list of all vrt files in each subfolder of a given directory. 
 generate_tile_footprints.py | Generates tile_footprint variable (based on dtm_10m by default).
@@ -138,6 +138,6 @@ remove_missing_tiles.py | Removes incomplete sets of tiles from the DTM and laz 
 
 ## Python modules required by support scripts
 
-In addtion to the modules provided by the OPALS shell / install, the support scripts require the following Python 2.7 modules also (version used): `pandas`(0.24.2), `numpy`(1.16.6), `scandir`(1.10.0) and `tqdm`(4.62.3).
+In addtion to the modules provided by the OPALS install, the support scripts require the following Python 2.7 modules also (version used): `pandas`(0.24.2), `numpy`(1.16.6), `scandir`(1.10.0) and `tqdm`(4.62.3).
 
 [\[to top\]](#content)
