@@ -10,8 +10,8 @@ Code repository accompanying:
 
 Following the recommendations and feedback during the first round of peer-review, we updated the EcoDes-DK processing pipeline and EcoDes-DK15 data set. The key changes are:
 
-- New version of the source data set optmised to contain only point data collected before the end of 2015. The source data for EcoDes-DK15 v1.0.0 unintentionally contained data from 2018. The new source data is documented in [/documentation/source_data/readme.md](/documentation/source_data/readme.md).
-- New "date_stamp_*" auxiallary variables that illustrate the survey dates for the vegeation points in each cell. See updated descriptor documentation [/documentation/descriptors.md](/documentation/descriptors.md).
+- New version of the source data set optimised to contain only point data collected before the end of 2015. The source data for EcoDes-DK15 v1.0.0 unintentionally contained data from 2018. The new source data is documented in [/documentation/source_data/readme.md](/documentation/source_data/readme.md).
+- New "date_stamp_*" auxiliary variables that illustrate the survey dates for the vegeation points in each cell. See updated descriptor documentation [/documentation/descriptors.md](/documentation/descriptors.md).
 - Re-scaling of "solar_radiation" variable to MJ per 100 m2 per year. 
 - Addtional support and quality control scripts. 
 
